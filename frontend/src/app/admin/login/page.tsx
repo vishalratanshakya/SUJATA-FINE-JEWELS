@@ -34,14 +34,15 @@ export default function AdminLoginPage() {
     if (!validate()) return;
 
     setIsLoading(true);
-    // Simulate admin login
+    // Simulate admin login with secure credentials
     setTimeout(() => {
       setIsLoading(false);
-      if (email.toLowerCase().includes("admin") || email === "admin@sujatafinejewels.com" || email === "admin@example.com") {
+      if (email === "admin@sujatafinejewels.com" && password === "Admin@123") {
+        document.cookie = "admin_token=true; path=/; max-age=86400; SameSite=Strict";
         toast.success("Welcome back to Admin Portal!");
         router.push("/admin");
       } else {
-        toast.error("You do not have permission to access the admin portal.");
+        toast.error("Invalid admin credentials.");
       }
     }, 1200);
   };

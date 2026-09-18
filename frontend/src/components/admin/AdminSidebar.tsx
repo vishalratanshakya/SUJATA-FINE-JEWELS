@@ -182,6 +182,20 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             </div>
           ))}
         </nav>
+
+        {/* Logout Button */}
+        <div className="p-4 border-t border-white/10 shrink-0">
+          <button
+            onClick={() => {
+              document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+              window.location.href = "/admin/login";
+            }}
+            className="flex items-center justify-center space-x-2 w-full py-2.5 px-4 rounded-lg bg-red-950/30 text-red-400 hover:bg-red-950/50 hover:text-red-300 transition-colors text-xs font-semibold uppercase tracking-wider"
+          >
+            <X size={15} />
+            <span>Sign Out</span>
+          </button>
+        </div>
       </aside>
     </>
   );
