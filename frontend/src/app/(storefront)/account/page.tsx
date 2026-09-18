@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { AccountLayoutWrapper } from "@/components/account/AccountLayoutWrapper";
 import {
   User,
@@ -34,15 +35,17 @@ export default function AccountPage() {
   const toggleWishlist = useStore((s) => s.toggleWishlist);
   const addToCart = useStore((s) => s.addToCart);
 
+  const { user } = useAuth();
+  
   // User Profile State
   const [userProfile, setUserProfile] = useState({
-    name: "Aanya Sharma",
-    email: "aanya.sharma@email.com",
-    phone: "+91 98765 43210",
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
   });
 
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
-  const [editForm, setEditForm] = useState({ ...userProfile });
+  // The edit profile is now handled on a separate page
+
 
   // Address State
   const [addresses, setAddresses] = useState([
@@ -58,14 +61,7 @@ export default function AccountPage() {
     },
   ]);
 
-  const [isAddAddressOpen, setIsAddAddressOpen] = useState(false);
-  const [newAddressForm, setNewAddressForm] = useState({
-    title: "WORK",
-    name: "",
-    line1: "",
-    line2: "",
-    phone: "",
-  });
+
 
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [passForm, setPassForm] = useState({ old: "", newPass: "", confirm: "" });
@@ -113,35 +109,8 @@ export default function AccountPage() {
     },
   ];
 
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    setUserProfile({ ...editForm });
-    setIsEditProfileOpen(false);
-    toast.success("Profile details updated successfully!");
-  };
 
-  const handleAddAddress = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAddressForm.name || !newAddressForm.line1) {
-      toast.error("Please fill required address fields");
-      return;
-    }
-    setAddresses((prev) => [
-      ...prev,
-      {
-        id: `addr-${Date.now()}`,
-        title: newAddressForm.title || "OTHER",
-        isDefault: false,
-        name: newAddressForm.name,
-        line1: newAddressForm.line1,
-        line2: newAddressForm.line2 || "New Delhi, India",
-        country: "India",
-        phone: newAddressForm.phone || userProfile.phone,
-      },
-    ]);
-    setIsAddAddressOpen(false);
-    toast.success("New address added!");
-  };
+
 
   const handleDeleteAddress = (id: string) => {
     setAddresses((prev) => prev.filter((a) => a.id !== id));
@@ -171,16 +140,13 @@ export default function AccountPage() {
               Here's what's happening with your account today.
             </p>
           </div>
-          <button
-            onClick={() => {
-              setEditForm({ ...userProfile });
-              setIsEditProfileOpen(true);
-            }}
+          <Link
+            href="/account/settings/profile"
             className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#B38E5D] hover:bg-[#997746] text-white text-xs font-semibold uppercase tracking-widest rounded-xl transition-all shadow-xs self-start sm:self-auto"
           >
             <Edit2 size={14} />
             <span>EDIT PROFILE</span>
-          </button>
+          </Link>
         </div>
 
         {/* Profile Avatar & Contact Details */}
@@ -189,15 +155,12 @@ export default function AccountPage() {
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#B38E5D] relative shadow-sm bg-[#F5EFE6] flex items-center justify-center">
               <User size={40} className="text-[#B38E5D]" />
             </div>
-            <button
-              onClick={() => {
-                setEditForm({ ...userProfile });
-                setIsEditProfileOpen(true);
-              }}
+            <Link
+              href="/account/settings/profile"
               className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#2C2825] text-white flex items-center justify-center border-2 border-white shadow-xs hover:bg-[#B38E5D] transition-colors"
             >
               <Camera size={14} />
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 flex-1 w-full">
@@ -528,150 +491,6 @@ export default function AccountPage() {
         </div>
       </div>
 
-      {/* EDIT PROFILE MODAL */}
-      {isEditProfileOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-8 border border-[#EAE4D9] shadow-2xl space-y-6">
-            <div className="flex justify-between items-center border-b border-[#F2EDE4] pb-4">
-              <h3 className="font-serif text-2xl text-[#2C2825]">Edit Profile Information</h3>
-              <button onClick={() => setIsEditProfileOpen(false)} className="text-[#8C8275] hover:text-[#2C2825]">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveProfile} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Full Name</label>
-                <input
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Email Address</label>
-                <input
-                  type="email"
-                  value={editForm.email}
-                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={editForm.phone}
-                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825]"
-                  required
-                />
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEditProfileOpen(false)}
-                  className="flex-1 py-3 border border-[#E2DDD3] rounded-xl text-xs font-bold uppercase tracking-wider text-[#6B6357] hover:bg-gray-50"
-                >
-                  CANCEL
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-[#B38E5D] hover:bg-[#997746] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm"
-                >
-                  SAVE CHANGES
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ADD ADDRESS MODAL */}
-      {isAddAddressOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl p-8 border border-[#EAE4D9] shadow-2xl space-y-6">
-            <div className="flex justify-between items-center border-b border-[#F2EDE4] pb-4">
-              <h3 className="font-serif text-2xl text-[#2C2825]">Add New Address</h3>
-              <button onClick={() => setIsAddAddressOpen(false)} className="text-[#8C8275] hover:text-[#2C2825]">
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddAddress} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Address Title</label>
-                <select
-                  value={newAddressForm.title}
-                  onChange={(e) => setNewAddressForm({ ...newAddressForm, title: e.target.value })}
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825] bg-white"
-                >
-                  <option value="WORK">WORK</option>
-                  <option value="HOME">HOME</option>
-                  <option value="OTHER">OTHER</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Recipient Name</label>
-                <input
-                  type="text"
-                  value={newAddressForm.name}
-                  onChange={(e) => setNewAddressForm({ ...newAddressForm, name: e.target.value })}
-                  placeholder="e.g. Aanya Sharma"
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Address Line 1</label>
-                <input
-                  type="text"
-                  value={newAddressForm.line1}
-                  onChange={(e) => setNewAddressForm({ ...newAddressForm, line1: e.target.value })}
-                  placeholder="House/Flat No., Street, Area"
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825]"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-1">Address Line 2</label>
-                <input
-                  type="text"
-                  value={newAddressForm.line2}
-                  onChange={(e) => setNewAddressForm({ ...newAddressForm, line2: e.target.value })}
-                  placeholder="City, State, Pincode"
-                  className="w-full border border-[#E2DDD3] rounded-xl p-3 text-sm focus:outline-none focus:border-[#2C2825]"
-                />
-              </div>
-
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsAddAddressOpen(false)}
-                  className="flex-1 py-3 border border-[#E2DDD3] rounded-xl text-xs font-bold uppercase tracking-wider text-[#6B6357] hover:bg-gray-50"
-                >
-                  CANCEL
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-[#2C2825] hover:bg-[#B38E5D] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm"
-                >
-                  SAVE ADDRESS
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
     </AccountLayoutWrapper>
   );

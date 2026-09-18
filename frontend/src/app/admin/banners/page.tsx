@@ -87,7 +87,7 @@ export default function AdminBannersPage() {
   };
 
   return (
-    <div className="max-w-5xl space-y-10">
+    <div className="w-full space-y-10">
       {/* Page Title */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-serif text-gray-800">Banners & Announcements</h1>

@@ -5,11 +5,10 @@ import Link from "next/link";
 import { Search, Heart, User, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/store/useStore";
-import { SearchDrawer } from "@/components/search/SearchDrawer";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export function RightActions() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   // Zustand state
   const wishlistItems = useStore((state) => state.wishlist);
@@ -25,20 +24,20 @@ export function RightActions() {
   const wishlistCount = isMounted ? wishlistItems.length : 0;
   const cartCount = isMounted ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
   
-  // Mock auth state for the dropdown
-  const isAuthenticated = true;
+  // Real auth state
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="flex-1 flex justify-end items-center space-x-5 md:space-x-6 relative">
       
       {/* Search */}
-      <button 
+      <Link 
+        href="/search"
         aria-label="Search" 
-        onClick={() => setIsSearchOpen(true)}
         className="hover:text-champagne transition-colors duration-200"
       >
         <Search size={20} strokeWidth={1} />
-      </button>
+      </Link>
 
       {/* Wishlist */}
       <Link href="/account/wishlist" aria-label="Wishlist" className="hover:text-champagne transition-colors duration-200 relative">
@@ -50,22 +49,25 @@ export function RightActions() {
         )}
       </Link>
 
-      {/* User Account Link */}
-      <Link 
-        href="/account" 
-        aria-label="Account" 
-        className="hover:text-champagne transition-colors duration-200 py-4 flex items-center"
-      >
-        <User size={20} strokeWidth={1} />
-      </Link>
+      {/* User Account Link / Login */}
+      {isAuthenticated ? (
+        <Link 
+          href="/account" 
+          aria-label="Account" 
+          className="hover:text-champagne transition-colors duration-200 py-4 flex items-center"
+        >
+          <User size={20} strokeWidth={1} />
+        </Link>
+      ) : (
+        <Link 
+          href="/login" 
+          className="hover:text-champagne transition-colors duration-200 py-4 flex items-center text-[10px] md:text-[11px] uppercase tracking-widest font-medium"
+        >
+          Login / Sign Up
+        </Link>
+      )}
 
 
-
-      {/* Search Drawer Overlay */}
-      <SearchDrawer 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
-      />
 
     </div>
   );

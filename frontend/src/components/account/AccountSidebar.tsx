@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/components/providers/AuthProvider";
 import {
   User,
   Package,
@@ -27,9 +28,10 @@ export function AccountSidebar({ unreadCount = 2 }: { unreadCount?: number }) {
   const cartItems = useStore((s) => s.cart);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
+  const { logout } = useAuth();
+  
   const handleLogout = () => {
-    toast.success("Signed out successfully");
-    router.push("/login");
+    logout();
   };
 
   const navItems = [

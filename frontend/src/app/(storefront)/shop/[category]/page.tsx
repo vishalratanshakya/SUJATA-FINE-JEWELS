@@ -1,12 +1,28 @@
+"use client";
+
+import { use } from "react";
 import { FilterSidebar } from "@/components/shop/FilterSidebar";
 import { ProductCard } from "@/components/product/ProductCard";
-import { FEATURED_PRODUCTS } from "@/data/mockData";
+import { useStore } from "@/store/useStore";
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
-  const { category } = await params;
+export default function CategoryPage(props: { params: Promise<{ category: string }> }) {
+  const params = use(props.params);
+  const category = params.category || "";
   
-  // Basic title formatting
-  const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
+  const storeProducts = useStore((s) => s.products);
+  const formattedCategory = category ? category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ') : "Catalogue";
+
+  const categoryProducts = storeProducts.filter((p) => {
+    const pCat = (p.category || "").toLowerCase().trim();
+    const targetCat = category.toLowerCase().trim();
+    if (targetCat === "all" || targetCat === "catalogue" || targetCat === "shop") return true;
+    if (pCat === targetCat) return true;
+    if (targetCat === "rings" && pCat === "earrings") return false;
+    if (pCat.endsWith("s") && pCat.slice(0, -1) === targetCat) return true;
+    if (targetCat.endsWith("s") && targetCat.slice(0, -1) === pCat) return true;
+    return pCat === targetCat;
+  });
+  const displayProducts = categoryProducts;
 
   return (
     <div className="bg-ivory pt-24 pb-20 min-h-screen">
@@ -29,7 +45,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
 
           <div className="flex-1">
             <div className="flex justify-between items-center mb-8 pb-4 border-b border-charcoal/5">
-              <span className="text-xs tracking-widest text-charcoal/50 uppercase">Showing Results</span>
+              <span className="text-xs tracking-widest text-charcoal/50 uppercase">SHOWING {displayProducts.length} RESULTS</span>
               <div className="flex items-center space-x-4">
                 <button className="lg:hidden text-xs tracking-widest text-charcoal uppercase underline underline-offset-4">Filters</button>
                 <select className="bg-transparent text-xs tracking-widest uppercase text-charcoal border-none focus:ring-0 outline-none cursor-pointer">
@@ -41,7 +57,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...FEATURED_PRODUCTS].map((product, i) => (
+              {displayProducts.map((product, i) => (
                 <ProductCard key={`${product.id}-${i}`} product={product} />
               ))}
             </div>

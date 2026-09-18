@@ -1,43 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { AccountLayoutWrapper } from "@/components/account/AccountLayoutWrapper";
 import { Award, FileText, Sparkles, ShieldCheck, Download, Eye } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { CertificateModal } from "@/components/account/CertificateModal";
 import { INITIAL_CERTIFICATES, CertificateData } from "@/data/certificates";
 
 export default function MyJewelleryPage() {
   const products = useStore((s) => s.products);
-  const [activeCert, setActiveCert] = useState<CertificateData | null>(null);
+  const [purchasedJewellery, setPurchasedJewellery] = useState<any[]>([]);
 
-  const purchasedJewellery = [
-    {
-      id: "j-1",
-      name: "Celestial Drop Pendant",
-      purchaseDate: "12 May, 2026",
-      orderId: "#SJ10018",
-      metal: "18K Rose Gold",
-      stone: "Natural Lab-Grown Diamond (VVS1 / E-F)",
-      certificate: INITIAL_CERTIFICATES[0],
-      image: products[1]?.images[0] || "/images/products/necklaces/necklace_placeholder.jpg",
-      slug: products[1]?.slug || "celestial-drop-pendant",
-    },
-    {
-      id: "j-2",
-      name: "Luxe Solitaire Ring",
-      purchaseDate: "01 May, 2026",
-      orderId: "#SJ10016",
-      metal: "18K Yellow Gold",
-      stone: "Solitaire Diamond (VS1 / F)",
-      certificate: INITIAL_CERTIFICATES[1],
-      image: products[0]?.images[0] || "/images/products/rings/ring_placeholder.jpg",
-      slug: products[0]?.slug || "lumiere-solitaire-ring",
-    },
-  ];
+  useEffect(() => {
+    const fetchJewellery = async () => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${backendUrl}/api/certificates/my-jewellery`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const mapped = data.data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            purchaseDate: new Date(item.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }),
+            orderId: item.orderId,
+            metal: item.metal,
+            stone: item.stone,
+            certificate: item.certificate,
+            image: item.image,
+            slug: item.slug
+          }));
+          setPurchasedJewellery(mapped);
+        }
+      } catch (err) {
+        console.error("Failed to fetch jewellery", err);
+      }
+    };
+    fetchJewellery();
+  }, []);
 
   return (
     <AccountLayoutWrapper>
@@ -90,13 +94,13 @@ export default function MyJewelleryPage() {
                   >
                     VIEW PRODUCT
                   </Link>
-                  <button
-                    onClick={() => setActiveCert(item.certificate)}
+                  <Link
+                    href={`/account/certificates/${item.certificate.certId}`}
                     className="px-4 py-2.5 border border-[#E2DDD3] hover:border-[#2C2825] text-[#2C2825] text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors flex items-center space-x-1 cursor-pointer"
                   >
                     <Eye size={13} />
                     <span>CERTIFICATE</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -123,14 +127,7 @@ export default function MyJewelleryPage() {
           </button>
         </div>
 
-        {/* Certificate Modal */}
-        {activeCert && (
-          <CertificateModal
-            certificate={activeCert}
-            isOpen={!!activeCert}
-            onClose={() => setActiveCert(null)}
-          />
-        )}
+
 
       </div>
     </AccountLayoutWrapper>

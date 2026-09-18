@@ -19,6 +19,7 @@ export const FEATURED_PRODUCTS = [
     originalPrice: 125000,
     discountPercentage: 32,
     rating: 5,
+    isBestSeller: true,
     images: [
       "/images/products/rings/ring_placeholder.jpg",
       "/images/products/pendants/pendant_placeholder.jpg"
@@ -35,6 +36,7 @@ export const FEATURED_PRODUCTS = [
     originalPrice: 55000,
     discountPercentage: 25,
     rating: 5,
+    isNewArrival: true,
     images: [
       "/images/products/necklaces/necklace_placeholder.jpg",
       "/images/products/earrings/earrings_placeholder.jpg"

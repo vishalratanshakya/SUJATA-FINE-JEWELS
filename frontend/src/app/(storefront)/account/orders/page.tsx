@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
@@ -12,48 +12,49 @@ export default function AccountOrdersPage() {
   const [filter, setFilter] = useState("ALL");
   const [search, setSearch] = useState("");
 
-  const orders = [
-    {
-      id: "#SJ10018",
-      name: "Celestial Drop Pendant",
-      date: "12 May, 2026",
-      price: 42000,
-      itemCount: "1 Item",
-      status: "DELIVERED",
-      statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      image: products[1]?.images[0] || "/images/products/necklaces/necklace_placeholder.jpg",
-    },
-    {
-      id: "#SJ10017",
-      name: "Eternal Bloom Studs",
-      date: "08 May, 2026",
-      price: 68000,
-      itemCount: "1 Item",
-      status: "DELIVERED",
-      statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      image: products[2]?.images[0] || "/images/products/earrings/earrings_placeholder.jpg",
-    },
-    {
-      id: "#SJ10016",
-      name: "Luxe Solitaire Ring",
-      date: "01 May, 2026",
-      price: 78999,
-      itemCount: "1 Item",
-      status: "PROCESSING",
-      statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-      image: products[0]?.images[0] || "/images/products/rings/ring_placeholder.jpg",
-    },
-    {
-      id: "#SJ10015",
-      name: "Diamond Tennis Bracelet",
-      date: "25 Apr, 2026",
-      price: 124999,
-      itemCount: "1 Item",
-      status: "DELIVERED",
-      statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      image: products[3]?.images[0] || "/images/products/bracelets/bracelet_placeholder.jpg",
-    },
-  ];
+  const [orders, setOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${backendUrl}/api/orders/my-orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const mappedOrders = data.data.map((o: any) => {
+            const dateStr = new Date(o.createdAt).toLocaleDateString("en-GB", {
+              day: "2-digit", month: "short", year: "numeric"
+            });
+            const statusColors: Record<string, string> = {
+              "PENDING": "bg-gray-50 text-gray-700 border-gray-200",
+              "PROCESSING": "bg-amber-50 text-amber-700 border-amber-200",
+              "SHIPPED": "bg-blue-50 text-blue-700 border-blue-200",
+              "DELIVERED": "bg-emerald-50 text-emerald-700 border-emerald-200",
+              "CANCELLED": "bg-red-50 text-red-700 border-red-200"
+            };
+            return {
+              id: o.orderId,
+              _id: o._id,
+              name: o.items[0]?.productName || "Order",
+              date: dateStr,
+              price: o.totalAmount,
+              itemCount: `${o.items.length} Item${o.items.length > 1 ? 's' : ''}`,
+              status: o.status,
+              statusColor: statusColors[o.status] || statusColors["PENDING"],
+              image: o.items[0]?.image || "/images/products/necklaces/necklace_placeholder.jpg"
+            };
+          });
+          setOrders(mappedOrders);
+        }
+      } catch (err) {
+        console.error("Failed to fetch orders", err);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   const filteredOrders = orders.filter((o) => {
     const matchesFilter = filter === "ALL" || o.status === filter;
@@ -148,7 +149,7 @@ export default function AccountOrdersPage() {
                     {order.status}
                   </span>
                   <Link
-                    href={`/account/orders/SJ10018`}
+                    href={`/account/orders/${order._id}`}
                     className="px-5 py-2 bg-[#2C2825] hover:bg-[#B38E5D] text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition-colors shadow-xs"
                   >
                     VIEW ORDER

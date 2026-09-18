@@ -8,7 +8,6 @@ import { useStore } from "@/store/useStore";
 import { AccountLayoutWrapper } from "@/components/account/AccountLayoutWrapper";
 import { Check, Truck, Package, ArrowLeft, Download, Headphones, Award } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { CertificateModal } from "@/components/account/CertificateModal";
 import { INITIAL_CERTIFICATES } from "@/data/certificates";
 
 export default function OrderDetailsPage() {
@@ -16,7 +15,6 @@ export default function OrderDetailsPage() {
   const orderId = params?.orderId || "SJ10018";
   const products = useStore((s) => s.products);
 
-  const [isCertOpen, setIsCertOpen] = useState(false);
   const sampleCertificate = INITIAL_CERTIFICATES[0];
 
   const product = products[1] || products[0];
@@ -116,15 +114,15 @@ export default function OrderDetailsPage() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setIsCertOpen(true)}
-                className="px-4 py-2 bg-[#FAF8F5] hover:bg-[#2C2825] text-[#2C2825] hover:text-white border border-[#E2DDD3] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors cursor-pointer"
+              <Link
+                href={`/account/certificates/${sampleCertificate.certId}`}
+                className="px-4 py-2 bg-[#FAF8F5] hover:bg-[#2C2825] text-[#2C2825] hover:text-white border border-[#E2DDD3] text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors cursor-pointer text-center inline-block"
               >
                 VIEW CERTIFICATE
-              </button>
+              </Link>
               <button
-                onClick={() => setIsCertOpen(true)}
-                className="px-4 py-2 bg-[#B38E5D] hover:bg-[#997746] text-white text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors cursor-pointer"
+                onClick={() => toast.success("Downloading Certificate...")}
+                className="px-4 py-2 bg-[#B38E5D] hover:bg-[#997746] text-white text-[10px] font-bold uppercase tracking-widest rounded-lg transition-colors cursor-pointer inline-block"
               >
                 DOWNLOAD CERTIFICATE
               </button>
@@ -182,14 +180,7 @@ export default function OrderDetailsPage() {
           </Link>
         </div>
 
-        {/* CERTIFICATE MODAL */}
-        {sampleCertificate && (
-          <CertificateModal
-            certificate={sampleCertificate}
-            isOpen={isCertOpen}
-            onClose={() => setIsCertOpen(false)}
-          />
-        )}
+
       </div>
     </AccountLayoutWrapper>
   );

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
-import { SizeGuideModal } from "@/components/ui/SizeGuideModal";
+
 import { ProductCard } from "@/components/product/ProductCard";
 import {
   Heart,
@@ -44,7 +44,8 @@ export default function ProductPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [metalColor, setMetalColor] = useState<"gold" | "rose" | "white">("rose");
   const [selectedSize, setSelectedSize] = useState<string>("12");
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [selectedLength, setSelectedLength] = useState<string>("");
+
 
   // Delivery Pincode State
   const [pincode, setPincode] = useState("");
@@ -91,8 +92,19 @@ export default function ProductPage() {
     }).format(price);
   };
 
-  // Image Gallery Handlers
-  const currentImages = product.images.length > 0 ? product.images : ["/images/products/rings/ring_placeholder.jpg"];
+  // Image Gallery Handlers (Primary + Hover + Gallery Images)
+  const currentImages = Array.from(
+    new Set(
+      [
+        product.primaryImage,
+        product.hoverImage,
+        ...(product.galleryImages || []),
+        ...product.images,
+      ].filter((img): img is string => Boolean(img && img.trim()))
+    )
+  );
+
+  const displayImages = currentImages.length > 0 ? currentImages : ["/images/products/rings/ring_placeholder.jpg"];
 
   const handleNextLightboxImage = () => {
     setLightboxIndex((prev) => (prev + 1) % currentImages.length);
@@ -126,7 +138,11 @@ export default function ProductPage() {
 
   // Add to Bag Handler
   const handleAddToBag = () => {
-    addToCart(product, 1);
+    addToCart(product, 1, {
+      selectedSize,
+      selectedVariant: `${metalColor} Gold`,
+      selectedLength: selectedLength || undefined,
+    });
     setIsAdded(true);
     setNotification(true);
 
@@ -139,14 +155,14 @@ export default function ProductPage() {
         >
           <div className="flex-1 w-0 flex items-center">
             <div className="relative w-14 h-14 rounded overflow-hidden flex-shrink-0 bg-white/10 border border-white/20 mr-4">
-              <Image src={currentImages[0]} alt={product.name} fill className="object-cover" />
+              <Image src={displayImages[0]} alt={product.name} fill className="object-cover" />
             </div>
             <div>
               <p className="text-xs font-semibold uppercase text-[#C5A880] tracking-widest flex items-center gap-1">
                 <Check className="w-3.5 h-3.5" /> Added to Bag
               </p>
               <p className="font-serif text-sm font-medium text-white truncate mt-0.5">{product.name}</p>
-              <p className="text-xs text-white/70 font-mono mt-0.5">{formatPrice(product.price)}</p>
+              <p className="text-xs text-white/70 font-mono mt-0.5">{formatPrice(product.price)} {selectedSize ? `• Size ${selectedSize}` : ''}</p>
             </div>
           </div>
           <div className="flex items-center space-x-2 pl-3 border-l border-white/10">
@@ -168,7 +184,11 @@ export default function ProductPage() {
 
   // Buy It Now Handler
   const handleBuyItNow = () => {
-    addToCart(product, 1);
+    addToCart(product, 1, {
+      selectedSize,
+      selectedVariant: `${metalColor} Gold`,
+      selectedLength: selectedLength || undefined,
+    });
     router.push("/checkout");
   };
 
@@ -187,7 +207,7 @@ export default function ProductPage() {
             
             {/* Vertical Thumbnails (Scrollbar Hidden) */}
             <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto no-scrollbar max-h-[400px] md:max-h-[460px] lg:max-h-[480px] md:w-20 flex-shrink-0">
-              {currentImages.map((img, idx) => (
+              {displayImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
@@ -198,21 +218,20 @@ export default function ProductPage() {
                       : "border-[#E2DDD3] opacity-70 hover:opacity-100 hover:border-[#8C8275]"
                   }`}
                 >
-                  <Image src={img} alt="" fill sizes="80px" className="object-cover" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={img} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
 
             {/* Main Primary Image Viewer (Compact Fixed Height) */}
             <div className="flex-1 relative w-full h-[400px] md:h-[460px] lg:h-[480px] bg-[#F7F5F0] rounded-2xl border border-[#EAE4D9] overflow-hidden shadow-sm group flex-shrink-0 self-start">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 key={activeImageIndex}
-                src={currentImages[activeImageIndex] || currentImages[0]}
+                src={displayImages[activeImageIndex] || displayImages[0]}
                 alt={product.name}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 55vw"
-                className="object-cover transition-opacity duration-300 group-hover:scale-105"
+                className="w-full h-full object-cover transition-opacity duration-300 group-hover:scale-105"
               />
 
               {/* Expand Fullscreen Button */}
@@ -268,7 +287,7 @@ export default function ProductPage() {
 
             {/* Short Description */}
             <p className="text-sm text-[#5C554E] leading-relaxed mb-8 font-light">
-              Exquisite and timeless, the {product.name} is meticulously handcrafted to celebrate your most precious moments. Features exceptional brilliance, clarity, and certified craftsmanship.
+              {product.description || `Exquisite and timeless, the ${product.name} is meticulously handcrafted to celebrate your most precious moments. Features exceptional brilliance, clarity, and certified craftsmanship.`}
             </p>
 
             {/* Metal Color Selector */}
@@ -302,33 +321,135 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Ring Size Selector */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-xs tracking-widest uppercase font-semibold text-[#2C2825]">Ring Size</span>
-                <button
-                  onClick={() => setIsSizeGuideOpen(true)}
-                  className="text-xs text-[#8C8275] underline underline-offset-4 hover:text-[#2C2825] transition-colors"
-                >
-                  Size Guide
-                </button>
-              </div>
-              <div className="grid grid-cols-5 gap-3">
-                {["10", "11", "12", "13", "14"].map((sz) => (
-                  <button
-                    key={sz}
-                    onClick={() => setSelectedSize(sz)}
-                    className={`py-3 text-xs font-semibold tracking-wider border rounded-lg transition-all duration-300 ${
-                      selectedSize === sz
-                        ? "border-[#2C2825] bg-[#2C2825] text-white shadow-sm"
-                        : "border-[#E2DDD3] bg-white text-[#2C2825] hover:border-[#2C2825]"
-                    }`}
+            {/* Dynamic Category Specifications Selector */}
+            {/* 1. RINGS & BANGLES & BRACELETS (SIZES) */}
+            {(product.category === "Rings" || product.category === "Bangles" || product.category === "Bracelets") && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs tracking-widest uppercase font-semibold text-[#2C2825]">
+                    Select {product.category === "Rings" ? "Ring Size" : product.category === "Bangles" ? "Bangle Size" : "Bracelet Length"}
+                  </span>
+                  <Link
+                    href="/size-guide"
+                    className="text-xs text-[#8C8275] underline underline-offset-4 hover:text-[#2C2825] transition-colors"
                   >
-                    {sz}
-                  </button>
-                ))}
+                    Size Guide
+                  </Link>
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {(
+                    product.availableSizes && product.availableSizes.length > 0
+                      ? product.availableSizes
+                      : product.category === "Rings"
+                      ? ["11", "12", "13", "14", "15", "16"]
+                      : product.category === "Bangles"
+                      ? ["2.2", "2.4", "2.6", "2.8"]
+                      : ["6.0 inch", "6.5 inch", "7.0 inch", "7.5 inch"]
+                  ).map((sz) => {
+                    const isSelected = (selectedSize || (product.availableSizes?.[0] || "12")) === sz;
+                    return (
+                      <button
+                        key={sz}
+                        type="button"
+                        onClick={() => setSelectedSize(sz)}
+                        className={`px-4 py-2.5 text-xs font-semibold tracking-wider border rounded-lg transition-all duration-200 cursor-pointer ${
+                          isSelected
+                            ? "border-[#2C2825] bg-[#2C2825] text-white shadow-sm"
+                            : "border-[#E2DDD3] bg-white text-[#2C2825] hover:border-[#2C2825]"
+                        }`}
+                      >
+                        Size {sz}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* 2. NECKLACES (LENGTHS) */}
+            {product.category === "Necklaces" && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs tracking-widest uppercase font-semibold text-[#2C2825]">
+                    Chain Length Option
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {(
+                    product.necklaceLength && product.necklaceLength.length > 0
+                      ? product.necklaceLength
+                      : ["16 inch (Choker)", "18 inch (Princess)", "20 inch (Matinee)"]
+                  ).map((len) => {
+                    const isSelected = (selectedLength || (product.necklaceLength?.[0] || "18 inch (Princess)")) === len;
+                    return (
+                      <button
+                        key={len}
+                        type="button"
+                        onClick={() => setSelectedLength(len)}
+                        className={`px-4 py-2.5 text-xs font-semibold tracking-wider border rounded-lg transition-all duration-200 cursor-pointer ${
+                          isSelected
+                            ? "border-[#2C2825] bg-[#2C2825] text-white shadow-sm"
+                            : "border-[#E2DDD3] bg-white text-[#2C2825] hover:border-[#2C2825]"
+                        }`}
+                      >
+                        {len}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 3. EARRINGS (TYPE & PAIR) */}
+            {product.category === "Earrings" && (
+              <div className="mb-8 p-4 bg-[#FAF8F5] border border-[#EAE4D9] rounded-xl flex items-center justify-between">
+                <div>
+                  <span className="text-xs tracking-widest uppercase font-bold text-[#2C2825] block mb-1">
+                    Earring Style & Specification
+                  </span>
+                  <p className="text-xs text-[#8C8275]">
+                    Style: <span className="font-semibold text-[#2C2825]">{product.earringType || "Studs"}</span> • Sold As: <span className="font-semibold text-[#2C2825]">{product.earringPairType || "Pair"}</span>
+                  </p>
+                </div>
+                <span className="px-3 py-1 bg-[#2C2825] text-white text-[10px] font-bold uppercase tracking-widest rounded-full">
+                  {product.earringPairType || "Pair"}
+                </span>
+              </div>
+            )}
+
+            {/* 4. PENDANTS (CHAIN OPTIONS) */}
+            {product.category === "Pendants" && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs tracking-widest uppercase font-semibold text-[#2C2825]">
+                    Pendant Chain Option
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {(
+                    product.pendantOptions && product.pendantOptions.length > 0
+                      ? product.pendantOptions
+                      : ["Pendant Only", "With 16 inch Chain", "With 18 inch Chain"]
+                  ).map((opt) => {
+                    const isSelected = (selectedLength || (product.pendantOptions?.[0] || "Pendant Only")) === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setSelectedLength(opt)}
+                        className={`px-4 py-2.5 text-xs font-semibold tracking-wider border rounded-lg transition-all duration-200 cursor-pointer ${
+                          isSelected
+                            ? "border-[#2C2825] bg-[#2C2825] text-white shadow-sm"
+                            : "border-[#E2DDD3] bg-white text-[#2C2825] hover:border-[#2C2825]"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Delivery Pincode Checker */}
             <div className="mb-8 bg-white p-5 rounded-xl border border-[#EAE4D9] shadow-sm">
@@ -446,8 +567,11 @@ export default function ProductPage() {
                   {expandedSections.details ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 {expandedSections.details && (
-                  <div className="pb-4 text-xs text-[#5C554E] leading-relaxed">
-                    Handcrafted in 18K {metalColor} gold. Features a brilliant cut center stone flanked by delicate pavé setting. Weight: approx 4.2g. Certificate of authenticity included.
+                  <div className="pb-4 text-xs text-[#5C554E] leading-relaxed space-y-2">
+                    <p>{product.productDetails || product.description || `Handcrafted fine jewellery piece in ${product.metal || '18K Gold'}. Features a brilliant cut center stone flanked by delicate pavé setting.`}</p>
+                    {product.description && product.productDetails && (
+                      <p className="text-[#8C8275] border-t border-[#F5F2ED] pt-2">{product.description}</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -458,12 +582,17 @@ export default function ProductPage() {
                   onClick={() => toggleAccordion("diamond")}
                   className="w-full flex items-center justify-between py-4 text-xs font-semibold uppercase tracking-widest text-[#2C2825]"
                 >
-                  <span>Diamond Information</span>
+                  <span>Gemstone & Diamond Specification</span>
                   {expandedSections.diamond ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
                 {expandedSections.diamond && (
-                  <div className="pb-4 text-xs text-[#5C554E] leading-relaxed">
-                    Color: VVS1/VS2 | Clarity: EF Top Wesselton | Cut: Excellent Ideal Cut | Ethically Sourced Natural Conflict-Free Diamonds.
+                  <div className="pb-4 text-xs text-[#5C554E] leading-relaxed space-y-2">
+                    <p>{product.diamondInfo || `Stone / Diamond: ${product.stone || "Ethically Sourced Natural Conflict-Free Diamond"} | Metal: ${product.metal || "18K Gold"} | Category: ${product.category}.`}</p>
+                    <div className="flex flex-wrap gap-3 pt-1 text-[11px] font-medium text-[#2C2825]">
+                      <span className="bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#EAE4D9]">Metal: {product.metal}</span>
+                      <span className="bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#EAE4D9]">Gemstone: {product.stone}</span>
+                      <span className="bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#EAE4D9]">Category: {product.category}</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -479,7 +608,7 @@ export default function ProductPage() {
                 </button>
                 {expandedSections.shipping && (
                   <div className="pb-4 text-xs text-[#5C554E] leading-relaxed">
-                    Free fully insured door-to-door delivery across India within 3-5 business days. 15-day return policy with zero deduction fees.
+                    {product.shippingReturns || "Free fully insured door-to-door delivery across India within 3-5 business days. 15-day return policy with zero deduction fees."}
                   </div>
                 )}
               </div>
@@ -495,7 +624,7 @@ export default function ProductPage() {
                 </button>
                 {expandedSections.care && (
                   <div className="pb-4 text-xs text-[#5C554E] leading-relaxed">
-                    Store individually in the provided Sujata velvet suede box. Clean gently with warm soapy water and a soft micro-bristle brush.
+                    {product.careInstructions || "Store individually in the provided Sujata velvet suede box. Clean gently with warm soapy water and a soft micro-bristle brush."}
                   </div>
                 )}
               </div>
@@ -589,8 +718,6 @@ export default function ProductPage() {
         </div>
       )}
 
-      {/* Size Guide Modal */}
-      <SizeGuideModal isOpen={isSizeGuideOpen} onClose={() => setIsSizeGuideOpen(false)} />
     </div>
   );
 }

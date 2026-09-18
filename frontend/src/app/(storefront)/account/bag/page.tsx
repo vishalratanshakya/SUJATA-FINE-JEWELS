@@ -94,6 +94,9 @@ export default function AccountBagPage() {
                       </Link>
                       <p className="text-xs text-[#8C8275]">
                         {item.product.metal} {item.product.stone ? `• ${item.product.stone}` : ""}
+                        {item.selectedSize ? ` • Size: ${item.selectedSize}` : ""}
+                        {item.selectedLength ? ` • Length: ${item.selectedLength}` : ""}
+                        {item.selectedVariant ? ` • ${item.selectedVariant}` : ""}
                       </p>
                       <p className="text-sm font-semibold text-[#B38E5D]">
                         {formatPrice(item.product.price)}

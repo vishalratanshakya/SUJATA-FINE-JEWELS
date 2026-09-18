@@ -32,6 +32,8 @@ export const metadata: Metadata = {
   description: "Exquisite jewellery, handcrafted with passion, designed to celebrate life's most precious moments.",
 };
 
+import { Providers } from "@/components/providers/Providers";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,8 +42,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} antialiased`}>
       <body className="min-h-screen flex flex-col font-sans bg-ivory text-charcoal" suppressHydrationWarning>
-        <Toaster position="top-right" />
-        {children}
+        <Providers>
+          <Toaster position="top-right" />
+          {children}
+        </Providers>
       </body>
     </html>
   );

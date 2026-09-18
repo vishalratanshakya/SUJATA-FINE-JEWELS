@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useStore } from "@/store/useStore";
 
 const OCCASIONS = [
   {
@@ -31,6 +32,9 @@ const OCCASIONS = [
 ];
 
 export function ShopByOccasion() {
+  const occasions = useStore((s) => s.occasions);
+  const displayOccasions = occasions.length > 0 ? occasions : OCCASIONS;
+
   return (
     <section className="py-24 bg-white">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
@@ -50,7 +54,7 @@ export function ShopByOccasion() {
         </div>
 
         <div className="flex overflow-x-auto md:grid md:grid-cols-2 gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar pb-6 -mx-4 px-4 md:mx-0 md:px-0">
-          {OCCASIONS.map((occasion, idx) => (
+          {displayOccasions.map((occasion, idx) => (
             <Link 
               href={`/collections/${occasion.id}`} 
               key={occasion.id}

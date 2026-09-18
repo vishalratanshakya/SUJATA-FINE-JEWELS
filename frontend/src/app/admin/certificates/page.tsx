@@ -1,415 +1,334 @@
 "use client";
 
 import { useState } from "react";
-import { INITIAL_CERTIFICATES, CertificateData } from "@/data/certificates";
-import { CertificateModal } from "@/components/account/CertificateModal";
-import {
-  Award,
-  Plus,
-  Search,
-  Edit,
-  Eye,
-  RefreshCw,
-  Slash,
-  Download,
-  CheckCircle2,
-  AlertCircle,
-  X,
-} from "lucide-react";
+import { Award, Plus, Search, Eye, Trash2, X, Download, CheckCircle, ShieldCheck } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useStore, Certificate } from "@/store/useStore";
 
 export default function AdminCertificatesPage() {
-  const [certs, setCerts] = useState<CertificateData[]>(INITIAL_CERTIFICATES);
+  const certificates = useStore((s) => s.certificates);
+  const addCertificate = useStore((s) => s.addCertificate);
+  const deleteCertificate = useStore((s) => s.deleteCertificate);
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [activeCert, setActiveCert] = useState<CertificateData | null>(null);
+  const [selectedCert, setSelectedCert] = useState<Certificate | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
-  // Edit / Create Modal State
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingCert, setEditingCert] = useState<Partial<CertificateData>>({});
-
-  const filteredCerts = certs.filter((c) => {
-    const matchesSearch =
-      c.certId.toLowerCase().includes(search.toLowerCase()) ||
-      c.orderId.toLowerCase().includes(search.toLowerCase()) ||
-      c.productName.toLowerCase().includes(search.toLowerCase()) ||
-      c.customerName.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === "ALL" || c.status === statusFilter;
-    return matchesSearch && matchesStatus;
+  const [formState, setFormState] = useState({
+    certificateNumber: `SGL-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+    productName: "Royal Solitaire Diamond Ring",
+    productId: "ring-1",
+    customerName: "Priya Sharma",
+    customerEmail: "priya.sharma@example.com",
+    goldPurity: "18K Yellow Gold (750)",
+    diamondCarat: "1.25 Carat (VVS1, E Color)",
+    gemstoneDetails: "Natural Earth-Mined Diamond",
+    issueDate: new Date().toISOString().split("T")[0],
+    certifiedBy: "Solitaire Gemological Laboratories (SGL)"
   });
 
-  const handleOpenCreate = () => {
-    setEditingCert({
-      certId: `SJ-CERT-000${Date.now().toString().slice(-3)}`,
-      orderId: "SJ10019",
-      productId: "prod-4",
-      customerId: "USER_456",
-      customerName: "Aanya Sharma",
-      productName: "Diamond Tennis Bracelet",
-      productImage: "/images/products/bracelets/bracelet_placeholder.jpg",
-      jewelleryType: "Bracelet",
-      metalType: "18K White Gold",
-      metalPurity: "750",
-      grossWeight: "12.50 g",
-      netWeight: "11.80 g",
-      gemstoneDetails: "Natural Diamonds (1.20 ct, VVS1 / E-F)",
-      sku: "SKU-SJ-99120",
-      purchaseDate: "25 Apr 2026",
-      certificationDate: "26 Apr 2026",
-      status: "Generated",
-    });
-    setIsEditModalOpen(true);
-  };
+  const filteredCerts = certificates.filter(c =>
+    c.certificateNumber.toLowerCase().includes(search.toLowerCase()) ||
+    c.productName.toLowerCase().includes(search.toLowerCase()) ||
+    c.customerName.toLowerCase().includes(search.toLowerCase())
+  );
 
-  const handleOpenEdit = (cert: CertificateData) => {
-    setEditingCert({ ...cert });
-    setIsEditModalOpen(true);
-  };
-
-  const handleSaveCert = (e: React.FormEvent) => {
+  const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingCert.certId || !editingCert.orderId) return;
+    if (!formState.certificateNumber || !formState.productName) {
+      toast.error("Please fill in required certificate details");
+      return;
+    }
 
-    setCerts((prev) => {
-      const exists = prev.find((c) => c.certId === editingCert.certId);
-      if (exists) {
-        return prev.map((c) => (c.certId === editingCert.certId ? (editingCert as CertificateData) : c));
-      } else {
-        return [editingCert as CertificateData, ...prev];
-      }
-    });
-
-    toast.success(`Certificate ${editingCert.certId} saved successfully!`);
-    setIsEditModalOpen(false);
+    addCertificate(formState);
+    toast.success(`Certificate ${formState.certificateNumber} issued successfully!`);
+    setIsCreating(false);
   };
 
-  const handleToggleStatus = (certId: string, currentStatus: string) => {
-    const nextStatus =
-      currentStatus === "Pending"
-        ? "Generated"
-        : currentStatus === "Generated"
-        ? "Issued"
-        : currentStatus === "Issued"
-        ? "Revoked"
-        : "Issued";
-
-    setCerts((prev) =>
-      prev.map((c) => (c.certId === certId ? { ...c, status: nextStatus as any } : c))
-    );
-    toast.success(`Updated ${certId} status to ${nextStatus}`);
+  const handleDelete = (id: string, num: string) => {
+    deleteCertificate(id);
+    toast.success(`Certificate ${num} revoked.`);
   };
 
   return (
-    <div className="p-8 space-y-6">
-      
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-charcoal/10 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-serif text-3xl text-charcoal flex items-center space-x-2">
-            <Award className="text-champagne" size={28} />
-            <span>Certificate Management</span>
-          </h1>
-          <p className="text-xs text-charcoal/60 mt-1">
-            Generate, issue, edit, and revoke official Jewellery Certificates of Authenticity.
-          </p>
+          <h1 className="text-2xl font-serif text-gray-900">Jewellery Authenticity Certificates</h1>
+          <p className="text-sm text-gray-500 mt-1">Generate and issue certified hallmark cards for gold purity and diamond specifications</p>
         </div>
         <button
-          onClick={handleOpenCreate}
-          className="bg-charcoal text-white hover:bg-champagne px-5 py-3 rounded text-xs tracking-widest uppercase font-medium flex items-center space-x-2 transition-colors self-start sm:self-auto cursor-pointer"
+          onClick={() => setIsCreating(true)}
+          className="bg-charcoal text-white text-xs font-medium px-4 py-2.5 rounded hover:bg-gray-800 transition-colors flex items-center space-x-2 self-start sm:self-auto"
         >
           <Plus size={16} />
-          <span>GENERATE CERTIFICATE</span>
+          <span>Issue New Certificate</span>
         </button>
       </div>
 
-      {/* Filters & Search */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        {/* Status Tabs */}
-        <div className="flex items-center space-x-2 overflow-x-auto w-full sm:w-auto">
-          {["ALL", "Pending", "Generated", "Issued", "Revoked"].map((st) => (
-            <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-4 py-2 rounded text-xs tracking-wider uppercase transition-colors whitespace-nowrap ${
-                statusFilter === st
-                  ? "bg-charcoal text-champagne font-bold"
-                  : "bg-white text-charcoal/70 border border-charcoal/10 hover:bg-charcoal/5"
-              }`}
-            >
-              {st}
-            </button>
-          ))}
-        </div>
-
-        {/* Search Input */}
-        <div className="relative w-full sm:w-80">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-charcoal/40" />
+      {/* Toolbar */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+        <div className="relative max-w-md w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Order ID, Cert ID or Customer..."
-            className="w-full bg-white border border-charcoal/15 pl-10 pr-4 py-2.5 text-xs rounded focus:outline-none focus:border-charcoal"
+            placeholder="Search by Certificate #, product or customer..."
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-charcoal"
           />
         </div>
       </div>
 
       {/* Certificates Table */}
-      <div className="bg-white rounded-lg border border-charcoal/10 shadow-xs overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[#FAF8F5] border-b border-charcoal/10 text-[11px] uppercase tracking-wider text-charcoal/60">
-              <th className="p-4">Certificate ID</th>
-              <th className="p-4">Order ID</th>
-              <th className="p-4">Customer</th>
-              <th className="p-4">Product Details</th>
-              <th className="p-4">Issue Date</th>
-              <th className="p-4">Status</th>
-              <th className="p-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-charcoal/5 text-xs">
-            {filteredCerts.length === 0 ? (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-gray-600">
+            <thead className="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-100">
               <tr>
-                <td colSpan={7} className="p-8 text-center text-charcoal/50">
-                  No certificates found matching criteria.
-                </td>
+                <th className="px-6 py-3.5">Cert #</th>
+                <th className="px-6 py-3.5">Product Title</th>
+                <th className="px-6 py-3.5">Customer</th>
+                <th className="px-6 py-3.5">Gold Purity & Diamond</th>
+                <th className="px-6 py-3.5">Issued Date</th>
+                <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
-            ) : (
-              filteredCerts.map((cert) => (
-                <tr key={cert.certId} className="hover:bg-[#FAF8F5]/60 transition-colors">
-                  <td className="p-4 font-mono font-bold text-charcoal">{cert.certId}</td>
-                  <td className="p-4 font-mono text-charcoal/70">{cert.orderId}</td>
-                  <td className="p-4">
-                    <p className="font-semibold text-charcoal">{cert.customerName}</p>
-                    <p className="text-[10px] text-charcoal/50">ID: {cert.customerId}</p>
-                  </td>
-                  <td className="p-4 max-w-xs">
-                    <p className="font-serif text-sm text-charcoal truncate">{cert.productName}</p>
-                    <p className="text-[10px] text-charcoal/60">
-                      {cert.metalType} • {cert.gemstoneDetails}
-                    </p>
-                  </td>
-                  <td className="p-4 text-charcoal/70">{cert.certificationDate}</td>
-                  <td className="p-4">
-                    <span
-                      className={`inline-block px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                        cert.status === "Issued"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : cert.status === "Generated"
-                          ? "bg-blue-100 text-blue-800"
-                          : cert.status === "Pending"
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-rose-100 text-rose-800"
-                      }`}
-                    >
-                      {cert.status}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      <button
-                        onClick={() => setActiveCert(cert)}
-                        className="p-1.5 hover:bg-charcoal/5 rounded text-charcoal/70 hover:text-charcoal"
-                        title="View Certificate"
-                      >
-                        <Eye size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleOpenEdit(cert)}
-                        className="p-1.5 hover:bg-charcoal/5 rounded text-charcoal/70 hover:text-charcoal"
-                        title="Edit Details"
-                      >
-                        <Edit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleToggleStatus(cert.certId, cert.status)}
-                        className="p-1.5 hover:bg-charcoal/5 rounded text-charcoal/70 hover:text-charcoal"
-                        title="Update Status"
-                      >
-                        <RefreshCw size={16} />
-                      </button>
-                    </div>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredCerts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                    No authenticity certificates found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filteredCerts.map((cert) => (
+                  <tr key={cert.id} className="hover:bg-gray-50/80 transition-colors">
+                    <td className="px-6 py-4 font-mono text-xs font-bold text-amber-800">
+                      {cert.certificateNumber}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{cert.productName}</td>
+                    <td className="px-6 py-4 text-xs text-gray-600">{cert.customerName}</td>
+                    <td className="px-6 py-4 text-xs text-gray-500">
+                      {cert.goldPurity} • {cert.diamondCarat}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-gray-400">{cert.issueDate}</td>
+                    <td className="px-6 py-4 text-right space-x-2">
+                      <button
+                        onClick={() => setSelectedCert(cert)}
+                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-medium rounded transition-colors inline-flex items-center space-x-1"
+                      >
+                        <Eye size={14} />
+                        <span>Preview</span>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(cert.id, cert.certificateNumber)}
+                        className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded hover:bg-red-50"
+                        title="Revoke Certificate"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* VIEW CERTIFICATE MODAL */}
-      {activeCert && (
-        <CertificateModal
-          certificate={activeCert}
-          isOpen={!!activeCert}
-          onClose={() => setActiveCert(null)}
-          currentUserId={activeCert.customerId}
-        />
-      )}
-
-      {/* EDIT / GENERATE MODAL */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xl rounded-xl p-6 border border-charcoal/10 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-charcoal/10 pb-4">
-              <h3 className="font-serif text-xl text-charcoal">
-                {editingCert.certId ? `Manage Certificate ${editingCert.certId}` : "Generate New Certificate"}
-              </h3>
-              <button onClick={() => setIsEditModalOpen(false)} className="text-charcoal/50 hover:text-charcoal">
-                <X size={20} />
-              </button>
+      {/* Generate Certificate Modal */}
+      {isCreating && (
+        <div 
+          onClick={() => setIsCreating(false)}
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 cursor-pointer"
+        >
+          <form 
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={handleCreate} 
+            className="bg-white rounded-lg max-w-lg w-full p-6 shadow-xl space-y-6 cursor-default"
+          >
+            <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+              <h2 className="text-lg font-serif text-gray-900">Issue Authenticity Certificate</h2>
+              <button type="button" onClick={() => setIsCreating(false)} className="text-gray-400 hover:text-gray-600">✕</button>
             </div>
 
-            <form onSubmit={handleSaveCert} className="space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Certificate ID</label>
-                  <input
-                    type="text"
-                    value={editingCert.certId || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, certId: e.target.value })}
-                    className="w-full border border-charcoal/20 rounded p-2.5 font-mono"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Order ID</label>
-                  <input
-                    type="text"
-                    value={editingCert.orderId || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, orderId: e.target.value })}
-                    className="w-full border border-charcoal/20 rounded p-2.5 font-mono"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Customer Name</label>
-                  <input
-                    type="text"
-                    value={editingCert.customerName || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, customerName: e.target.value })}
-                    className="w-full border border-charcoal/20 rounded p-2.5"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Customer ID</label>
-                  <input
-                    type="text"
-                    value={editingCert.customerId || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, customerId: e.target.value })}
-                    className="w-full border border-charcoal/20 rounded p-2.5 font-mono"
-                    required
-                  />
-                </div>
-              </div>
-
+            <div className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Product Name</label>
+                <label className="block font-medium text-gray-700 mb-1">Certificate ID Number</label>
                 <input
                   type="text"
-                  value={editingCert.productName || ""}
-                  onChange={(e) => setEditingCert({ ...editingCert, productName: e.target.value })}
-                  className="w-full border border-charcoal/20 rounded p-2.5"
                   required
+                  value={formState.certificateNumber}
+                  onChange={(e) => setFormState({ ...formState, certificateNumber: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2.5 font-mono focus:outline-none focus:border-charcoal text-sm"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Metal Type &amp; Purity</label>
-                  <input
-                    type="text"
-                    value={editingCert.metalType || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, metalType: e.target.value })}
-                    placeholder="e.g. 18K Yellow Gold"
-                    className="w-full border border-charcoal/20 rounded p-2.5"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Jewellery Type</label>
-                  <input
-                    type="text"
-                    value={editingCert.jewelleryType || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, jewelleryType: e.target.value })}
-                    placeholder="Pendant / Ring / Earrings"
-                    className="w-full border border-charcoal/20 rounded p-2.5"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Gross Weight</label>
-                  <input
-                    type="text"
-                    value={editingCert.grossWeight || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, grossWeight: e.target.value })}
-                    placeholder="e.g. 8.42 g"
-                    className="w-full border border-charcoal/20 rounded p-2.5"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Net Weight</label>
-                  <input
-                    type="text"
-                    value={editingCert.netWeight || ""}
-                    onChange={(e) => setEditingCert({ ...editingCert, netWeight: e.target.value })}
-                    placeholder="e.g. 7.95 g"
-                    className="w-full border border-charcoal/20 rounded p-2.5"
-                  />
-                </div>
-              </div>
-
               <div>
-                <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Diamond / Gemstone Details</label>
+                <label className="block font-medium text-gray-700 mb-1">Product Title</label>
                 <input
                   type="text"
-                  value={editingCert.gemstoneDetails || ""}
-                  onChange={(e) => setEditingCert({ ...editingCert, gemstoneDetails: e.target.value })}
-                  placeholder="e.g. Natural Diamond (0.47 ct, VVS1 / E-F)"
-                  className="w-full border border-charcoal/20 rounded p-2.5"
+                  required
+                  value={formState.productName}
+                  onChange={(e) => setFormState({ ...formState, productName: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2.5 focus:outline-none focus:border-charcoal text-sm"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-charcoal mb-1 uppercase tracking-wider">Status</label>
-                <select
-                  value={editingCert.status || "Generated"}
-                  onChange={(e) => setEditingCert({ ...editingCert, status: e.target.value as any })}
-                  className="w-full border border-charcoal/20 rounded p-2.5 bg-white font-semibold"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Generated">Generated</option>
-                  <option value="Issued">Issued</option>
-                  <option value="Revoked">Revoked</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">Customer Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={formState.customerName}
+                    onChange={(e) => setFormState({ ...formState, customerName: e.target.value })}
+                    className="w-full border border-gray-200 rounded p-2.5 focus:outline-none focus:border-charcoal text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">Customer Email</label>
+                  <input
+                    type="email"
+                    value={formState.customerEmail}
+                    onChange={(e) => setFormState({ ...formState, customerEmail: e.target.value })}
+                    className="w-full border border-gray-200 rounded p-2.5 focus:outline-none focus:border-charcoal text-sm"
+                  />
+                </div>
               </div>
 
-              <div className="flex space-x-3 pt-4 border-t border-charcoal/10">
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="flex-1 py-3 border border-charcoal/20 rounded text-xs font-bold uppercase tracking-wider hover:bg-charcoal/5"
-                >
-                  CANCEL
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-charcoal hover:bg-champagne text-white rounded text-xs font-bold uppercase tracking-wider transition-colors"
-                >
-                  SAVE CERTIFICATE
-                </button>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">Gold Purity Spec</label>
+                  <input
+                    type="text"
+                    value={formState.goldPurity}
+                    onChange={(e) => setFormState({ ...formState, goldPurity: e.target.value })}
+                    className="w-full border border-gray-200 rounded p-2.5 focus:outline-none focus:border-charcoal text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">Diamond Specification</label>
+                  <input
+                    type="text"
+                    value={formState.diamondCarat}
+                    onChange={(e) => setFormState({ ...formState, diamondCarat: e.target.value })}
+                    className="w-full border border-gray-200 rounded p-2.5 focus:outline-none focus:border-charcoal text-sm"
+                  />
+                </div>
               </div>
-            </form>
-          </div>
+
+              <div>
+                <label className="block font-medium text-gray-700 mb-1">Certification Agency / Authority</label>
+                <input
+                  type="text"
+                  value={formState.certifiedBy}
+                  onChange={(e) => setFormState({ ...formState, certifiedBy: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2.5 focus:outline-none focus:border-charcoal text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={() => setIsCreating(false)}
+                className="px-4 py-2 text-xs font-medium text-gray-600 hover:text-gray-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 bg-charcoal text-white text-xs font-medium rounded hover:bg-gray-800"
+              >
+                Issue Certificate
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
+      {/* Printable Certificate Card Preview Modal */}
+      {selectedCert && (
+        <div 
+          onClick={() => setSelectedCert(null)}
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 cursor-pointer"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#0F0E0D] text-white rounded-xl max-w-xl w-full p-8 shadow-2xl space-y-8 border border-amber-500/30 relative cursor-default"
+          >
+            <button
+              onClick={() => setSelectedCert(null)}
+              className="absolute right-4 top-4 text-amber-200/60 hover:text-white"
+            >
+              ✕
+            </button>
+
+            {/* Certificate Layout */}
+            <div className="border-2 border-dashed border-amber-400/40 p-6 rounded-lg text-center space-y-6 bg-gradient-to-b from-[#1a1816] to-[#0d0c0b]">
+              <div className="space-y-1">
+                <div className="flex items-center justify-center space-x-2 text-amber-300">
+                  <ShieldCheck size={28} />
+                  <span className="font-serif tracking-widest text-xl">SUJATA FINE JEWELS</span>
+                </div>
+                <p className="text-[10px] tracking-[0.3em] font-light text-amber-200/60 uppercase">Official Certificate of Authenticity</p>
+              </div>
+
+              <div className="py-2 border-y border-amber-500/20 text-xs font-mono text-amber-300">
+                CERTIFICATE #: {selectedCert.certificateNumber}
+              </div>
+
+              <div className="text-left text-xs space-y-3 text-gray-200">
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span className="text-gray-400">Product Title:</span>
+                  <span className="font-medium text-amber-100">{selectedCert.productName}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span className="text-gray-400">Issued To:</span>
+                  <span className="font-medium text-amber-100">{selectedCert.customerName}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span className="text-gray-400">Gold Purity:</span>
+                  <span className="font-medium text-amber-100">{selectedCert.goldPurity}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span className="text-gray-400">Diamond Spec:</span>
+                  <span className="font-medium text-amber-100">{selectedCert.diamondCarat}</span>
+                </div>
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span className="text-gray-400">Certified By:</span>
+                  <span className="font-medium text-amber-100">{selectedCert.certifiedBy}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Issue Date:</span>
+                  <span className="font-medium text-amber-100">{selectedCert.issueDate}</span>
+                </div>
+              </div>
+
+              <div className="pt-4 flex items-center justify-between text-[10px] text-amber-200/40 uppercase tracking-widest border-t border-amber-500/20">
+                <span>100% Certified Hallmarked</span>
+                <span>Authentic Diamond</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  window.print();
+                }}
+                className="px-5 py-2.5 bg-amber-400 text-charcoal font-semibold text-xs rounded hover:bg-amber-300 transition-colors flex items-center space-x-2"
+              >
+                <Download size={14} />
+                <span>Print / Download Certificate</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

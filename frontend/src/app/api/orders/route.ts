@@ -1,0 +1,29 @@
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/db";
+import { OrderModel } from "@/models/Order";
+
+export async function GET(req: Request) {
+  try {
+    await connectToDatabase();
+    const orders = await OrderModel.find({}).sort({ createdAt: -1 });
+    return NextResponse.json({ success: true, orders });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    await connectToDatabase();
+    const body = await req.json();
+
+    const newOrder = await OrderModel.create({
+      orderId: body.orderId || `SJ${Math.floor(10000 + Math.random() * 90000)}`,
+      ...body,
+    });
+
+    return NextResponse.json({ success: true, order: newOrder }, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}

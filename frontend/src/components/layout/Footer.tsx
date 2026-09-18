@@ -41,13 +41,12 @@ export function Footer() {
         <div>
           <h4 className="text-white uppercase tracking-widest text-xs font-semibold mb-6">Customer Care</h4>
           <ul className="space-y-4">
-            {["FAQs", "Shipping & Delivery", "Returns & Refunds", "Track Order", "Contact Us", "Care Guide", "Size Guide"].map((item) => (
-              <li key={item}>
-                <Link href="#" className="hover:text-champagne transition-colors">
-                  {item}
-                </Link>
-              </li>
-            ))}
+            <li><Link href="/faq" className="hover:text-champagne transition-colors">FAQs</Link></li>
+            <li><Link href="/faq" className="hover:text-champagne transition-colors">Shipping &amp; Delivery</Link></li>
+            <li><Link href="/faq" className="hover:text-champagne transition-colors">Returns &amp; Refunds</Link></li>
+            <li><Link href="/account/orders" className="hover:text-champagne transition-colors">Track Order</Link></li>
+            <li><Link href="/contact" className="hover:text-champagne transition-colors">Contact Us</Link></li>
+            <li><Link href="/account/my-jewellery" className="hover:text-champagne transition-colors">Care Guide &amp; Certificates</Link></li>
           </ul>
         </div>
 
@@ -74,8 +73,7 @@ export function Footer() {
         <p>&copy; {new Date().getFullYear()} SUJATA FINE JEWELS. All Rights Reserved.</p>
         <div className="flex space-x-6 mt-4 md:mt-0">
           <Link href="/privacy-policy" className="hover:text-ivory transition-colors">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-ivory transition-colors">Terms & Conditions</Link>
-          <Link href="/refund-policy" className="hover:text-ivory transition-colors">Refund Policy</Link>
+          <Link href="/terms" className="hover:text-ivory transition-colors">Terms &amp; Conditions</Link>
         </div>
       </div>
     </footer>

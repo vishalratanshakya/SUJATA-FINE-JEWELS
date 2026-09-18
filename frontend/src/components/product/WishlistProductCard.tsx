@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart, Star, ShoppingBag } from "lucide-react";
 import { useStore, Product } from "@/store/useStore";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 interface WishlistProductCardProps {
   product: Product;
@@ -13,6 +14,7 @@ interface WishlistProductCardProps {
 export function WishlistProductCard({ product }: WishlistProductCardProps) {
   const toggleWishlist = useStore((state) => state.toggleWishlist);
   const addToCart = useStore((state) => state.addToCart);
+  const { isAuthenticated } = useAuth();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -35,27 +37,41 @@ export function WishlistProductCard({ product }: WishlistProductCardProps) {
       {/* Image Container */}
       <div className="relative aspect-square bg-[#F9F8F6] flex items-center justify-center overflow-hidden rounded-lg mb-4">
         <Link href={`/product/${product.slug}`} className="relative w-full h-full block">
-          <Image
-            src={product.images[0]}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={product.primaryImage || product.images[0]}
             alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 20vw"
-            className="object-cover transition-opacity duration-300 [@media(hover:hover)]:group-hover:opacity-0"
+            className="w-full h-full object-cover transition-opacity duration-300 [@media(hover:hover)]:group-hover:opacity-0"
           />
-          {product.images[1] && (
-            <Image
-              src={product.images[1]}
-              alt={`${product.name} alternate view`}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 20vw"
-              className="object-cover absolute inset-0 opacity-0 transition-opacity duration-300 [@media(hover:hover)]:group-hover:opacity-100"
+          {(product.hoverImage || product.images[1]) && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={product.hoverImage || product.images[1]}
+              alt={`${product.name} hover view`}
+              className="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-300 [@media(hover:hover)]:group-hover:opacity-100"
             />
           )}
         </Link>
         <button
-          onClick={() => {
-            toggleWishlist(product);
-            toast.error(`${product.name} removed from wishlist.`);
+          onClick={async () => {
+            if (!isAuthenticated) {
+              window.location.href = "/login";
+              return;
+            }
+            try {
+              const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+              const token = localStorage.getItem("token");
+              const res = await fetch(`${backendUrl}/api/wishlist/${product.id}`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              if (res.ok) {
+                toggleWishlist(product);
+                toast.error(`${product.name} removed from wishlist.`);
+              }
+            } catch (err) {
+              toast.error("Failed to update wishlist");
+            }
           }}
           className="absolute top-3 right-3 z-10 p-1 hover:scale-110 transition-transform"
           aria-label="Remove from wishlist"
@@ -96,7 +112,34 @@ export function WishlistProductCard({ product }: WishlistProductCardProps) {
 
         <div className="mt-auto">
           <button
-            onClick={() => addToCart(product, 1)}
+            onClick={async () => {
+              if (!isAuthenticated) {
+                window.location.href = "/login";
+                return;
+              }
+              try {
+                const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+                const token = localStorage.getItem("token");
+                const res = await fetch(`${backendUrl}/api/cart/add`, {
+                  method: "POST",
+                  headers: { 
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}` 
+                  },
+                  body: JSON.stringify({ 
+                    productId: product.id, 
+                    quantity: 1, 
+                    price: product.price 
+                  })
+                });
+                if (res.ok) {
+                  addToCart(product, 1);
+                  toast.success("Added to Bag!", { icon: "🛍️" });
+                }
+              } catch (err) {
+                toast.error("Failed to add to bag");
+              }
+            }}
             aria-label={`Add ${product.name} to cart`}
             className="w-full flex items-center justify-center space-x-2 bg-[#B38D45] hover:bg-[#9A7635] text-white py-2.5 rounded transition-colors text-sm font-medium"
           >
