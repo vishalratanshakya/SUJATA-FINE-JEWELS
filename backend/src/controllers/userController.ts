@@ -32,3 +32,14 @@ export const updateProfile = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const { getAllCustomers } = await import("../services/userService");
+    const customers = await getAllCustomers();
+    res.json({ success: true, count: customers.length, data: customers });
+  } catch (error: any) {
+    console.error("Get All Users Error:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};

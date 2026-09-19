@@ -79,26 +79,26 @@ export function DealOfTheDay() {
             {/* Timer */}
             <div className="mb-10">
               <p className="text-sm text-charcoal/60 font-medium mb-3 uppercase tracking-widest">Offer ends in:</p>
-              <div className="flex space-x-4">
+              <div className="flex space-x-3 md:space-x-4">
                 <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-[#F9F8F6] rounded flex items-center justify-center font-serif text-2xl text-charcoal border border-charcoal/5">
+                  <div className="w-14 h-14 md:w-16 md:h-16 bg-[#F9F8F6] rounded flex items-center justify-center font-serif text-xl md:text-2xl text-charcoal border border-charcoal/5">
                     {String(timeLeft.hours).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] uppercase tracking-wider mt-2 text-charcoal/50">Hours</span>
+                  <span className="text-[10px] uppercase tracking-wider mt-1.5 md:mt-2 text-charcoal/50 block pb-1">Hours</span>
                 </div>
-                <div className="text-2xl font-serif text-charcoal/40 mt-3">:</div>
+                <div className="text-xl md:text-2xl font-serif text-charcoal/40 mt-3 md:mt-4">:</div>
                 <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-[#F9F8F6] rounded flex items-center justify-center font-serif text-2xl text-charcoal border border-charcoal/5">
+                  <div className="w-14 h-14 md:w-16 md:h-16 bg-[#F9F8F6] rounded flex items-center justify-center font-serif text-xl md:text-2xl text-charcoal border border-charcoal/5">
                     {String(timeLeft.minutes).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] uppercase tracking-wider mt-2 text-charcoal/50">Mins</span>
+                  <span className="text-[10px] uppercase tracking-wider mt-1.5 md:mt-2 text-charcoal/50 block pb-1">Mins</span>
                 </div>
-                <div className="text-2xl font-serif text-charcoal/40 mt-3">:</div>
+                <div className="text-xl md:text-2xl font-serif text-charcoal/40 mt-3 md:mt-4">:</div>
                 <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 bg-[#F9F8F6] rounded flex items-center justify-center font-serif text-2xl text-charcoal border border-charcoal/5">
+                  <div className="w-14 h-14 md:w-16 md:h-16 bg-[#F9F8F6] rounded flex items-center justify-center font-serif text-xl md:text-2xl text-charcoal border border-charcoal/5">
                     {String(timeLeft.seconds).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] uppercase tracking-wider mt-2 text-charcoal/50">Secs</span>
+                  <span className="text-[10px] uppercase tracking-wider mt-1.5 md:mt-2 text-charcoal/50 block pb-1">Secs</span>
                 </div>
               </div>
             </div>

@@ -31,3 +31,39 @@ export const updateProfileInfo = async (userId: string, data: any) => {
     profileImage: user.profileImage,
   };
 };
+
+export const getAllCustomers = async () => {
+  const customers = await User.aggregate([
+    {
+      $match: { role: "customer" }
+    },
+    {
+      $lookup: {
+        from: "orders",
+        let: { userIdString: { $toString: "$_id" } },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$customerId", "$$userIdString"] } } }
+        ],
+        as: "orders"
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        email: 1,
+        phone: 1,
+        createdAt: 1,
+        totalOrders: { $size: "$orders" },
+        totalSpent: {
+          $sum: "$orders.totalAmount"
+        }
+      }
+    },
+    {
+      $sort: { createdAt: -1 }
+    }
+  ]);
+
+  return customers;
+};

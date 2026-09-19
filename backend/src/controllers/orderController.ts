@@ -7,6 +7,15 @@ export const placeOrder = asyncHandler(async (req: any, res: Response) => {
   const userId = req.user.id;
   try {
     const order = await createOrder(userId, req.body);
+    
+    const io = req.app.get("io");
+    if (io) {
+      io.to("admin_room").emit("new_order", {
+        message: `New order #${order._id} placed by user ${userId}`,
+        order: order
+      });
+    }
+
     sendResponse(res, 201, true, "Order placed successfully", order);
   } catch (error: any) {
     if (error.message === "User not found") {

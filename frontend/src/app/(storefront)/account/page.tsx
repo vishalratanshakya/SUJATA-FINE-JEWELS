@@ -142,7 +142,7 @@ export default function AccountPage() {
           </div>
           <Link
             href="/account/settings/profile"
-            className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#B38E5D] hover:bg-[#997746] text-white text-xs font-semibold uppercase tracking-widest rounded-xl transition-all shadow-xs self-start sm:self-auto"
+            className="hidden sm:inline-flex items-center space-x-2 px-5 py-2.5 bg-[#B38E5D] hover:bg-[#997746] text-white text-xs font-semibold uppercase tracking-widest rounded-xl transition-all shadow-xs self-start sm:self-auto"
           >
             <Edit2 size={14} />
             <span>EDIT PROFILE</span>
@@ -150,7 +150,7 @@ export default function AccountPage() {
         </div>
 
         {/* Profile Avatar & Contact Details */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+        <div className="hidden md:flex flex-col md:flex-row items-start md:items-center gap-6">
           <div className="relative group">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#B38E5D] relative shadow-sm bg-[#F5EFE6] flex items-center justify-center">
               <User size={40} className="text-[#B38E5D]" />
@@ -423,7 +423,7 @@ export default function AccountPage() {
             {wishlist.slice(0, 4).map((product) => (
               <div
                 key={product.id}
-                className="group bg-[#FAF8F5] rounded-xl p-4 border border-[#EAE4D9] space-y-3 relative flex flex-col justify-between"
+                className="group bg-[#FAF8F5] rounded-xl p-4 border border-[#D5CEC4] space-y-3 relative flex flex-col justify-between hover:border-[#B38E5D] transition-colors shadow-sm"
               >
                 <button
                   onClick={() => toggleWishlist(product)}

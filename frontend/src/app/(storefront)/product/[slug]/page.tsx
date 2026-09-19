@@ -203,7 +203,7 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 mb-24 items-start">
           
           {/* LEFT: GALLERY (55-60% width → 7 Cols) */}
-          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 lg:gap-6 sticky top-28 items-start self-start">
+          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4 lg:gap-6 lg:sticky lg:top-28 items-start lg:self-start">
             
             {/* Vertical Thumbnails (Scrollbar Hidden) */}
             <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto no-scrollbar max-h-[400px] md:max-h-[460px] lg:max-h-[480px] md:w-20 flex-shrink-0">

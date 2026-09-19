@@ -1,21 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Mail, Eye, X, ShoppingBag, Heart, MapPin, Award, UserCheck } from "lucide-react";
+import { Search, Eye } from "lucide-react";
+import { toast } from "react-hot-toast";
 
-import Image from "next/image";
-import { useStore, Customer } from "@/store/useStore";
+type RealCustomer = {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  totalOrders: number;
+  totalSpent: number;
+  createdAt: string;
+};
 
 export default function AdminCustomersPage() {
-  const customers = useStore((s) => s.customers);
+  const [customers, setCustomers] = useState<RealCustomer[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setCustomers(data.data);
+        } else {
+          toast.error(data.message || "Failed to fetch customers");
+        }
+      } catch (error) {
+        toast.error("Error fetching customers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
 
   const filteredCustomers = customers.filter(c => 
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.email.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone.toLowerCase().includes(search.toLowerCase())
+    (c.phone && c.phone.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -57,34 +90,40 @@ export default function AdminCustomersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredCustomers.length === 0 ? (
+              {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
-                    No customers found matching search.
+                    Loading customers...
+                  </td>
+                </tr>
+              ) : filteredCustomers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                    No customers found.
                   </td>
                 </tr>
               ) : (
                 filteredCustomers.map((cust) => (
-                  <tr key={cust.id} className="hover:bg-gray-50/80 transition-colors">
+                  <tr key={cust._id} className="hover:bg-gray-50/80 transition-colors">
                     <td className="px-6 py-4">
                       <p className="font-semibold text-gray-900">{cust.name}</p>
-                      <p className="text-xs text-gray-400">{cust.email} • {cust.phone}</p>
+                      <p className="text-xs text-gray-400">{cust.email} {cust.phone ? `• ${cust.phone}` : ''}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        cust.status === 'active' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-gray-100 text-gray-700'
-                      }`}>
-                        {cust.status}
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200`}>
+                        active
                       </span>
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-800">{cust.totalOrders} Orders</td>
                     <td className="px-6 py-4 text-right font-bold text-gray-900">
-                      ₹{cust.totalSpent.toLocaleString('en-IN')}
+                      ₹{cust.totalSpent?.toLocaleString('en-IN') || 0}
                     </td>
-                    <td className="px-6 py-4 text-xs text-gray-500">{cust.joinedDate}</td>
+                    <td className="px-6 py-4 text-xs text-gray-500">
+                      {new Date(cust.createdAt).toLocaleDateString()}
+                    </td>
                     <td className="px-6 py-4 text-right">
                       <Link 
-                        href={`/admin/customers/${cust.id}`}
+                        href={`/admin/customers/${cust._id}`}
                         className="px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-charcoal hover:text-white rounded text-xs font-medium transition-colors inline-flex items-center space-x-1.5"
                       >
                         <Eye size={14} />

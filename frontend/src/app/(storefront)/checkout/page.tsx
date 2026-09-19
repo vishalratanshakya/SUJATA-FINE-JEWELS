@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronRight, CheckCircle } from "lucide-react";
+import { ChevronRight, CheckCircle, CreditCard, Banknote } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useStore } from "@/store/useStore";
 import Image from "next/image";
@@ -14,6 +14,25 @@ export default function CheckoutPage() {
   const clearCart = useStore((state) => state.clearCart);
   const cartTotal = useStore((state) => state.getCartTotal());
 
+  const [shippingForm, setShippingForm] = useState({
+    email: "",
+    name: "",
+    phone: "",
+    house: "",
+    street: "",
+    landmark: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod">("card");
+  const [cardForm, setCardForm] = useState({
+    cardNumber: "",
+    expiry: "",
+    cvc: ""
+  });
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -22,8 +41,37 @@ export default function CheckoutPage() {
   const handleContinue = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === "information") {
+      // Validate Shipping Form
+      if (!shippingForm.email) {
+        toast.error("Email address is required.");
+        return;
+      }
+      if (!/^[a-zA-Z\s]+$/.test(shippingForm.name.trim())) {
+        toast.error("Full Name must contain only letters.");
+        return;
+      }
+      if (!/^\d{10}$/.test(shippingForm.phone.trim().replace(/\s+/g, '').replace(/^\+91/, ''))) {
+        toast.error("Please enter a valid 10-digit mobile number.");
+        return;
+      }
+      if (!shippingForm.house || !shippingForm.street || !shippingForm.city || !shippingForm.state || !shippingForm.pincode) {
+        toast.error("Please fill in all required address fields.");
+        return;
+      }
       setStep("payment");
     } else if (step === "payment") {
+      // Validate Payment
+      if (paymentMethod === "card") {
+        if (!/^\d{16}$/.test(cardForm.cardNumber.replace(/\s+/g, ''))) {
+          toast.error("Please enter a valid 16-digit card number.");
+          return;
+        }
+        if (!cardForm.expiry || !cardForm.cvc) {
+          toast.error("Please complete all card details.");
+          return;
+        }
+      }
+
       try {
         const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
         const token = localStorage.getItem("token");
@@ -44,10 +92,16 @@ export default function CheckoutPage() {
             selectedVariant: item.selectedVariant
           })),
           totalAmount: cartTotal,
+          paymentMethod: paymentMethod === "cod" ? "COD" : "CARD",
           shippingAddress: {
-            name: "Customer Name", // Would normally come from form state
-            line1: "Customer Address",
-            phone: "0000000000"
+            name: shippingForm.name,
+            line1: `${shippingForm.house}, ${shippingForm.street}`,
+            line2: shippingForm.landmark,
+            phone: shippingForm.phone,
+            city: shippingForm.city,
+            state: shippingForm.state,
+            postalCode: shippingForm.pincode,
+            country: "India"
           }
         };
 
@@ -118,19 +172,88 @@ export default function CheckoutPage() {
                     <input 
                       type="email" 
                       required
+                      value={shippingForm.email}
+                      onChange={(e) => setShippingForm({...shippingForm, email: e.target.value})}
                       placeholder="Email Address" 
-                      className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne transition-colors"
+                      className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne transition-colors rounded-none"
                     />
                   </section>
 
                   <section>
                     <h2 className="text-lg font-serif text-charcoal mb-4">Shipping Address</h2>
-                    <div className="grid grid-cols-2 gap-4">
-                      <input type="text" required placeholder="First Name" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
-                      <input type="text" required placeholder="Last Name" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
-                      <input type="text" required placeholder="Address" className="col-span-2 w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
-                      <input type="text" required placeholder="City" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
-                      <input type="text" required placeholder="Postal Code" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
+                    <div className="space-y-4">
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="Full Name *" 
+                          value={shippingForm.name}
+                          onChange={(e) => setShippingForm({...shippingForm, name: e.target.value})}
+                          className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                        />
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="Mobile Number *" 
+                          value={shippingForm.phone}
+                          onChange={(e) => setShippingForm({...shippingForm, phone: e.target.value})}
+                          className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                        />
+                      </div>
+                      
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="House/Flat/Building Number *" 
+                        value={shippingForm.house}
+                        onChange={(e) => setShippingForm({...shippingForm, house: e.target.value})}
+                        className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                      />
+                      
+                      <input 
+                        type="text" 
+                        required 
+                        placeholder="Street/Area *" 
+                        value={shippingForm.street}
+                        onChange={(e) => setShippingForm({...shippingForm, street: e.target.value})}
+                        className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                      />
+                      
+                      <input 
+                        type="text" 
+                        placeholder="Landmark (Optional)" 
+                        value={shippingForm.landmark}
+                        onChange={(e) => setShippingForm({...shippingForm, landmark: e.target.value})}
+                        className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                      />
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="City *" 
+                          value={shippingForm.city}
+                          onChange={(e) => setShippingForm({...shippingForm, city: e.target.value})}
+                          className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                        />
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="State *" 
+                          value={shippingForm.state}
+                          onChange={(e) => setShippingForm({...shippingForm, state: e.target.value})}
+                          className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                        />
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="PIN Code *" 
+                          value={shippingForm.pincode}
+                          onChange={(e) => setShippingForm({...shippingForm, pincode: e.target.value})}
+                          className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                        />
+                      </div>
                     </div>
                   </section>
                 </>
@@ -138,13 +261,83 @@ export default function CheckoutPage() {
 
               {step === "payment" && (
                 <section>
-                  <h2 className="text-lg font-serif text-charcoal mb-4">Payment Details</h2>
-                  <div className="p-4 border border-charcoal/20 bg-white space-y-4">
-                    <input type="text" required placeholder="Card Number" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
-                    <div className="grid grid-cols-2 gap-4">
-                      <input type="text" required placeholder="MM / YY" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
-                      <input type="text" required placeholder="CVC" className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne" />
+                  <h2 className="text-lg font-serif text-charcoal mb-4">Payment Options</h2>
+                  
+                  <div className="border border-charcoal/20 bg-white rounded-none divide-y divide-charcoal/10">
+                    
+                    {/* Credit Card Option */}
+                    <div className="p-4">
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input 
+                          type="radio" 
+                          name="payment" 
+                          value="card" 
+                          checked={paymentMethod === "card"}
+                          onChange={() => setPaymentMethod("card")}
+                          className="w-4 h-4 text-charcoal focus:ring-charcoal accent-charcoal" 
+                        />
+                        <span className="flex-1 text-sm font-medium text-charcoal flex items-center space-x-2">
+                          <CreditCard size={16} /> <span>Credit/Debit Card</span>
+                        </span>
+                      </label>
+                      
+                      {paymentMethod === "card" && (
+                        <div className="mt-4 pt-4 border-t border-charcoal/5 space-y-4">
+                          <input 
+                            type="text" 
+                            required 
+                            placeholder="Card Number (16 digits)" 
+                            value={cardForm.cardNumber}
+                            onChange={(e) => setCardForm({...cardForm, cardNumber: e.target.value})}
+                            className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                          />
+                          <div className="grid grid-cols-2 gap-4">
+                            <input 
+                              type="text" 
+                              required 
+                              placeholder="MM / YY" 
+                              value={cardForm.expiry}
+                              onChange={(e) => setCardForm({...cardForm, expiry: e.target.value})}
+                              className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                            />
+                            <input 
+                              type="text" 
+                              required 
+                              placeholder="CVC" 
+                              value={cardForm.cvc}
+                              onChange={(e) => setCardForm({...cardForm, cvc: e.target.value})}
+                              className="w-full border border-charcoal/20 bg-white p-3 text-sm text-charcoal focus:outline-none focus:border-champagne rounded-none" 
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
+                    
+                    {/* COD Option */}
+                    <div className="p-4">
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input 
+                          type="radio" 
+                          name="payment" 
+                          value="cod" 
+                          checked={paymentMethod === "cod"}
+                          onChange={() => setPaymentMethod("cod")}
+                          className="w-4 h-4 text-charcoal focus:ring-charcoal accent-charcoal" 
+                        />
+                        <span className="flex-1 text-sm font-medium text-charcoal flex items-center space-x-2">
+                          <Banknote size={16} /> <span>Cash on Delivery (COD)</span>
+                        </span>
+                      </label>
+                      
+                      {paymentMethod === "cod" && (
+                        <div className="mt-4 pt-4 border-t border-charcoal/5">
+                          <p className="text-xs text-charcoal/70 leading-relaxed">
+                            Pay with cash upon delivery. Please ensure you have the exact amount ready for the delivery executive.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                   </div>
                 </section>
               )}
@@ -160,8 +353,8 @@ export default function CheckoutPage() {
             <h2 className="font-serif text-xl text-charcoal mb-6">Order Summary</h2>
             
             <div className="max-h-[40vh] overflow-y-auto mb-6 pr-2 space-y-4">
-              {cart.map((item) => (
-                <div key={item.product.id} className="flex space-x-4">
+              {cart.map((item, index) => (
+                <div key={`${item.product.id}-${index}`} className="flex space-x-4">
                   <div className="w-16 h-16 bg-white relative rounded overflow-hidden">
                     <Image src={item.product.images[0]} alt={item.product.name} fill sizes="64px" className="object-cover" />
                     <span className="absolute -top-2 -right-2 bg-charcoal text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center z-10">{item.quantity}</span>

@@ -101,7 +101,7 @@ export function SignatureProductCarousel() {
           <button
             onClick={handlePrev}
             aria-label="Previous Product"
-            className="absolute left-1 md:left-4 lg:left-8 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] flex items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
+            className="hidden md:flex absolute left-1 md:left-4 lg:left-8 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
           >
             <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -109,7 +109,7 @@ export function SignatureProductCarousel() {
           <button
             onClick={handleNext}
             aria-label="Next Product"
-            className="absolute right-1 md:right-4 lg:right-8 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] flex items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
+            className="hidden md:flex absolute right-1 md:right-4 lg:right-8 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
           >
             <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
           </button>

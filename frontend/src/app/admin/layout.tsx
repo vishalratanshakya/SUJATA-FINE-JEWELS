@@ -1,16 +1,59 @@
 "use client";
 
-import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Search, Bell, ShieldCheck, Menu } from "lucide-react";
 import Link from "next/link";
+import { io } from "socket.io-client";
+import { toast } from "react-hot-toast";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const isAdminLogin = pathname === "/admin/login";
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (isAdminLogin) return;
+
+    // Connect to Backend Socket.IO
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const socket = io(backendUrl, {
+      withCredentials: true,
+    });
+
+    socket.on("connect", () => {
+      // Join admin room to receive specific admin events
+      socket.emit("join_admin");
+    });
+
+    socket.on("new_order", (data) => {
+      toast.success(data.message || "New order received!", {
+        duration: 5000,
+        position: "top-right",
+      });
+      setUnreadCount((prev) => prev + 1);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [isAdminLogin]);
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      router.push(`/admin/orders?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleClearNotifications = () => {
+    setUnreadCount(0);
+    // Optionally redirect to an admin notifications page here
+  };
 
   if (isAdminLogin) {
     return <div className="min-h-screen bg-[#0F0E0D]">{children}</div>;
@@ -47,14 +90,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <input
                 type="text"
                 placeholder="Global search orders, products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
                 className="w-full pl-10 pr-4 py-2 bg-gray-50/80 border border-gray-200 rounded-full text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-charcoal focus:bg-white transition-all"
               />
             </div>
 
             {/* Notification Icon */}
-            <button className="relative p-2 text-gray-500 hover:text-charcoal hover:bg-gray-100 rounded-full transition-colors">
+            <button 
+              onClick={handleClearNotifications}
+              className="relative p-2 text-gray-500 hover:text-charcoal hover:bg-gray-100 rounded-full transition-colors"
+              title="Notifications"
+            >
               <Bell size={18} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full ring-2 ring-white"></span>
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-amber-500 rounded-full ring-2 ring-white text-[8px] font-bold text-white flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
 
             <div className="h-6 w-[1px] bg-gray-200 hidden sm:block"></div>
@@ -80,4 +134,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
-

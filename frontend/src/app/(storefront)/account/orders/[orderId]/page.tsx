@@ -57,7 +57,7 @@ export default function OrderDetailsPage() {
         <div className="bg-[#FAF8F5] p-6 rounded-2xl border border-[#EAE4D9] space-y-4">
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#2C2825]">Order Delivery Timeline</h3>
           
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-2">
+          <div className="flex items-start space-x-6 md:justify-between overflow-x-auto no-scrollbar pt-2 pb-4 w-full">
             {[
               { step: "Order Placed", date: "12 May, 10:30 AM", active: true },
               { step: "Confirmed", date: "12 May, 11:15 AM", active: true },
@@ -65,7 +65,7 @@ export default function OrderDetailsPage() {
               { step: "Out for Delivery", date: "14 May, 09:00 AM", active: true },
               { step: "Delivered", date: "14 May, 04:30 PM", active: true },
             ].map((st, i) => (
-              <div key={i} className="flex flex-col items-center text-center space-y-1">
+              <div key={i} className="flex flex-col items-center text-center space-y-1 flex-shrink-0 min-w-[100px]">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
                     st.active ? "bg-[#2C2825] text-white" : "bg-[#E2DDD3] text-[#8C8275]"

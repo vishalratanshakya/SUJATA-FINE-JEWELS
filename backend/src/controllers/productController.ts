@@ -24,6 +24,15 @@ export async function getProductBySlug(req: Request, res: Response) {
 export async function createProduct(req: Request, res: Response) {
   try {
     const product = await productService.createProduct(req.body);
+    
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("new_product", {
+        message: `A new product "${product.name}" has just been added!`,
+        product: product
+      });
+    }
+
     res.status(201).json({ success: true, data: product });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });

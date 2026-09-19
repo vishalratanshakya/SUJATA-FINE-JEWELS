@@ -74,7 +74,7 @@ export function CraftsmanshipSection() {
           </div>
 
           {/* Text Container */}
-          <div className="w-full lg:w-2/5 bg-white p-8 md:p-12 lg:p-20 flex flex-col justify-center relative shadow-sm z-10 lg:-ml-12 lg:my-12">
+          <div className="w-11/12 mx-auto -mt-12 lg:mx-0 lg:w-2/5 bg-white p-8 md:p-12 lg:p-20 flex flex-col justify-center relative shadow-lg lg:shadow-sm z-10 lg:-ml-12 lg:my-12">
             <div ref={textRef} className="max-w-md mx-auto">
               <span className="text-[10px] md:text-xs tracking-[0.3em] uppercase text-charcoal/50 mb-4 block">
                 THE ART OF

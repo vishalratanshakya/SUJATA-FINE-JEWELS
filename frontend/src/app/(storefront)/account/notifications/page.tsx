@@ -65,19 +65,20 @@ export default function NotificationsPage() {
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#EAE4D9] shadow-xs space-y-6">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#F2EDE4] pb-6">
-          <div>
-            <h1 className="font-serif text-3xl text-[#2C2825]">Notifications</h1>
-            <p className="text-xs text-[#8C8275] tracking-wider uppercase mt-1">
+        <div className="flex flex-row items-start sm:items-center justify-between gap-4 border-b border-[#F2EDE4] pb-6">
+          <div className="flex-1">
+            <h1 className="font-serif text-2xl sm:text-3xl text-[#2C2825]">Notifications</h1>
+            <p className="text-[10px] sm:text-xs text-[#8C8275] tracking-wider uppercase mt-1">
               Stay updated on your orders, offers, and account activity.
             </p>
           </div>
           <button
             onClick={handleMarkAllRead}
-            className="inline-flex items-center space-x-2 px-4 py-2 border border-[#E2DDD3] hover:border-[#2C2825] text-[#2C2825] text-xs font-bold uppercase tracking-wider rounded-xl transition-colors self-start sm:self-auto"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 sm:px-4 sm:py-2 border border-[#E2DDD3] hover:border-[#2C2825] text-[#2C2825] text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-lg sm:rounded-xl transition-colors flex-shrink-0 mt-1 sm:mt-0"
           >
-            <CheckCheck size={16} />
-            <span>MARK ALL AS READ</span>
+            <CheckCheck size={14} />
+            <span className="hidden sm:inline">MARK ALL AS READ</span>
+            <span className="sm:hidden">MARK READ</span>
           </button>
         </div>
 

@@ -15,12 +15,13 @@ export default function EditAddressPage() {
   const [form, setForm] = useState({
     title: "HOME",
     name: "",
-    line1: "",
-    line2: "",
     phone: "",
+    house: "",
+    street: "",
+    landmark: "",
     city: "",
     state: "",
-    postalCode: "",
+    pincode: "",
     isDefault: false,
   });
 
@@ -37,15 +38,23 @@ export default function EditAddressPage() {
           const data = await res.json();
           const address = data.data.find((a: any) => a._id === addressId);
           if (address) {
+            
+            // Reconstruct fields from old schema if needed, otherwise use direct
+            // Since old schema didn't have house, street explicitly, we'll try to map if possible or leave blank
+            const parts = address.addressLine1 ? address.addressLine1.split(", ") : [];
+            const house = parts[0] || "";
+            const street = parts.slice(1).join(", ") || "";
+            
             setForm({
               title: address.label || "HOME",
-              name: address.fullName,
-              line1: address.addressLine1,
-              line2: address.addressLine2,
-              phone: address.phone,
+              name: address.fullName || "",
+              phone: address.phone || "",
+              house: house,
+              street: street,
+              landmark: address.addressLine2 || "",
               city: address.city || "",
               state: address.state || "",
-              postalCode: address.postalCode || "",
+              pincode: address.postalCode || "",
               isDefault: address.isDefault,
             });
           }
@@ -59,20 +68,32 @@ export default function EditAddressPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.line1) {
-      toast.error("Please fill in required fields");
+
+    // Validation
+    if (!/^[a-zA-Z\s]+$/.test(form.name.trim())) {
+      toast.error("Full Name must contain only letters.");
+      return;
+    }
+    
+    if (!/^\d{10}$/.test(form.phone.trim().replace(/\s+/g, '').replace(/^\+91/, ''))) {
+      toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    if (!form.house || !form.street || !form.city || !form.state || !form.pincode) {
+      toast.error("Please fill in all required address fields.");
       return;
     }
 
     const payload = {
       label: form.title,
       fullName: form.name,
-      addressLine1: form.line1,
-      addressLine2: form.line2,
+      addressLine1: `${form.house}, ${form.street}`,
+      addressLine2: form.landmark,
       phone: form.phone,
-      city: form.city || "Default City",
-      state: form.state || "Default State",
-      postalCode: form.postalCode || "000000",
+      city: form.city,
+      state: form.state,
+      postalCode: form.pincode,
       country: "India",
       isDefault: form.isDefault
     };
@@ -105,35 +126,45 @@ export default function EditAddressPage() {
     <AccountLayoutWrapper>
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#EAE4D9] shadow-xs space-y-6">
         
-        <div className="flex items-center space-x-4 border-b border-[#F2EDE4] pb-6">
-          <Link href="/account/addresses" className="w-10 h-10 rounded-full border border-[#EAE4D9] flex items-center justify-center text-[#8C8275] hover:bg-[#FAF8F5] transition-colors">
-            <ArrowLeft size={18} />
+        {/* Header */}
+        <div className="border-b border-[#F2EDE4] pb-6 space-y-4">
+          <Link
+            href="/account/addresses"
+            className="inline-flex items-center space-x-2 px-4 py-2 border border-[#E2DDD3] rounded-xl text-xs font-bold uppercase tracking-wider text-[#6B6357] hover:text-[#2C2825] hover:bg-[#FAF8F5] transition-colors self-start"
+          >
+            <ArrowLeft size={14} />
+            <span>BACK TO ADDRESSES</span>
           </Link>
-          <div>
+          <div className="space-y-1">
             <h1 className="font-serif text-3xl text-[#2C2825]">Edit Address</h1>
-            <p className="text-xs text-[#8C8275] tracking-wider uppercase mt-1">
-              Update your delivery details
+            <p className="text-xs text-[#8C8275] tracking-wider uppercase">
+              Update your delivery information below.
             </p>
           </div>
         </div>
 
-        <div className="max-w-xl mx-auto py-4">
-          <form onSubmit={handleSave} className="space-y-6">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">Address Title</label>
-              <select
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825] bg-white"
-              >
-                <option value="HOME">HOME</option>
-                <option value="WORK">WORK</option>
-                <option value="OTHER">OTHER</option>
-              </select>
-            </div>
+        {/* Edit Address Form */}
+        <form onSubmit={handleSave} className="space-y-6 max-w-2xl">
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+              Address Type
+            </label>
+            <select
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className="w-full sm:w-1/2 border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825] bg-white font-medium text-[#2C2825]"
+            >
+              <option value="HOME">HOME</option>
+              <option value="WORK">WORK</option>
+              <option value="OTHER">OTHER</option>
+            </select>
+          </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">Recipient Name</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+                Full Name *
+              </label>
               <input
                 type="text"
                 value={form.name}
@@ -145,69 +176,134 @@ export default function EditAddressPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">Address Line 1</label>
-              <input
-                type="text"
-                value={form.line1}
-                onChange={(e) => setForm({ ...form, line1: e.target.value })}
-                placeholder="House/Flat No., Street, Area"
-                className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">Address Line 2</label>
-              <input
-                type="text"
-                value={form.line2}
-                onChange={(e) => setForm({ ...form, line2: e.target.value })}
-                placeholder="City, State, Pincode"
-                className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">Phone Number</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+                Mobile Number *
+              </label>
               <input
                 type="text"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="+91 98765 43210"
+                placeholder="10-digit mobile number"
                 className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+                required
               />
             </div>
+          </div>
 
-            <div className="flex items-center space-x-3 pt-2">
-              <input
-                id="set-def"
-                type="checkbox"
-                checked={form.isDefault}
-                onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
-                className="h-5 w-5 rounded border-[#E2DDD3] text-[#2C2825] focus:ring-[#2C2825]"
-              />
-              <label htmlFor="set-def" className="text-sm font-medium text-[#6B6357]">
-                Set as default address
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+              House/Flat/Building Number *
+            </label>
+            <input
+              type="text"
+              value={form.house}
+              onChange={(e) => setForm({ ...form, house: e.target.value })}
+              placeholder="e.g. Flat No. 12B"
+              className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+              Street/Area *
+            </label>
+            <input
+              type="text"
+              value={form.street}
+              onChange={(e) => setForm({ ...form, street: e.target.value })}
+              placeholder="e.g. Green Avenue, South Extension"
+              className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+              required
+            />
+          </div>
+          
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+              Landmark (Optional)
+            </label>
+            <input
+              type="text"
+              value={form.landmark}
+              onChange={(e) => setForm({ ...form, landmark: e.target.value })}
+              placeholder="e.g. Opposite Metro Station"
+              className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+                City *
               </label>
+              <input
+                type="text"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+                placeholder="e.g. New Delhi"
+                className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+                required
+              />
             </div>
+            
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+                State *
+              </label>
+              <input
+                type="text"
+                value={form.state}
+                onChange={(e) => setForm({ ...form, state: e.target.value })}
+                placeholder="e.g. Delhi"
+                className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
+                PIN Code *
+              </label>
+              <input
+                type="text"
+                value={form.pincode}
+                onChange={(e) => setForm({ ...form, pincode: e.target.value })}
+                placeholder="e.g. 110049"
+                className="w-full border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825]"
+                required
+              />
+            </div>
+          </div>
 
-            <div className="flex space-x-4 pt-6 border-t border-[#F2EDE4]">
-              <button
-                type="button"
-                onClick={() => router.push("/account/addresses")}
-                className="flex-1 py-3.5 border border-[#E2DDD3] rounded-xl text-xs font-bold uppercase tracking-wider text-[#6B6357] hover:bg-[#FAF8F5] transition-colors"
-              >
-                CANCEL
-              </button>
-              <button
-                type="submit"
-                className="flex-1 py-3.5 bg-[#2C2825] hover:bg-[#B38E5D] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition-colors"
-              >
-                SAVE CHANGES
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="flex items-center space-x-2 pt-2">
+            <input
+              id="set-default-check"
+              type="checkbox"
+              checked={form.isDefault}
+              onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
+              className="h-4 w-4 rounded border-[#E2DDD3] text-[#2C2825] focus:ring-[#2C2825]"
+            />
+            <label htmlFor="set-default-check" className="text-xs font-semibold text-[#6B6357] cursor-pointer">
+              Set as default shipping address
+            </label>
+          </div>
+
+          <div className="flex space-x-4 pt-4 border-t border-[#F2EDE4]">
+            <button
+              type="button"
+              onClick={() => router.push("/account/addresses")}
+              className="flex-1 sm:flex-none px-6 py-3.5 border border-[#E2DDD3] rounded-xl text-xs font-bold uppercase tracking-wider text-[#6B6357] hover:bg-gray-50 transition-colors flex items-center justify-center"
+            >
+              CANCEL
+            </button>
+            <button
+              type="submit"
+              className="flex-1 sm:flex-none px-8 py-3.5 bg-[#2C2825] hover:bg-[#B38E5D] text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-colors shadow-xs flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              <span>SAVE CHANGES</span>
+            </button>
+          </div>
+        </form>
 
       </div>
     </AccountLayoutWrapper>
