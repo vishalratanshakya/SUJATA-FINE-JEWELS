@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getProfile, updateProfileInfo } from "../services/userService";
+import { getProfile, updateProfileInfo, getAllCustomers } from "../services/userService";
 
 export const getMe = async (req: Request, res: Response) => {
   try {
@@ -35,7 +35,6 @@ export const updateProfile = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const { getAllCustomers } = await import("../services/userService");
     const customers = await getAllCustomers();
     res.json({ success: true, count: customers.length, data: customers });
   } catch (error: any) {
