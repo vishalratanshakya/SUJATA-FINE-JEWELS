@@ -28,6 +28,7 @@ export function ShopByCategory() {
                   src={category.image}
                   alt={category.name}
                   fill
+                  sizes="(max-width: 768px) 100px, 128px"
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>

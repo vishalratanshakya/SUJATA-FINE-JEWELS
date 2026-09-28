@@ -2,12 +2,29 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStore } from "@/store/useStore";
 
 export function AnnouncementBarBanner() {
   const announcementBar = useStore((s) => s.announcementBar);
+  const setAnnouncementBar = useStore((s) => s.setAnnouncementBar);
   const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    const fetchAnnouncement = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/announcement-bar`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.success && data.data) {
+          setAnnouncementBar(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch announcement bar:", err);
+      }
+    };
+    fetchAnnouncement();
+  }, [setAnnouncementBar]);
 
   if (!announcementBar.active || dismissed) return null;
 

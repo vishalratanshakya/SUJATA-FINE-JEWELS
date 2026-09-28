@@ -68,7 +68,7 @@ export function CraftsmanshipSection() {
             <Image
               src="/images/products/rings/ring_placeholder.jpg"
               alt="Jewellery Artisan Crafting"
-              fill
+              fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover"
             />
           </div>

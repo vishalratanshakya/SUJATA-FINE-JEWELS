@@ -179,10 +179,25 @@ export default function AdminBannersPage() {
     }
   };
 
-  const saveAnnouncement = () => {
-    updateAnnouncementBar(annForm);
-    toast.success("Announcement bar updated!");
-    setEditingAnn(false);
+  const saveAnnouncement = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/announcement-bar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(annForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        updateAnnouncementBar(annForm);
+        toast.success("Announcement bar updated!");
+        setEditingAnn(false);
+      } else {
+        toast.error("Failed to update announcement");
+      }
+    } catch (err) {
+      toast.error("Server error");
+    }
   };
 
   const handleAddNewBanner = () => {
@@ -243,7 +258,23 @@ export default function AdminBannersPage() {
           </div>
           <div className="flex items-center space-x-3">
             <button
-              onClick={() => updateAnnouncementBar({ active: !announcementBar.active })}
+              onClick={async () => {
+                const newState = { active: !announcementBar.active };
+                try {
+                  const token = localStorage.getItem("token");
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/announcement-bar`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                    body: JSON.stringify(newState),
+                  });
+                  if (res.ok) {
+                    updateAnnouncementBar(newState);
+                    toast.success(newState.active ? "Announcement bar active" : "Announcement bar hidden");
+                  }
+                } catch (err) {
+                  toast.error("Server error");
+                }
+              }}
               className={`flex items-center space-x-1 text-sm ${announcementBar.active ? "text-green-600" : "text-gray-400"}`}
             >
               {announcementBar.active

@@ -247,7 +247,7 @@ const DEFAULT_HERO_BANNERS: HeroBanner[] = [
     description: "Discover handcrafted diamond necklaces, rings, and gold jewelry designed to elevate every moment with unmatched brilliance.",
     cta: "Explore Collection",
     ctaUrl: "/shop",
-    image: "https://images.unsplash.com/photo-1599643478514-4a52023028dd?q=80&w=2070&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
     active: true,
   },
   {
@@ -536,6 +536,7 @@ interface StoreState {
 
   // Announcement Bar
   announcementBar: AnnouncementBar;
+  setAnnouncementBar: (bar: AnnouncementBar) => void;
   updateAnnouncementBar: (updates: Partial<AnnouncementBar>) => void;
 
   // Coupons
@@ -899,6 +900,8 @@ export const useStore = create<StoreState>()(
 
       // --- Announcement Bar ---
       announcementBar: DEFAULT_ANNOUNCEMENT_BAR,
+
+      setAnnouncementBar: (bar) => set({ announcementBar: bar }),
 
       updateAnnouncementBar: (updates) => {
         set((state) => ({

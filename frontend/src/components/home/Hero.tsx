@@ -15,6 +15,7 @@ export function Hero() {
     const fetchBanners = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`);
+        if (!res.ok) return;
         const data = await res.json();
         if (data.success && data.data && data.data.length > 0) {
           setHeroBanners(data.data);
@@ -91,9 +92,9 @@ export function Hero() {
               src={HERO_BANNERS[currentIndex].image}
               alt={HERO_BANNERS[currentIndex].heading}
               fill
+              sizes="(max-width: 768px) 100vw, 100vw"
               className="object-cover"
               priority
-              quality={100}
             />
             {/* Subtle gradient overlay to ensure text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-black/20 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/40 md:to-transparent" />

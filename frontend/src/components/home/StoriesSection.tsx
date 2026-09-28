@@ -110,7 +110,7 @@ export function StoriesSection() {
                 <Image 
                   src={story.src} 
                   alt={story.title} 
-                  fill 
+                  fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" 
                   className="object-cover"
                 />
               )}
@@ -147,7 +147,7 @@ export function StoriesSection() {
                   className="w-full bg-black/40 backdrop-blur-md border border-white/20 rounded-xl p-3 flex items-center gap-4 hover:bg-black/60 transition-colors"
                 >
                   <div className="w-16 h-16 relative rounded-lg overflow-hidden flex-shrink-0 bg-white">
-                    <Image src={story.productImage} alt={story.productName} fill className="object-cover" />
+                    <Image src={story.productImage} alt={story.productName} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover" />
                   </div>
                   <div className="flex-1 flex justify-between items-center">
                     <span className="text-white font-medium text-sm leading-tight pr-4">{story.productName}</span>
