@@ -22,7 +22,7 @@ export const FEATURED_PRODUCTS = [
     isBestSeller: true,
     images: [
       "/images/products/rings/ring_placeholder.jpg",
-      "/images/products/pendants/pendant_placeholder.jpg"
+      "/images/products/rings/ring_placeholder.jpg"
     ]
   },
   {
@@ -39,7 +39,7 @@ export const FEATURED_PRODUCTS = [
     isNewArrival: true,
     images: [
       "/images/products/necklaces/necklace_placeholder.jpg",
-      "/images/products/earrings/earrings_placeholder.jpg"
+      "/images/products/necklaces/necklace_placeholder.jpg"
     ]
   },
   {
@@ -55,7 +55,7 @@ export const FEATURED_PRODUCTS = [
     rating: 5,
     images: [
       "/images/products/earrings/earrings_placeholder.jpg",
-      "/images/products/rings/ring_placeholder.jpg"
+      "/images/products/earrings/earrings_placeholder.jpg"
     ]
   },
   {
@@ -71,7 +71,7 @@ export const FEATURED_PRODUCTS = [
     rating: 5,
     images: [
       "/images/products/bracelets/bracelet_placeholder.jpg",
-      "/images/products/bangles/bangle_placeholder.jpg"
+      "/images/products/bracelets/bracelet_placeholder.jpg"
     ]
   },
   {
@@ -96,7 +96,7 @@ export const FEATURED_PRODUCTS = [
     slug: "aura-solitaire-pendant",
     metal: "18K Yellow Gold",
     stone: "Diamond",
-    category: "Pendents",
+    category: "Pendants",
     price: 68000,
     originalPrice: 82000,
     discountPercentage: 17,

@@ -9,6 +9,7 @@ import {
   ExternalLink, ToggleLeft, ToggleRight, Trash2
 } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import Link from "next/link";
 
 export default function AdminBannersPage() {
   const heroBanners = useStore((s) => s.heroBanners);
@@ -52,10 +53,6 @@ export default function AdminBannersPage() {
   // ── Editing state ──
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Partial<HeroBanner>>({});
-
-  // ── Adding New state ──
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [newBannerForm, setNewBannerForm] = useState<Partial<HeroBanner>>({});
 
   // ── Image upload ──
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -214,46 +211,7 @@ export default function AdminBannersPage() {
     }
   };
 
-  const handleAddNewBanner = () => {
-    setIsAddingNew(true);
-    setNewBannerForm({
-      heading: "",
-      description: "",
-      eyebrow: "",
-      image: "",
-      cta: "Discover More",
-      ctaUrl: "/shop",
-      active: false,
-    });
-  };
 
-  const submitNewBanner = async () => {
-    if (!newBannerForm.heading?.trim()) { toast.error("Heading is required"); return; }
-    if (!newBannerForm.image?.trim()) { toast.error("Image is required"); return; }
-    
-    try {
-      const token = localStorage.getItem("token");
-      const nextId = heroBanners.length > 0 ? Math.max(...heroBanners.map((b) => b.id)) + 1 : 1;
-      const bannerData = { ...newBannerForm, id: nextId };
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(bannerData),
-      });
-      
-      const data = await res.json();
-      if (data.success) {
-        addHeroBanner(bannerData as HeroBanner);
-        toast.success("New banner created!");
-        setIsAddingNew(false);
-      } else {
-        toast.error(data.message || "Failed to create banner");
-      }
-    } catch (err) {
-      toast.error("Server error");
-    }
-  };
 
   return (
     <div className="w-full space-y-10">
@@ -264,11 +222,11 @@ export default function AdminBannersPage() {
 
       {/* ── Announcement Bar ── */}
       <div className="bg-white rounded shadow-sm border border-gray-100 p-6 space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Megaphone size={18} className="text-gray-500" />
-            <h2 className="text-lg font-medium text-gray-800">Announcement Bar</h2>
-            <span className="text-xs text-gray-400">(shown above the navbar)</span>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Megaphone size={18} className="text-gray-500 flex-shrink-0" />
+            <h2 className="text-lg font-medium text-gray-800 whitespace-nowrap">Announcement Bar</h2>
+            <span className="text-xs text-gray-400 whitespace-nowrap">(shown above the navbar)</span>
           </div>
           <div className="flex items-center space-x-3">
             <button
@@ -284,6 +242,9 @@ export default function AdminBannersPage() {
                   if (res.ok) {
                     updateAnnouncementBar(newState);
                     toast.success(newState.active ? "Announcement bar active" : "Announcement bar hidden");
+                  } else {
+                    const data = await res.json();
+                    toast.error(data.message || "Failed to update announcement bar");
                   }
                 } catch (err) {
                   toast.error("Server error");
@@ -414,24 +375,24 @@ export default function AdminBannersPage() {
 
       {/* ── Hero Banners ── */}
       <div className="bg-white rounded shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <ImageIcon size={18} className="text-gray-500" />
-            <h2 className="text-lg font-medium text-gray-800">Hero Banners</h2>
-            <span className="text-xs text-gray-400">({heroBanners.filter(b => b.active).length} of {heroBanners.length} active)</span>
+        <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <ImageIcon size={18} className="text-gray-500 flex-shrink-0" />
+            <h2 className="text-lg font-medium text-gray-800 whitespace-nowrap">Hero Banners</h2>
+            <span className="text-xs text-gray-400 whitespace-nowrap">({heroBanners.filter(b => b.active).length} of {heroBanners.length} active)</span>
           </div>
           <div className="flex items-center space-x-4">
-            <button
-              onClick={handleAddNewBanner}
-              className="px-4 py-1.5 bg-charcoal text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors shadow-sm"
+            <Link
+              href="/admin/banners/add"
+              className="px-4 py-1.5 bg-charcoal text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap"
             >
               + Add Banner
-            </button>
+            </Link>
             <a
               href="/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-1 text-xs text-blue-600 hover:underline"
+              className="flex items-center space-x-1 text-xs text-blue-600 hover:underline whitespace-nowrap"
             >
               <ExternalLink size={12} /><span>View Storefront</span>
             </a>
@@ -442,83 +403,6 @@ export default function AdminBannersPage() {
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
         <div className="divide-y divide-gray-100">
-          {isAddingNew && (
-            <div className="p-6 bg-blue-50/30 border-b border-gray-100">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-sm text-gray-700">Create New Banner</span>
-                  <div className="flex space-x-2">
-                    <button onClick={submitNewBanner} className="flex items-center space-x-1 px-3 py-1.5 bg-charcoal text-white text-xs rounded hover:bg-gray-800">
-                      <Check size={12} /><span>Create Banner</span>
-                    </button>
-                    <button onClick={() => setIsAddingNew(false)} className="flex items-center space-x-1 px-3 py-1.5 border border-gray-200 text-xs rounded hover:border-gray-400">
-                      <X size={12} /><span>Cancel</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Eyebrow Text</label>
-                    <input
-                      type="text"
-                      value={newBannerForm.eyebrow ?? ''}
-                      onChange={(e) => setNewBannerForm({ ...newBannerForm, eyebrow: e.target.value })}
-                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
-                      placeholder="e.g. NEW COLLECTION"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Heading <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      value={newBannerForm.heading ?? ''}
-                      onChange={(e) => setNewBannerForm({ ...newBannerForm, heading: e.target.value })}
-                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
-                      placeholder="e.g. Crafted for Your Forever Moments"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-xs text-gray-600 mb-1">Description</label>
-                    <textarea
-                      rows={2}
-                      value={newBannerForm.description ?? ''}
-                      onChange={(e) => setNewBannerForm({ ...newBannerForm, description: e.target.value })}
-                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
-                      placeholder="e.g. Exquisite jewellery, handcrafted with passion..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">CTA Button Text</label>
-                    <input
-                      type="text"
-                      value={newBannerForm.cta ?? ''}
-                      onChange={(e) => setNewBannerForm({ ...newBannerForm, cta: e.target.value })}
-                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
-                      placeholder="e.g. Discover More"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">CTA URL</label>
-                    <input
-                      type="text"
-                      value={newBannerForm.ctaUrl ?? ''}
-                      onChange={(e) => setNewBannerForm({ ...newBannerForm, ctaUrl: e.target.value })}
-                      className="w-full border border-gray-200 rounded p-2 text-sm font-mono focus:outline-none focus:border-charcoal bg-white"
-                      placeholder="e.g. /shop"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-xs text-gray-600 mb-1">Banner Image (Desktop 16:9, Mobile 4:5) <span className="text-red-500">*</span></label>
-                    <ImageUpload
-                      value={newBannerForm.image ?? ''}
-                      onChange={(url) => setNewBannerForm({ ...newBannerForm, image: url })}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {heroBanners.map((banner, index) => (
             <div key={banner.id} className={`p-6 ${!banner.active ? 'opacity-50' : ''}`}>
@@ -597,8 +481,12 @@ export default function AdminBannersPage() {
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Thumbnail */}
                   <div className="relative w-full md:w-36 h-24 flex-shrink-0 rounded overflow-hidden bg-gray-100 group">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={banner.image} alt={banner.heading} className="w-full h-full object-cover" />
+                    {banner.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={banner.image} alt={banner.heading} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 bg-gray-200">No Image</div>
+                    )}
                     <button
                       onClick={() => handleImageUpload(banner.id)}
                       className="absolute inset-0 bg-black/0 hover:bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
@@ -618,7 +506,7 @@ export default function AdminBannersPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex md:flex-col items-center gap-2 flex-shrink-0">
+                  <div className="flex flex-row items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => openEdit(banner)}
                       title="Edit banner"

@@ -146,6 +146,7 @@ export default function AdminProductsPage() {
                               src={product.images?.[0] || "/images/products/rings/ring_placeholder.jpg"} 
                               alt={product.name} 
                               fill 
+                              sizes="(max-width: 768px) 100vw, 56px"
                               className="object-contain p-1" 
                             />
                           </div>

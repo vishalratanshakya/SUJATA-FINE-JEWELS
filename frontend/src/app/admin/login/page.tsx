@@ -34,17 +34,29 @@ export default function AdminLoginPage() {
     if (!validate()) return;
 
     setIsLoading(true);
-    // Simulate admin login with secure credentials
-    setTimeout(() => {
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const res = await fetch(`${backendUrl}/api/auth/admin-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      
       setIsLoading(false);
-      if (email === "admin@sujatafinejewels.com" && password === "Admin@123") {
+      if (data.success) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         document.cookie = "admin_token=true; path=/; max-age=86400; SameSite=Strict";
         toast.success("Welcome back to Admin Portal!");
         router.push("/admin");
       } else {
-        toast.error("Invalid admin credentials.");
+        toast.error(data.message || "Invalid admin credentials.");
       }
-    }, 1200);
+    } catch (err) {
+      setIsLoading(false);
+      toast.error("Network error. Please try again.");
+    }
   };
 
   return (
@@ -60,6 +72,7 @@ export default function AdminLoginPage() {
               alt="Sujata Admin Portal Solitaire Ring"
               fill
               priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover opacity-60"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#141210] via-[#141210]/60 to-[#141210]/75" />

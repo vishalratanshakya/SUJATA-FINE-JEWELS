@@ -12,8 +12,8 @@ export function FeaturedCollection() {
     <section className="py-20 bg-pearl">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-          <h2 className="font-serif text-3xl md:text-4xl text-charcoal tracking-wide mb-4 md:mb-0">
+        <div className="flex flex-row justify-between items-center mb-12">
+          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-charcoal tracking-wide">
             FEATURED COLLECTION
           </h2>
           <Link href="/collections/featured" className="text-xs tracking-widest uppercase text-charcoal/60 hover:text-champagne transition-colors flex items-center space-x-2">

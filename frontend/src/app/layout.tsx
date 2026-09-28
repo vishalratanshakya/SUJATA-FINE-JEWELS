@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -48,7 +49,10 @@ export default async function RootLayout({
       <body className="min-h-screen flex flex-col font-sans bg-ivory text-charcoal" suppressHydrationWarning>
         <StoreInitializer products={products} />
         <Providers>
-          <Toaster position="top-right" />
+          <Toaster 
+            position="top-right" 
+            toastOptions={{ duration: 3000 }}
+          />
           {children}
         </Providers>
       </body>

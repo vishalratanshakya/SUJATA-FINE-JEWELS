@@ -88,14 +88,16 @@ export function Hero() {
             transition={{ duration: 1.5, ease: "easeInOut" }}
             className="absolute inset-0"
           >
-            <Image
-              src={HERO_BANNERS[currentIndex].image}
-              alt={HERO_BANNERS[currentIndex].heading}
-              fill
-              sizes="(max-width: 768px) 100vw, 100vw"
-              className="object-cover"
-              priority
-            />
+            {HERO_BANNERS[currentIndex].image && (
+              <Image
+                src={HERO_BANNERS[currentIndex].image}
+                alt={HERO_BANNERS[currentIndex].heading}
+                fill
+                sizes="(max-width: 768px) 100vw, 100vw"
+                className="object-cover"
+                priority
+              />
+            )}
             {/* Subtle gradient overlay to ensure text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-black/20 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/40 md:to-transparent" />
           </motion.div>
@@ -123,7 +125,7 @@ export function Hero() {
                 
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                  className="font-serif text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-6 font-light"
+                  className="font-serif text-4xl md:text-5xl lg:text-6xl leading-[1.15] mb-6 font-light max-w-2xl"
                   dangerouslySetInnerHTML={{
                     __html: HERO_BANNERS[currentIndex].heading.replace(
                       /Your Forever Moments|Heritage|Remembered|Lasts Forever|Most Precious Moments/,

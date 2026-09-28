@@ -41,11 +41,36 @@ export function ProductCard({ product }: { product: Product }) {
       if (res.ok) {
         toggleWishlist(product);
         if (!isInWishlist) {
-          toast.success(`${product.name} added to wishlist!`);
+          toast.success("Added to wishlist", {
+            duration: 3000,
+            style: {
+              borderRadius: "9999px",
+              padding: "8px 16px",
+              fontSize: "12px",
+              minWidth: "auto",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              border: "1px solid #EAE4D9",
+              background: "#FDFBF7",
+              color: "#2C2825"
+            },
+            iconTheme: { primary: "#2C2825", secondary: "#FDFBF7" }
+          });
           setIsBouncing(true);
           setTimeout(() => setIsBouncing(false), 1000);
         } else {
-          toast.error(`${product.name} removed from wishlist.`);
+          toast("Removed from wishlist", {
+            duration: 3000,
+            style: {
+              borderRadius: "9999px",
+              padding: "8px 16px",
+              fontSize: "12px",
+              minWidth: "auto",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              border: "1px solid #EAE4D9",
+              background: "#FDFBF7",
+              color: "#2C2825"
+            }
+          });
         }
       }
     } catch (err) {

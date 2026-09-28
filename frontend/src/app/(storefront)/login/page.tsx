@@ -67,6 +67,7 @@ export default function LoginPage() {
               alt="Sujata Fine Jewels Solitaire Ring"
               fill
               priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-bottom opacity-90"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-[#FAF8F5]/95 via-[#F2EDE4]/60 to-transparent h-3/4" />

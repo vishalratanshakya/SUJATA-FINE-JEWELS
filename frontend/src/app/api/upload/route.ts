@@ -31,8 +31,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Invalid file content" }, { status: 400 });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(fileToUpload, {
-      folder: "sujata_fine_jewels/products",
+    const uploadResponse = await cloudinary.uploader.unsigned_upload(fileToUpload, "Sujata Fine Jewels", {
+      folder: "Sujata Fine Jewels",
       resource_type: "auto",
     });
 
