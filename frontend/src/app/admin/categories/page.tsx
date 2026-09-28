@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit2, Trash2, Tag, Eye, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -8,27 +8,63 @@ import Image from "next/image";
 import { useStore, CategoryItem } from "@/store/useStore";
 
 export default function AdminCategoriesPage() {
-  const categories = useStore((s) => s.categories);
-  const updateCategory = useStore((s) => s.updateCategory);
-  const deleteCategory = useStore((s) => s.deleteCategory);
-
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`);
+      const data = await res.json();
+      if (data.success) {
+        setCategories(data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const filtered = categories.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     c.code.toLowerCase().includes(search.toLowerCase())
   );
 
-  const toggleStatus = (cat: CategoryItem) => {
-    updateCategory(cat.id, { active: !cat.active });
-    toast.success(`Category "${cat.name}" status updated to ${!cat.active ? "ACTIVE" : "INACTIVE"}`);
+  const toggleStatus = async (cat: any) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${cat._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ active: !cat.active })
+      });
+      if (res.ok) {
+        toast.success(`Category "${cat.name}" status updated`);
+        fetchCategories();
+      }
+    } catch (err) {
+      toast.error("Failed to update status");
+    }
   };
 
-  const handleDelete = (id: string, name: string) => {
-    deleteCategory(id);
-    toast.success(`Category "${name}" deleted successfully`);
-    setDeletingId(null);
+  const handleDelete = async (id: string, name: string) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories/${id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        toast.success(`Category "${name}" deleted successfully`);
+        setDeletingId(null);
+        fetchCategories();
+      }
+    } catch (err) {
+      toast.error("Failed to delete category");
+    }
   };
 
   return (
@@ -83,7 +119,7 @@ export default function AdminCategoriesPage() {
               </tr>
             ) : (
               filtered.map((cat) => (
-                <tr key={cat.id} className="hover:bg-gray-50/80 transition-colors">
+                <tr key={cat._id || cat.id} className="hover:bg-gray-50/80 transition-colors">
                   <td className="px-6 py-4 flex items-center space-x-4">
                     <div className="w-12 h-12 relative bg-gray-100 rounded-lg overflow-hidden border flex-shrink-0">
                       <Image
@@ -118,14 +154,14 @@ export default function AdminCategoriesPage() {
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
                     <Link
-                      href={`/admin/categories/${cat.id}/edit`}
+                      href={`/admin/categories/${cat._id}/edit`}
                       className="p-2 text-gray-400 hover:text-charcoal transition-colors inline-flex rounded-lg hover:bg-gray-100"
                       title="Edit Category"
                     >
                       <Edit2 size={16} />
                     </Link>
                     <button
-                      onClick={() => setDeletingId(cat.id)}
+                      onClick={() => setDeletingId(cat._id)}
                       className="p-2 text-gray-400 hover:text-rose-600 transition-colors inline-flex rounded-lg hover:bg-rose-50"
                       title="Delete Category"
                     >

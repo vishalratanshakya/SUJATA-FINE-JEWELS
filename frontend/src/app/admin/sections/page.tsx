@@ -59,15 +59,7 @@ export default function AdminSectionsHubPage() {
       count: articles.length,
       activeCount: articles.filter(a => a.active).length
     },
-    {
-      title: "Featured Product Media",
-      description: "Carousel of product images & videos",
-      href: "/admin/sections/featured-media",
-      icon: Camera,
-      color: "text-pink-600 bg-pink-50 border-pink-100",
-      count: posts.length,
-      activeCount: posts.filter(p => p.active).length
-    },
+
     {
       title: "Product Accordions",
       description: "Product page specification & policy tabs",

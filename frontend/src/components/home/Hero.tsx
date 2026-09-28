@@ -17,7 +17,7 @@ export function Hero() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`);
         if (!res.ok) return;
         const data = await res.json();
-        if (data.success && data.data && data.data.length > 0) {
+        if (data.success && data.data) {
           setHeroBanners(data.data);
         }
       } catch (err) {

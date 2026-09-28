@@ -239,38 +239,7 @@ export type ProductAccordionItem = {
 
 // ─── Default Data ─────────────────────────────────────────────────────────────
 
-const DEFAULT_HERO_BANNERS: HeroBanner[] = [
-  {
-    id: 1,
-    eyebrow: "EXCLUSIVE COLLECTION",
-    heading: "Timeless Elegance & Fine Diamonds",
-    description: "Discover handcrafted diamond necklaces, rings, and gold jewelry designed to elevate every moment with unmatched brilliance.",
-    cta: "Explore Collection",
-    ctaUrl: "/shop",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
-    active: true,
-  },
-  {
-    id: 2,
-    eyebrow: "DIAMOND NECKLACE AND EARRINGS",
-    heading: "Diamond Necklace and earrings",
-    description: "Diamond Necklace and earrings",
-    cta: "Shop Now",
-    ctaUrl: "/shop",
-    image: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2070&auto=format&fit=crop",
-    active: true,
-  },
-  {
-    id: 3,
-    eyebrow: "TIMELESS ELEGANCE",
-    heading: "The Pearl Collection",
-    description: "Discover our exquisite collection of luminous pearls, beautifully crafted with gold to elevate your everyday and evening wear.",
-    cta: "Shop Pearls",
-    ctaUrl: "/shop",
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop",
-    active: true,
-  }
-];
+const DEFAULT_HERO_BANNERS: HeroBanner[] = [];
 
 const DEFAULT_ANNOUNCEMENT_BAR: AnnouncementBar = {
   message: '✨ Free shipping on orders above ₹50,000 — Use code FREESHIP',
@@ -1074,7 +1043,7 @@ export const useStore = create<StoreState>()(
         },
         setItem: (name, value) => {
           try {
-            const sanitizeUrl = (url: string | undefined, fallback = '/images/products/rings/ring_placeholder.jpg') => {
+            const sanitizeUrl = (url: string | undefined, fallback = '') => {
               if (!url) return '';
               if (url.startsWith('data:') && url.length > 50000) {
                 return fallback;
@@ -1095,7 +1064,7 @@ export const useStore = create<StoreState>()(
             const sanitizeHeroBanner = (b: any) => {
               return {
                 ...b,
-                image: sanitizeUrl(b.image, '/images/products/necklaces/necklace_placeholder.jpg')
+                image: sanitizeUrl(b.image)
               };
             };
 

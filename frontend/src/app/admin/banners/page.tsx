@@ -21,19 +21,33 @@ export default function AdminBannersPage() {
   const setHeroBanners = useStore((s) => s.setHeroBanners);
 
   useEffect(() => {
-    const fetchBanners = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`);
-        const data = await res.json();
-        if (data.success && data.data) {
-          setHeroBanners(data.data);
+        const [bannersRes, annRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/announcement-bar`)
+        ]);
+        
+        if (bannersRes.ok) {
+          const bannersData = await bannersRes.json();
+          if (bannersData.success && bannersData.data) {
+            setHeroBanners(bannersData.data);
+          }
+        }
+        
+        if (annRes.ok) {
+          const annData = await annRes.json();
+          if (annData.success && annData.data) {
+            updateAnnouncementBar(annData.data);
+            setAnnForm(annData.data);
+          }
         }
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch banners/announcement data:", err);
       }
     };
-    fetchBanners();
-  }, [setHeroBanners]);
+    fetchData();
+  }, [setHeroBanners, updateAnnouncementBar]);
 
   // ── Editing state ──
   const [editingId, setEditingId] = useState<number | null>(null);

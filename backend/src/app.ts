@@ -13,6 +13,7 @@ import certificateRoutes from "./routes/certificateRoutes";
 import aboutRoutes from "./routes/aboutRoutes";
 import heroBannerRoutes from "./routes/heroBannerRoutes";
 import announcementBarRoutes from "./routes/announcementBarRoutes";
+import categoryRoutes from "./routes/categoryRoutes";
 dotenv.config();
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/about", aboutRoutes);
 app.use("/api/hero-banners", heroBannerRoutes);
 app.use("/api/announcement-bar", announcementBarRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });

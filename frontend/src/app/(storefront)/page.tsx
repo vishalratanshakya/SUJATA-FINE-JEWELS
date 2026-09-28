@@ -9,8 +9,6 @@ import { Bestsellers } from "@/components/home/Bestsellers";
 import { DealOfTheDay } from "@/components/home/DealOfTheDay";
 import { ShopByOccasion } from "@/components/home/ShopByOccasion";
 import { BlogSection } from "@/components/home/BlogSection";
-import { FeaturedMediaCarousel } from "@/components/home/FeaturedMediaCarousel";
-
 
 export default function Home() {
   return (
@@ -26,7 +24,6 @@ export default function Home() {
       <ShopByOccasion />
       <AIStylistSection />
       <BlogSection />
-      <FeaturedMediaCarousel />
     </div>
   );
 }
