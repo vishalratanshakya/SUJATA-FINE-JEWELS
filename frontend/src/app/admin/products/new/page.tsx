@@ -21,6 +21,7 @@ export default function NewProductPage() {
   const [model3D, setModel3D] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
 
+  const [sizingType, setSizingType] = useState<"free" | "specific">("free");
   const [categorySpecs, setCategorySpecs] = useState({
     availableSizes: [] as string[],
     sizeStock: {} as Record<string, number>,
@@ -35,19 +36,20 @@ export default function NewProductPage() {
     name: "",
     description: "",
     category: "Rings",
-    metal: "18K Gold",
-    stone: "Solitaire Diamond",
-    price: 95000,
-    originalPrice: 110000,
-    sku: `SJ-${Math.floor(1000 + Math.random() * 9000)}`,
+    metal: "",
+    stone: "",
+    price: "",
+    originalPrice: "",
+    sku: "",
     isBestSeller: false,
-    isNewArrival: true,
+    isNewArrival: false,
     isSignatureCarousel: false,
     selectedOccasions: [] as string[],
-    productDetails: "Handcrafted fine jewellery piece in 18K Gold featuring high-clarity gemstones.",
-    diamondInfo: "Ethically Sourced Natural Conflict-Free Diamond | VVS-VS Clarity | E-F Color Grade | Certified.",
-    shippingReturns: "Free fully insured door-to-door delivery across India within 3-5 business days. 15-day return policy.",
-    careInstructions: "Store individually in the provided Sujata velvet suede box. Clean gently with warm soapy water and a soft micro-bristle brush.",
+    productDetails: "",
+    diamondInfo: "",
+    shippingReturns: "",
+    careInstructions: "",
+    customCategory: "",
   });
 
   const handleOccasionToggle = (id: string) => {
@@ -135,6 +137,11 @@ export default function NewProductPage() {
       return;
     }
 
+    if (formData.category === "Other" && !formData.customCategory.trim()) {
+      toast.error("Please enter a Custom Category Name");
+      return;
+    }
+
     const categoryPlaceholder = formData.category.toLowerCase() === 'necklaces' 
       ? '/images/products/necklaces/necklace_placeholder.jpg'
       : formData.category.toLowerCase() === 'earrings'
@@ -154,12 +161,29 @@ export default function NewProductPage() {
     const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const allImages = [finalPrimaryImage, finalHoverImage, ...galleryImages].filter(Boolean);
 
+    const finalCategory = formData.category === "Other" && formData.customCategory.trim() 
+      ? formData.customCategory.trim() 
+      : formData.category;
+
+    // Sizing determination
+    const isRingCategory = formData.category === "Rings";
+    const isBraceletBangleCategory = formData.category === "Bracelets" || formData.category === "Bangles";
+
+    let finalAvailableSizes = categorySpecs.availableSizes;
+    let finalSizeStock = categorySpecs.sizeStock;
+
+    if (!isRingCategory && (!isBraceletBangleCategory || sizingType === "free")) {
+      // Default behind scenes to "Standard / Free Size"
+      finalAvailableSizes = ["Standard / Free Size"];
+      finalSizeStock = { "Standard / Free Size": 10 };
+    }
+
     const productPayload = {
       id,
       name: formData.name,
       description: formData.description.trim(),
       slug,
-      category: formData.category,
+      category: finalCategory,
       metal: formData.metal,
       stone: formData.stone,
       price: Number(formData.price),
@@ -173,8 +197,8 @@ export default function NewProductPage() {
       isNewArrival: formData.isNewArrival,
       isSignatureCarousel: formData.isSignatureCarousel,
       occasions: formData.selectedOccasions,
-      availableSizes: categorySpecs.availableSizes,
-      sizeStock: categorySpecs.sizeStock,
+      availableSizes: finalAvailableSizes,
+      sizeStock: finalSizeStock,
       necklaceLength: categorySpecs.necklaceLength,
       earringType: categorySpecs.earringType,
       earringPairType: categorySpecs.earringPairType,
@@ -213,14 +237,6 @@ export default function NewProductPage() {
             <h1 className="text-2xl font-serif text-gray-900">Add New Jewellery Product</h1>
             <p className="text-xs text-gray-500">Create a master product entry for the online catalog</p>
           </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Link href="/admin/products" className="px-4 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors">
-            Cancel
-          </Link>
-          <button type="submit" className="bg-charcoal text-white text-xs font-medium px-6 py-2.5 rounded hover:bg-gray-800 transition-colors">
-            Save Product
-          </button>
         </div>
       </div>
 
@@ -301,7 +317,7 @@ export default function NewProductPage() {
                   type="number" 
                   required
                   value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: Number(e.target.value)})}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
                   className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
                 />
               </div>
@@ -310,7 +326,7 @@ export default function NewProductPage() {
                 <input 
                   type="number" 
                   value={formData.originalPrice}
-                  onChange={(e) => setFormData({...formData, originalPrice: Number(e.target.value)})}
+                  onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
                   className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
                 />
               </div>
@@ -385,31 +401,26 @@ export default function NewProductPage() {
             <div className="border-b border-gray-100 pb-3 flex justify-between items-center">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">
-                  {formData.category} Category Specifications
+                  {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category} Category Specifications
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Configure real-time available sizes, options, and variant stock for {formData.category}.
+                  Configure real-time available sizes, options, and variant stock for {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category}.
                 </p>
               </div>
               <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold rounded-full uppercase tracking-wider">
-                {formData.category}
+                {formData.category === "Other" ? (formData.customCategory || "Custom") : formData.category}
               </span>
             </div>
 
-            {/* 1. RINGS & BANGLES & BRACELETS (SIZES + STOCK) */}
-            {(formData.category === "Rings" || formData.category === "Bangles" || formData.category === "Bracelets") && (
+            {/* 1. RINGS SIZES */}
+            {formData.category === "Rings" && (
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
-                    Available {formData.category === "Rings" ? "Ring Sizes" : formData.category === "Bangles" ? "Bangle Sizes" : "Bracelet Lengths"}
+                    Available Ring Sizes
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(formData.category === "Rings"
-                      ? ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
-                      : formData.category === "Bangles"
-                      ? ["2.2", "2.4", "2.6", "2.8", "2.10"]
-                      : ["6.0 inch", "6.5 inch", "7.0 inch", "7.5 inch", "8.0 inch"]
-                    ).map((size) => {
+                    {["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"].map((size) => {
                       const isSelected = categorySpecs.availableSizes.includes(size);
                       return (
                         <button
@@ -435,7 +446,7 @@ export default function NewProductPage() {
                     type="text"
                     value={categorySpecs.customSizeInput}
                     onChange={(e) => setCategorySpecs({ ...categorySpecs, customSizeInput: e.target.value })}
-                    placeholder="Enter custom size (e.g. 14.5 or 2.5)..."
+                    placeholder="Enter custom ring size (e.g. 14.5)..."
                     className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-charcoal"
                   />
                   <button
@@ -477,9 +488,130 @@ export default function NewProductPage() {
               </div>
             )}
 
-            {/* 2. NECKLACES */}
+            {/* 2. BRACELETS & BANGLES WITH TOGGLE */}
+            {(formData.category === "Bracelets" || formData.category === "Bangles") && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
+                    Sizing Mode
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2 text-xs font-medium text-gray-800 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sizingType"
+                        value="free"
+                        checked={sizingType === "free"}
+                        onChange={() => setSizingType("free")}
+                        className="text-charcoal focus:ring-charcoal"
+                      />
+                      <span>Adjustable / Free Size (Default)</span>
+                    </label>
+                    <label className="flex items-center space-x-2 text-xs font-medium text-gray-800 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sizingType"
+                        value="specific"
+                        checked={sizingType === "specific"}
+                        onChange={() => setSizingType("specific")}
+                        className="text-charcoal focus:ring-charcoal"
+                      />
+                      <span>Specific Sizes</span>
+                    </label>
+                  </div>
+                </div>
+
+                {sizingType === "specific" && (
+                  <div className="space-y-4 pt-2 border-t border-gray-100">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
+                        Available {formData.category === "Bangles" ? "Bangle Sizes" : "Bracelet Lengths"}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {(formData.category === "Bangles"
+                          ? ["2.2", "2.4", "2.6", "2.8", "2.10"]
+                          : ["6.0 inch", "6.5 inch", "7.0 inch", "7.5 inch", "8.0 inch"]
+                        ).map((size) => {
+                          const isSelected = categorySpecs.availableSizes.includes(size);
+                          return (
+                            <button
+                              key={size}
+                              type="button"
+                              onClick={() => handleSizeToggle(size)}
+                              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-charcoal text-white border-charcoal shadow-xs"
+                                  : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
+                              }`}
+                            >
+                              {isSelected ? `✓ ${size}` : `+ ${size}`}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2 pt-1">
+                      <input
+                        type="text"
+                        value={categorySpecs.customSizeInput}
+                        onChange={(e) => setCategorySpecs({ ...categorySpecs, customSizeInput: e.target.value })}
+                        placeholder="Enter custom size (e.g. 2.5 or 7.25)..."
+                        className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-charcoal"
+                      />
+                      <button
+                        type="button"
+                        onClick={addCustomSize}
+                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg border border-gray-200"
+                      >
+                        + Add Size
+                      </button>
+                    </div>
+
+                    {categorySpecs.availableSizes.length > 0 && (
+                      <div className="pt-3 border-t border-gray-100 space-y-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                          Stock per Available Size
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {categorySpecs.availableSizes.map((size) => (
+                            <div key={size} className="bg-gray-50 p-2.5 rounded-lg border border-gray-200">
+                              <span className="block text-[11px] font-bold text-gray-700 mb-1">Size {size} Stock</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={categorySpecs.sizeStock[size] ?? 5}
+                                onChange={(e) =>
+                                  setCategorySpecs({
+                                    ...categorySpecs,
+                                    sizeStock: { ...categorySpecs.sizeStock, [size]: Number(e.target.value) },
+                                  })
+                                }
+                                className="w-full bg-white border border-gray-200 rounded px-2 py-1 text-xs font-semibold text-gray-900"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3. NECKLACES, EARRINGS, PENDANTS, CUSTOM CATEGORIES (FREE / STANDARD SIZE INFO) */}
+            {formData.category !== "Rings" && formData.category !== "Bracelets" && formData.category !== "Bangles" && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-600 flex items-center space-x-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <span>
+                  <strong>Standard / Free Size</strong> automatically applied for {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category}. No numeric size input required to publish.
+                </span>
+              </div>
+            )}
+
+            {/* 4. NECKLACES LENGTHS */}
             {formData.category === "Necklaces" && (
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2 border-t border-gray-100">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
                   Available Chain / Necklace Lengths
                 </label>
@@ -505,9 +637,9 @@ export default function NewProductPage() {
               </div>
             )}
 
-            {/* 3. EARRINGS */}
+            {/* 5. EARRINGS */}
             {formData.category === "Earrings" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Earring Type / Style</label>
                   <select
@@ -543,9 +675,9 @@ export default function NewProductPage() {
               </div>
             )}
 
-            {/* 4. PENDANTS */}
+            {/* 6. PENDANTS */}
             {formData.category === "Pendants" && (
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2 border-t border-gray-100">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
                   Chain Options for Pendant
                 </label>
@@ -714,7 +846,22 @@ export default function NewProductPage() {
                 <option value="Bracelets">Bracelets</option>
                 <option value="Bangles">Bangles</option>
                 <option value="Pendants">Pendants</option>
+                <option value="Other">Other / Custom Category</option>
               </select>
+              
+              {formData.category === "Other" && (
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Custom Category Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.customCategory}
+                    onChange={(e) => setFormData({...formData, customCategory: e.target.value})}
+                    placeholder="e.g. Necklace & Earring Sets, Bridal Suite"
+                    className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="space-y-3 pt-2">

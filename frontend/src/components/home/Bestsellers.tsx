@@ -9,14 +9,14 @@ export function Bestsellers() {
   const displayProducts = bestSellers.length > 0 ? bestSellers : products;
 
   return (
-    <section className="py-24 bg-white relative">
+    <section className="py-12 md:py-24 bg-white relative">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         
-        <div className="text-center mb-16">
+        <div className="text-left mb-10 md:mb-16">
           <h2 className="font-serif text-3xl md:text-4xl text-charcoal mb-4 tracking-wide">
             BESTSELLERS
           </h2>
-          <div className="flex justify-center">
+          <div className="flex justify-start">
             <div className="w-16 h-[1px] bg-champagne flex items-center justify-center">
               <div className="w-2 h-2 bg-champagne rotate-45" />
             </div>

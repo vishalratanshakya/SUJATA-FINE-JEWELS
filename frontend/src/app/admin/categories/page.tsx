@@ -126,6 +126,7 @@ export default function AdminCategoriesPage() {
                         src={cat.image || "/images/products/rings/ring_placeholder.jpg"}
                         alt={cat.name}
                         fill
+                        sizes="48px"
                         className="object-cover"
                       />
                     </div>

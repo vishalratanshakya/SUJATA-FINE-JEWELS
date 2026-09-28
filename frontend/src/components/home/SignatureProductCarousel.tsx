@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, PanInfo } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "@/store/useStore";
 
@@ -14,53 +13,96 @@ export function SignatureProductCarousel() {
   const signatureProducts = allProducts.filter((p) => p.isSignatureCarousel);
   const products = signatureProducts.length > 0 ? signatureProducts : allProducts;
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-
   const totalProducts = products.length;
+  // 5 sets to give plenty of buffer for fast swipes/scrolls (clones)
+  const extendedProducts = [...products, ...products, ...products, ...products, ...products];
+  const MIDDLE_SET_START = 2 * totalProducts;
 
-  const triggerNavigation = useCallback((nextIndex: number) => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setCurrentIndex(nextIndex);
-    setTimeout(() => setIsAnimating(false), 450);
-  }, [isAnimating]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [absoluteIndex, setAbsoluteIndex] = useState(MIDDLE_SET_START);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const activeIndex = absoluteIndex % totalProducts;
+
+  const scrollToIndex = useCallback((index: number, smooth = true) => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    const cards = Array.from(container.children).filter(c => c.hasAttribute('data-index')) as HTMLElement[];
+    const targetCard = cards.find(c => parseInt(c.getAttribute('data-index') || '0', 10) === index);
+    
+    if (targetCard) {
+      const scrollPosition = targetCard.offsetLeft - container.offsetLeft - (container.clientWidth / 2) + (targetCard.clientWidth / 2);
+      
+      if (!smooth) {
+        container.style.scrollBehavior = "auto";
+        container.scrollLeft = scrollPosition;
+        // Restore smooth behavior quickly
+        setTimeout(() => {
+          if (containerRef.current) containerRef.current.style.scrollBehavior = "smooth";
+        }, 50);
+      } else {
+        container.style.scrollBehavior = "smooth";
+        container.scrollLeft = scrollPosition;
+      }
+    }
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    
+    const scrollLeft = container.scrollLeft;
+    const containerCenter = scrollLeft + container.clientWidth / 2;
+    
+    let closestIndex = absoluteIndex;
+    let minDistance = Infinity;
+
+    const cards = Array.from(container.children) as HTMLElement[];
+    const productCards = cards.filter(card => card.hasAttribute('data-index'));
+    
+    productCards.forEach((card) => {
+      const index = parseInt(card.getAttribute('data-index') || '0', 10);
+      const cardCenter = card.offsetLeft + card.clientWidth / 2 - container.offsetLeft;
+      const distance = Math.abs(containerCenter - cardCenter);
+      
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    if (closestIndex !== absoluteIndex) {
+      setAbsoluteIndex(closestIndex);
+    }
+
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = setTimeout(() => {
+      // If we got too close to edges (in the first or last set), jump silently to the middle set
+      if (closestIndex < totalProducts || closestIndex >= extendedProducts.length - totalProducts) {
+        const relativeIdx = closestIndex % totalProducts;
+        const middleIdx = MIDDLE_SET_START + relativeIdx;
+        scrollToIndex(middleIdx, false);
+        setAbsoluteIndex(middleIdx);
+      }
+    }, 150);
+  }, [absoluteIndex, totalProducts, extendedProducts.length, MIDDLE_SET_START, scrollToIndex]);
+
+  useEffect(() => {
+    // Initial centering without animation
+    if (totalProducts > 0) {
+      scrollToIndex(MIDDLE_SET_START, false);
+    }
+  }, [totalProducts, MIDDLE_SET_START, scrollToIndex]);
 
   const handlePrev = useCallback(() => {
-    if (totalProducts === 0 || isAnimating) return;
-    triggerNavigation((currentIndex - 1 + totalProducts) % totalProducts);
-  }, [totalProducts, isAnimating, currentIndex, triggerNavigation]);
+    if (totalProducts === 0) return;
+    scrollToIndex(absoluteIndex - 1, true);
+  }, [absoluteIndex, totalProducts, scrollToIndex]);
 
   const handleNext = useCallback(() => {
-    if (totalProducts === 0 || isAnimating) return;
-    triggerNavigation((currentIndex + 1) % totalProducts);
-  }, [totalProducts, isAnimating, currentIndex, triggerNavigation]);
-
-  const handleDragEnd = useCallback(
-    (_: any, info: PanInfo) => {
-      const threshold = 40;
-      if (info.offset.x < -threshold) {
-        handleNext();
-      } else if (info.offset.x > threshold) {
-        handlePrev();
-      }
-    },
-    [handleNext, handlePrev]
-  );
-
-  // Wheel scroll handler (Mouse scroll wheel support)
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      // DeltaX for trackpad horizontal swipe, DeltaY for normal mouse wheel
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      if (delta > 30) {
-        handleNext();
-      } else if (delta < -30) {
-        handlePrev();
-      }
-    },
-    [handleNext, handlePrev]
-  );
+    if (totalProducts === 0) return;
+    scrollToIndex(absoluteIndex + 1, true);
+  }, [absoluteIndex, totalProducts, scrollToIndex]);
 
   if (totalProducts === 0) return null;
 
@@ -72,12 +114,9 @@ export function SignatureProductCarousel() {
     }).format(price);
   };
 
-  // Generate position offsets for 5 visible cards [-2, -1, 0, 1, 2]
-  const positions = [-2, -1, 0, 1, 2];
-
   return (
     <section className="py-20 md:py-28 bg-[#FAF8F5] overflow-hidden select-none border-y border-[#EAE4D9]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
@@ -95,13 +134,13 @@ export function SignatureProductCarousel() {
         </div>
 
         {/* Carousel Scene */}
-        <div className="relative min-h-[520px] md:min-h-[600px] flex items-center justify-center">
+        <div className="relative flex items-center justify-center w-full max-w-7xl mx-auto">
           
           {/* Nav Buttons */}
           <button
             onClick={handlePrev}
             aria-label="Previous Product"
-            className="hidden md:flex absolute left-1 md:left-4 lg:left-8 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
+            className="hidden md:flex absolute left-0 lg:-left-6 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
           >
             <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
           </button>
@@ -109,198 +148,93 @@ export function SignatureProductCarousel() {
           <button
             onClick={handleNext}
             aria-label="Next Product"
-            className="hidden md:flex absolute right-1 md:right-4 lg:right-8 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
+            className="hidden md:flex absolute right-0 lg:-right-6 z-40 w-12 h-12 md:w-14 md:h-14 rounded-full border border-[#D5C9B8] bg-white/90 backdrop-blur-md text-[#4A4238] items-center justify-center shadow-md hover:bg-[#2C2825] hover:text-[#FBF9F5] hover:border-[#2C2825] transition-all duration-300 group cursor-pointer"
           >
             <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
           </button>
 
-          {/* 3D Perspective Stage */}
-          <motion.div
-            onWheel={handleWheel}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.15}
-            onDragEnd={handleDragEnd}
-            className="w-full max-w-[1400px] h-[520px] md:h-[620px] relative flex items-center justify-center cursor-grab active:cursor-grabbing"
-            style={{ perspective: 1200 }}
+          {/* Native Scroll Stage */}
+          <div
+            ref={containerRef}
+            onScroll={handleScroll}
+            className="w-full flex items-center justify-start gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory no-scrollbar hide-scrollbar py-12 px-4"
+            style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            {products.map((product, idx) => {
-              // Calculate offset from current active index in infinite loop
-              let diff = idx - currentIndex;
-              
-              // Normalize diff for infinite wrap (-totalProducts/2 to +totalProducts/2)
-              if (diff > totalProducts / 2) diff -= totalProducts;
-              if (diff < -totalProducts / 2) diff += totalProducts;
 
-              const isCenter = diff === 0;
-              const isInnerLeft = diff === -1;
-              const isInnerRight = diff === 1;
-              const isOuterLeft = diff === -2;
-              const isOuterRight = diff === 2;
-
-              // Show 5 products in front stage (-2 to +2)
-              const isVisible = Math.abs(diff) <= 2;
-
-              // 5-Product Spatial 3D properties
-              let xVal = "0%";
-              let scaleVal = 1;
-              let rotateYVal = 0;
-              let opacityVal = 1;
-              let zIndexVal = 30;
-
-              if (isCenter) {
-                xVal = "0%";
-                scaleVal = 1;
-                rotateYVal = 0;
-                opacityVal = 1;
-                zIndexVal = 30;
-              } else if (isInnerLeft) {
-                xVal = "-46%";
-                scaleVal = 0.82;
-                rotateYVal = 14;
-                opacityVal = 0.92;
-                zIndexVal = 20;
-              } else if (isInnerRight) {
-                xVal = "46%";
-                scaleVal = 0.82;
-                rotateYVal = -14;
-                opacityVal = 0.92;
-                zIndexVal = 20;
-              } else if (isOuterLeft) {
-                xVal = "-84%";
-                scaleVal = 0.68;
-                rotateYVal = 22;
-                opacityVal = 0.78;
-                zIndexVal = 10;
-              } else if (isOuterRight) {
-                xVal = "84%";
-                scaleVal = 0.68;
-                rotateYVal = -22;
-                opacityVal = 0.78;
-                zIndexVal = 10;
-              } else if (diff < -2) {
-                xVal = "-120%";
-                scaleVal = 0.5;
-                rotateYVal = 30;
-                opacityVal = 0;
-                zIndexVal = 0;
-              } else {
-                xVal = "120%";
-                scaleVal = 0.5;
-                rotateYVal = -30;
-                opacityVal = 0;
-                zIndexVal = 0;
-              }
+            {extendedProducts.map((product, idx) => {
+              const isCenter = absoluteIndex === idx;
 
               return (
-                <motion.div
-                  key={product.id}
-                  layout
+                <div
+                  key={`${product.id}-${idx}`}
+                  data-index={idx}
                   onClick={() => {
-                    if (isAnimating) return;
-                    if (diff !== 0) {
-                      setIsAnimating(true);
-                      setCurrentIndex(idx);
-                      setTimeout(() => setIsAnimating(false), 450);
-                    }
+                    if (!isCenter) scrollToIndex(idx);
                   }}
-                  animate={{
-                    x: xVal,
-                    scale: scaleVal,
-                    rotateY: rotateYVal,
-                    opacity: isVisible ? opacityVal : 0,
-                    zIndex: zIndexVal,
-                    pointerEvents: isVisible ? "auto" : "none",
-                  }}
-                  whileHover={{
-                    scale: isCenter ? 1 : scaleVal * 1.05,
-                    opacity: isCenter ? 1 : 1,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 260,
-                    damping: 28,
-                    mass: 0.8,
-                  }}
-                  className={`absolute rounded-2xl p-5 md:p-6 flex flex-col items-center justify-between border transition-shadow duration-300 ${
+                  className={`relative flex-shrink-0 snap-center rounded-2xl p-5 md:p-6 flex flex-col items-center justify-between border transition-transform duration-500 ease-out origin-center will-change-transform w-[280px] sm:w-[320px] md:w-[360px] h-[480px] md:h-[520px] ${
                     isCenter
-                      ? "w-[290px] sm:w-[340px] md:w-[380px] bg-[#FFFDF9] border-[#D5C9B8] shadow-2xl cursor-default"
-                      : "w-[240px] sm:w-[280px] md:w-[310px] bg-[#EFECE6]/95 border-[#E2DDD3] shadow-md cursor-pointer"
+                      ? "bg-[#FFFDF9] border-[#D5C9B8] shadow-2xl scale-105 z-20 cursor-default"
+                      : "bg-[#EFECE6]/95 border-[#E2DDD3] shadow-md scale-95 z-10 cursor-pointer opacity-70 hover:opacity-100"
                   }`}
-                  style={{ transformStyle: "preserve-3d" }}
                 >
                   {/* Bestseller Badge for center */}
-                  {isCenter && (
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="bg-[#B38E5D] text-white text-[10px] uppercase tracking-widest font-semibold px-3.5 py-1 rounded-full shadow-sm">
-                        BESTSELLER
-                      </span>
-                    </div>
-                  )}
+                  <div className={`absolute top-4 left-4 z-10 transition-opacity duration-500 ${isCenter ? 'opacity-100' : 'opacity-0'}`}>
+                    <span className="bg-[#B38E5D] text-white text-[10px] uppercase tracking-widest font-semibold px-3.5 py-1 rounded-full shadow-sm">
+                      BESTSELLER
+                    </span>
+                  </div>
 
                   {/* Image container */}
-                  <div className="relative w-full aspect-square mb-4 flex items-center justify-center rounded-lg bg-[#F9F8F6] overflow-hidden">
-                    {isCenter ? (
-                      <Link href={`/product/${product.slug}`} className="w-full h-full relative block group">
-                        <Image
-                          src={product.images[0] || "/images/products/rings/ring_placeholder.jpg"}
-                          alt={product.name}
-                          fill
-                          priority
-                          sizes="(max-width: 768px) 370px, 420px"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </Link>
-                    ) : (
+                  <div className="relative w-full flex-1 mb-4 flex items-center justify-center rounded-lg bg-[#F9F8F6] overflow-hidden group">
+                    <Link href={`/product/${product.slug}`} className="w-full h-full relative block" onClick={(e) => { if (!isCenter) e.preventDefault(); }}>
                       <Image
                         src={product.images[0] || "/images/products/rings/ring_placeholder.jpg"}
                         alt={product.name}
                         fill
-                        sizes="(max-width: 768px) 310px, 360px"
-                        className="object-cover"
+                        priority={isCenter}
+                        sizes="(max-width: 768px) 370px, 420px"
+                        className={`object-cover transition-transform duration-500 ${isCenter ? 'group-hover:scale-105' : ''}`}
                       />
-                    )}
+                    </Link>
                   </div>
 
                   {/* Product Details */}
-                  <div className="text-center w-full">
-                    <h3 className={`font-serif text-[#2C2825] font-medium tracking-tight ${
-                      isCenter ? "text-xl md:text-2xl line-clamp-2" : "text-base md:text-lg text-[#3D3732] line-clamp-1"
-                    }`} title={product.name}>
+                  <div className="text-center w-full flex flex-col items-center">
+                    <h3 className="font-serif text-[#2C2825] font-medium tracking-tight text-lg md:text-xl line-clamp-2 h-[56px] flex items-center justify-center" title={product.name}>
                       {product.name}
                     </h3>
                     
-                    <p className={`font-serif font-semibold text-[#1F1B18] ${
-                      isCenter ? "text-lg md:text-xl mt-3" : "text-sm mt-2"
-                    }`}>
+                    <p className="font-serif font-semibold text-[#1F1B18] text-base md:text-lg mt-2 h-[28px]">
                       {formatPrice(product.price)}
                     </p>
 
-                    {isCenter && (
+                    <div className="h-[48px] w-full mt-4 flex items-center justify-center">
                       <Link
                         href={`/product/${product.slug}`}
-                        className="mt-5 inline-block w-full py-3.5 px-6 bg-[#26221F] hover:bg-[#3D3732] text-[#FFFDF9] text-xs font-semibold uppercase tracking-[0.2em] rounded-md transition-colors shadow-md text-center"
+                        className={`inline-block w-full py-3.5 px-6 bg-[#26221F] hover:bg-[#3D3732] text-[#FFFDF9] text-xs font-semibold uppercase tracking-[0.2em] rounded-md shadow-md text-center transition-all duration-500 ${
+                          isCenter ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+                        }`}
                       >
                         EXPLORE DETAILS
                       </Link>
-                    )}
+                    </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         </div>
 
         {/* Compact Dynamic Pagination */}
-        <div className="flex items-center justify-center space-x-2 mt-8 md:mt-10">
+        <div className="flex items-center justify-center space-x-2 mt-4 md:mt-6">
           {totalProducts <= 10 ? (
             products.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentIndex(idx)}
+                onClick={() => scrollToIndex(MIDDLE_SET_START + idx)}
                 aria-label={`Go to product ${idx + 1}`}
                 className={`h-1.5 transition-all duration-300 rounded-full ${
-                  idx === currentIndex
+                  idx === activeIndex
                     ? "w-8 bg-[#8C6D3B]"
                     : "w-2 bg-[#D9D2C5] hover:bg-[#B3A694]"
                 }`}
@@ -308,7 +242,7 @@ export function SignatureProductCarousel() {
             ))
           ) : (
             <div className="flex items-center space-x-2 bg-white/80 border border-[#E2DDD3] px-4 py-1.5 rounded-full shadow-sm text-xs font-mono text-[#787168]">
-              <span className="font-semibold text-[#2C2825]">{currentIndex + 1}</span>
+              <span className="font-semibold text-[#2C2825]">{activeIndex + 1}</span>
               <span>/</span>
               <span>{totalProducts}</span>
             </div>
@@ -362,5 +296,3 @@ export function SignatureProductCarousel() {
     </section>
   );
 }
-
-

@@ -9,10 +9,10 @@ export function FeaturedCollection() {
   const displayProducts = products.length > 0 ? products : [];
 
   return (
-    <section className="py-20 bg-pearl">
+    <section className="py-12 md:py-20 bg-pearl">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         
-        <div className="flex flex-row justify-between items-center mb-12">
+        <div className="flex flex-row justify-between items-center mb-8 md:mb-12">
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-charcoal tracking-wide">
             FEATURED COLLECTION
           </h2>

@@ -117,6 +117,12 @@ export function ProductCard({ product }: { product: Product }) {
     maximumFractionDigits: 0,
   }).format(product.price);
 
+  const formattedOriginalPrice = product.originalPrice ? new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(product.originalPrice) : null;
+
   return (
     <div className="group relative flex flex-col bg-[#FDFBF7] rounded-lg overflow-hidden border border-[#EAE4D9] hover:border-[#B38E5D] transition-all duration-300 shadow-sm hover:shadow-md h-full">
       {/* Product Image Container */}
@@ -127,9 +133,9 @@ export function ProductCard({ product }: { product: Product }) {
         {/* Wishlist Button: Top Right */}
         <button
           onClick={handleToggleWishlist}
-          className={`absolute top-2.5 right-2.5 z-20 p-1.5 rounded-full transition-all duration-300 ${
+          className={`absolute top-3 right-3 z-20 p-2 rounded-full bg-white shadow-sm hover:shadow-md transition-all duration-300 ${
             isBouncing ? "scale-125" : ""
-          } ${mounted && isInWishlist ? "text-rose-600" : "text-[#2C2825]/70 hover:text-rose-600"}`}
+          } ${mounted && isInWishlist ? "text-rose-600" : "text-gray-600 hover:text-rose-600"}`}
           aria-label="Add to wishlist"
         >
           <Heart size={18} strokeWidth={1.5} className={mounted && isInWishlist ? "fill-rose-600 text-rose-600" : ""} fill={mounted && isInWishlist ? "currentColor" : "none"} />
@@ -158,15 +164,27 @@ export function ProductCard({ product }: { product: Product }) {
 
       {/* Card Info Details */}
       <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1 space-y-2 bg-[#FDFBF7]">
-        <Link href={`/product/${product.slug}`} className="block space-y-0.5">
+        <div className="flex justify-between items-center mb-1">
+           <span className="text-xs text-[#B38E5D] truncate pr-2 font-medium">{product.category || 'Jewellery'}</span>
+           <span className="flex items-center text-xs text-[#B38E5D] font-bold">
+             <span className="text-amber-400 mr-1 text-[10px]">⭐</span> {product.rating || 4.9}
+           </span>
+        </div>
+        
+        <Link href={`/product/${product.slug}`} className="block space-y-0.5 mb-1">
           <h3 className="font-serif text-sm sm:text-base text-[#2C2825] group-hover:text-[#B38E5D] transition-colors truncate">
             {product.name}
           </h3>
         </Link>
 
         {/* Price & Add to Bag Trigger */}
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-sm font-semibold text-[#2C2825] font-sans">{formattedPrice}</span>
+        <div className="flex items-center justify-between pt-1 mt-auto">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-semibold text-[#2C2825] font-sans">{formattedPrice}</span>
+            {formattedOriginalPrice && (
+              <span className="text-xs text-slate-400 line-through font-sans">{formattedOriginalPrice}</span>
+            )}
+          </div>
 
           <button
             onClick={handleAddToCart}

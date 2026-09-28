@@ -12,6 +12,9 @@ export function FilterSidebar({
   onPriceRangeChange = (p: string) => {},
   selectedCollection = "",
   onCollectionChange = (col: string) => {},
+  availableCategories = [],
+  availableMetals = [],
+  availableCollections = [],
 }: {
   selectedCategories?: string[];
   onCategoryChange?: (category: string) => void;
@@ -21,6 +24,9 @@ export function FilterSidebar({
   onPriceRangeChange?: (price: string) => void;
   selectedCollection?: string;
   onCollectionChange?: (collection: string) => void;
+  availableCategories?: { name: string; count: number }[];
+  availableMetals?: { name: string; count: number }[];
+  availableCollections?: { name: string; count: number }[];
 }) {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     category: true,
@@ -33,7 +39,7 @@ export function FilterSidebar({
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const categories = [
+  const categories = availableCategories.length > 0 ? availableCategories : [
     { name: "Rings", count: 32 },
     { name: "Necklaces", count: 28 },
     { name: "Earrings", count: 24 },
@@ -42,7 +48,7 @@ export function FilterSidebar({
     { name: "Pendants", count: 16 },
   ];
 
-  const metals = [
+  const metals = availableMetals.length > 0 ? availableMetals : [
     { name: "Yellow Gold", count: 42 },
     { name: "Rose Gold", count: 28 },
     { name: "White Gold", count: 36 },
@@ -57,7 +63,7 @@ export function FilterSidebar({
     { label: "Above ₹2,00,000", id: "above_200k", count: 6 },
   ];
 
-  const collections = [
+  const collections = availableCollections.length > 0 ? availableCollections : [
     { name: "Celestial", count: 15 },
     { name: "Heritage", count: 20 },
     { name: "Timeless", count: 18 },

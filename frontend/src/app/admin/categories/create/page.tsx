@@ -11,32 +11,48 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 
 export default function CreateCategoryPage() {
   const router = useRouter();
-  const addCategory = useStore((s) => s.addCategory);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !code) {
       toast.error("Please fill in category name and code");
       return;
     }
 
-    addCategory({
-      name,
-      code: code.toUpperCase(),
-      slug: name.toLowerCase().replace(/\s+/g, "-"),
-      description,
-      image: image || "/images/products/rings/ring_placeholder.jpg",
-      itemCount: 0,
-      active: true,
-    });
+    setIsSubmitting(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/categories`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          code: code.toUpperCase(),
+          slug: name.toLowerCase().replace(/\s+/g, "-"),
+          description,
+          image: image || "/images/products/rings/ring_placeholder.jpg",
+          itemCount: 0,
+          active: true,
+        }),
+      });
 
-    toast.success(`Category "${name}" created successfully!`);
-    router.push("/admin/categories");
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Category "${name}" created successfully!`);
+        router.push("/admin/categories");
+      } else {
+        toast.error(data.message || "Failed to create category");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,9 +89,9 @@ export default function CreateCategoryPage() {
               <input
                 type="text"
                 value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''))}
                 placeholder="e.g. MNG"
-                maxLength={4}
+                maxLength={25}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:border-charcoal uppercase"
                 required
               />
@@ -104,9 +120,9 @@ export default function CreateCategoryPage() {
           <Link href="/admin/categories" className="px-5 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900">
             Cancel
           </Link>
-          <button type="submit" className="bg-charcoal text-white text-xs font-semibold px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center space-x-2 shadow-sm">
+          <button type="submit" disabled={isSubmitting} className="bg-charcoal text-white text-xs font-semibold px-6 py-2.5 rounded-lg hover:bg-gray-800 transition-colors inline-flex items-center space-x-2 shadow-sm">
             <Save size={16} />
-            <span>Save Category</span>
+            <span>{isSubmitting ? "Saving..." : "Save Category"}</span>
           </button>
         </div>
       </form>

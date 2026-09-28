@@ -118,6 +118,34 @@ export function ProductListingTemplate({
     return result;
   }, [allProducts, filterType, selectedCategories, selectedMetals, selectedPriceRange, sortBy]);
 
+  const availableCategories = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allProducts.forEach(p => {
+      const c = p.category || 'Other';
+      counts[c] = (counts[c] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  }, [allProducts]);
+
+  const availableMetals = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allProducts.forEach(p => {
+      const m = p.metal || 'Other';
+      counts[m] = (counts[m] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  }, [allProducts]);
+
+  const availableCollections = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allProducts.forEach(p => {
+      if (p.collection) {
+        counts[p.collection] = (counts[p.collection] || 0) + 1;
+      }
+    });
+    return Object.entries(counts).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  }, [allProducts]);
+
   return (
     <div className="bg-[#FAF8F5] pt-[72px] md:pt-[82px] pb-24 min-h-screen">
       
@@ -215,6 +243,9 @@ export function ProductListingTemplate({
               onMetalChange={handleMetalChange}
               onPriceRangeChange={setSelectedPriceRange}
               onCollectionChange={setSelectedCollection}
+              availableCategories={availableCategories}
+              availableMetals={availableMetals}
+              availableCollections={availableCollections}
             />
             <div className="mt-4 pt-4 border-t border-[#EAE4D9] flex gap-3">
               <button
@@ -247,6 +278,9 @@ export function ProductListingTemplate({
               onMetalChange={handleMetalChange}
               onPriceRangeChange={setSelectedPriceRange}
               onCollectionChange={setSelectedCollection}
+              availableCategories={availableCategories}
+              availableMetals={availableMetals}
+              availableCollections={availableCollections}
             />
           </div>
 

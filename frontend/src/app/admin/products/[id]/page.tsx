@@ -29,6 +29,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
   const [category, setCategory] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
   const [metal, setMetal] = useState("");
   const [stone, setStone] = useState("");
   const [price, setPrice] = useState("");
@@ -55,6 +56,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setIsMounted(true);
   }, []);
 
+  const [sizingType, setSizingType] = useState<"free" | "specific">("free");
   const [categorySpecs, setCategorySpecs] = useState({
     availableSizes: [] as string[],
     sizeStock: {} as Record<string, number>,
@@ -76,19 +78,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setNotFound(false);
     setName(product.name || "");
     setDescription(product.description || "");
-    setSlug(product.slug || "");
-    setCategory(product.category || "Rings");
+    if (product.category && !CATEGORIES.includes(product.category)) {
+      setCategory("Other");
+      setCustomCategory(product.category);
+    } else {
+      setCategory(product.category || "Rings");
+      setCustomCategory("");
+    }
     setMetal(product.metal || "");
     setStone(product.stone || "");
     setPrice(product.price ? String(product.price) : "");
     setOriginalPrice(product.originalPrice ? String(product.originalPrice) : "");
     setDiscountPercentage(product.discountPercentage ? String(product.discountPercentage) : "");
     setRating(product.rating ? String(product.rating) : "");
-    
-    setProductDetails(product.productDetails || "Handcrafted fine jewellery piece in 18K Gold featuring high-clarity gemstones.");
-    setDiamondInfo(product.diamondInfo || "Ethically Sourced Natural Conflict-Free Diamond | VVS-VS Clarity | E-F Color Grade | Certified.");
-    setShippingReturns(product.shippingReturns || "Free fully insured door-to-door delivery across India within 3-5 business days. 15-day return policy.");
-    setCareInstructions(product.careInstructions || "Store individually in the provided Sujata velvet suede box. Clean gently with warm soapy water and a soft micro-bristle brush.");
+    setProductDetails(product.productDetails || "");
+    setDiamondInfo(product.diamondInfo || "");
+    setShippingReturns(product.shippingReturns || "");
+    setCareInstructions(product.careInstructions || "");
 
     // Set Primary, Hover, and Gallery images from product fields or images array
     const primary = product.primaryImage || product.images?.[0] || "";
@@ -102,9 +108,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setIsSignatureCarousel(!!product.isSignatureCarousel);
     setProductOccasions(product.occasions || []);
 
+    const sizes = product.availableSizes || [];
+    const isFreeSizeOnly = sizes.length === 1 && sizes[0] === "Standard / Free Size";
+    if (sizes.length > 0 && !isFreeSizeOnly) {
+      setSizingType("specific");
+    } else {
+      setSizingType("free");
+    }
+
     // Pre-populate category specs
     setCategorySpecs({
-      availableSizes: product.availableSizes || [],
+      availableSizes: isFreeSizeOnly ? [] : sizes,
       sizeStock: product.sizeStock || {},
       necklaceLength: product.necklaceLength || [],
       earringType: product.earringType || "Studs",
@@ -183,6 +197,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     // Basic validation
     if (!name.trim()) { toast.error("Product name is required."); return; }
     if (!description.trim()) { toast.error("Product description is required."); return; }
+    if (category === "Other" && !customCategory.trim()) { toast.error("Custom Category Name is required."); return; }
     if (!price || isNaN(Number(price)) || Number(price) <= 0) { toast.error("A valid price is required."); return; }
     if (!primaryImage) { toast.error("Primary Product Image is required."); return; }
     if (!hoverImage) { toast.error("Hover Product Image is required."); return; }
@@ -191,11 +206,27 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
     const allImages = [primaryImage, hoverImage, ...galleryImages].filter(Boolean);
 
+    const finalCategory = category === "Other" && customCategory.trim() 
+      ? customCategory.trim() 
+      : category;
+
+    // Sizing determination
+    const isRingCategory = category === "Rings";
+    const isBraceletBangleCategory = category === "Bracelets" || category === "Bangles";
+
+    let finalAvailableSizes = categorySpecs.availableSizes;
+    let finalSizeStock = categorySpecs.sizeStock;
+
+    if (!isRingCategory && (!isBraceletBangleCategory || sizingType === "free")) {
+      finalAvailableSizes = ["Standard / Free Size"];
+      finalSizeStock = { "Standard / Free Size": 10 };
+    }
+
     const updates = {
       name: name.trim(),
       description: description.trim(),
       slug: slug.trim() || name.trim().toLowerCase().replace(/\s+/g, "-"),
-      category,
+      category: finalCategory,
       metal: metal.trim(),
       stone: stone.trim(),
       price: Number(price),
@@ -208,8 +239,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       galleryImages,
       isSignatureCarousel,
       occasions: productOccasions,
-      availableSizes: categorySpecs.availableSizes,
-      sizeStock: categorySpecs.sizeStock,
+      availableSizes: finalAvailableSizes,
+      sizeStock: finalSizeStock,
       necklaceLength: categorySpecs.necklaceLength,
       earringType: categorySpecs.earringType,
       earringPairType: categorySpecs.earringPairType,
@@ -502,31 +533,26 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             <div className="border-b border-gray-100 pb-3 flex justify-between items-center">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">
-                  {category} Category Specifications
+                  {category === "Other" ? (customCategory || "Custom Category") : category} Category Specifications
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Configure real-time available sizes, options, and variant stock for {category}.
+                  Configure real-time available sizes, options, and variant stock for {category === "Other" ? (customCategory || "Custom Category") : category}.
                 </p>
               </div>
               <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold rounded-full uppercase tracking-wider">
-                {category}
+                {category === "Other" ? (customCategory || "Custom") : category}
               </span>
             </div>
 
-            {/* 1. RINGS & BANGLES & BRACELETS (SIZES + STOCK) */}
-            {(category === "Rings" || category === "Bangles" || category === "Bracelets") && (
+            {/* 1. RINGS SIZES */}
+            {category === "Rings" && (
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
-                    Available {category === "Rings" ? "Ring Sizes" : category === "Bangles" ? "Bangle Sizes" : "Bracelet Lengths"}
+                    Available Ring Sizes
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {(category === "Rings"
-                      ? ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
-                      : category === "Bangles"
-                      ? ["2.2", "2.4", "2.6", "2.8", "2.10"]
-                      : ["6.0 inch", "6.5 inch", "7.0 inch", "7.5 inch", "8.0 inch"]
-                    ).map((size) => {
+                    {["10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"].map((size) => {
                       const isSelected = categorySpecs.availableSizes.includes(size);
                       return (
                         <button
@@ -552,7 +578,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     type="text"
                     value={categorySpecs.customSizeInput}
                     onChange={(e) => setCategorySpecs({ ...categorySpecs, customSizeInput: e.target.value })}
-                    placeholder="Enter custom size (e.g. 14.5 or 2.5)..."
+                    placeholder="Enter custom ring size (e.g. 14.5)..."
                     className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-charcoal"
                   />
                   <button
@@ -594,9 +620,130 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
 
-            {/* 2. NECKLACES */}
+            {/* 2. BRACELETS & BANGLES WITH TOGGLE */}
+            {(category === "Bracelets" || category === "Bangles") && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
+                    Sizing Mode
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center space-x-2 text-xs font-medium text-gray-800 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sizingType"
+                        value="free"
+                        checked={sizingType === "free"}
+                        onChange={() => setSizingType("free")}
+                        className="text-charcoal focus:ring-charcoal"
+                      />
+                      <span>Adjustable / Free Size (Default)</span>
+                    </label>
+                    <label className="flex items-center space-x-2 text-xs font-medium text-gray-800 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="sizingType"
+                        value="specific"
+                        checked={sizingType === "specific"}
+                        onChange={() => setSizingType("specific")}
+                        className="text-charcoal focus:ring-charcoal"
+                      />
+                      <span>Specific Sizes</span>
+                    </label>
+                  </div>
+                </div>
+
+                {sizingType === "specific" && (
+                  <div className="space-y-4 pt-2 border-t border-gray-100">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">
+                        Available {category === "Bangles" ? "Bangle Sizes" : "Bracelet Lengths"}
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {(category === "Bangles"
+                          ? ["2.2", "2.4", "2.6", "2.8", "2.10"]
+                          : ["6.0 inch", "6.5 inch", "7.0 inch", "7.5 inch", "8.0 inch"]
+                        ).map((size) => {
+                          const isSelected = categorySpecs.availableSizes.includes(size);
+                          return (
+                            <button
+                              key={size}
+                              type="button"
+                              onClick={() => handleSizeToggle(size)}
+                              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-charcoal text-white border-charcoal shadow-xs"
+                                  : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
+                              }`}
+                            >
+                              {isSelected ? `✓ ${size}` : `+ ${size}`}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2 pt-1">
+                      <input
+                        type="text"
+                        value={categorySpecs.customSizeInput}
+                        onChange={(e) => setCategorySpecs({ ...categorySpecs, customSizeInput: e.target.value })}
+                        placeholder="Enter custom size (e.g. 2.5 or 7.25)..."
+                        className="px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-charcoal"
+                      />
+                      <button
+                        type="button"
+                        onClick={addCustomSize}
+                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg border border-gray-200"
+                      >
+                        + Add Size
+                      </button>
+                    </div>
+
+                    {categorySpecs.availableSizes.length > 0 && (
+                      <div className="pt-3 border-t border-gray-100 space-y-2">
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                          Stock per Available Size
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {categorySpecs.availableSizes.map((size) => (
+                            <div key={size} className="bg-gray-50 p-2.5 rounded-lg border border-gray-200">
+                              <span className="block text-[11px] font-bold text-gray-700 mb-1">Size {size} Stock</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={categorySpecs.sizeStock[size] ?? 5}
+                                onChange={(e) =>
+                                  setCategorySpecs({
+                                    ...categorySpecs,
+                                    sizeStock: { ...categorySpecs.sizeStock, [size]: Number(e.target.value) },
+                                  })
+                                }
+                                className="w-full bg-white border border-gray-200 rounded px-2 py-1 text-xs font-semibold text-gray-900"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3. NECKLACES, EARRINGS, PENDANTS, CUSTOM CATEGORIES (FREE / STANDARD SIZE INFO) */}
+            {category !== "Rings" && category !== "Bracelets" && category !== "Bangles" && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-600 flex items-center space-x-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                <span>
+                  <strong>Standard / Free Size</strong> automatically applied for {category === "Other" ? (customCategory || "Custom Category") : category}. No numeric size input required to publish.
+                </span>
+              </div>
+            )}
+
+            {/* 4. NECKLACES LENGTHS */}
             {category === "Necklaces" && (
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2 border-t border-gray-100">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
                   Available Chain / Necklace Lengths
                 </label>
@@ -622,9 +769,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
 
-            {/* 3. EARRINGS */}
+            {/* 5. EARRINGS */}
             {category === "Earrings" && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-2">Earring Type / Style</label>
                   <select
@@ -660,9 +807,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </div>
             )}
 
-            {/* 4. PENDANTS */}
+            {/* 6. PENDANTS */}
             {category === "Pendants" && (
-              <div className="space-y-3">
+              <div className="space-y-3 pt-2 border-t border-gray-100">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
                   Chain Options for Pendant
                 </label>
@@ -833,7 +980,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
+                <option value="Other">Other / Custom Category</option>
               </select>
+
+              {category === "Other" && (
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Custom Category Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    placeholder="e.g. Necklace & Earring Sets, Bridal Suite"
+                    className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal"
+                  />
+                </div>
+              )}
             </div>
 
             <div>
