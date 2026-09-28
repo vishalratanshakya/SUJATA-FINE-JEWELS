@@ -239,7 +239,18 @@ export type ProductAccordionItem = {
 
 // ─── Default Data ─────────────────────────────────────────────────────────────
 
-const DEFAULT_HERO_BANNERS: HeroBanner[] = [];
+const DEFAULT_HERO_BANNERS: HeroBanner[] = [
+  {
+    id: 1,
+    eyebrow: "Timeless Elegance",
+    heading: "Crafting Your Forever Moments",
+    description: "Discover our latest collection of handcrafted jewelry, designed to make every moment unforgettable.",
+    cta: "Explore Collection",
+    ctaUrl: "/shop",
+    image: "/images/hero/hero_2.jpg",
+    active: true,
+  }
+];
 
 const DEFAULT_ANNOUNCEMENT_BAR: AnnouncementBar = {
   message: '✨ Free shipping on orders above ₹50,000 — Use code FREESHIP',

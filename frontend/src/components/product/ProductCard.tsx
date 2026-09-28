@@ -112,18 +112,20 @@ export function ProductCard({ product }: { product: Product }) {
 
         {/* Product Link Image */}
         <Link href={`/product/${product.slug}`} className="block w-full h-full relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={product.primaryImage || product.images[0]}
+          <Image
+            src={product.primaryImage || product.images[0] || "/images/products/rings/ring_placeholder.jpg"}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
           {(product.hoverImage || product.images[1]) && (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
+            <Image
               src={product.hoverImage || product.images[1]}
               alt={`${product.name} hover view`}
-              className="w-full h-full object-cover absolute inset-0 opacity-0 transition-opacity duration-500 [@media(hover:hover)]:group-hover:opacity-100"
+              fill
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+              className="object-cover absolute inset-0 opacity-0 transition-opacity duration-500 [@media(hover:hover)]:group-hover:opacity-100"
             />
           )}
         </Link>

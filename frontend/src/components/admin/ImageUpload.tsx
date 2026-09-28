@@ -153,13 +153,13 @@ export function ImageUpload({ value, onChange, label, hideUrlInput }: ImageUploa
           onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
           onDragLeave={() => setDragActive(false)}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center space-y-2.5 aspect-square ${
+          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all flex flex-col items-center justify-center space-y-2.5 ${
             dragActive ? "border-amber-500 bg-amber-50/50" : "border-gray-200 hover:border-charcoal bg-gray-50/50"
           }`}
         >
-          <div className="w-12 h-12 rounded-full bg-white shadow-md border border-amber-100 flex items-center justify-center text-amber-700 aspect-square">
+          <div className="w-12 h-12 rounded-full bg-white shadow-md border border-amber-100 flex items-center justify-center text-amber-700">
             {uploading ? (
-              <Loader2 size={24} className="animate-spin text-amber-700 shrink-0 aspect-square" style={{ animation: "spin 1s linear infinite" }} />
+              <Loader2 size={24} className="animate-spin text-amber-700 shrink-0" style={{ animation: "spin 1s linear infinite" }} />
             ) : (
               <ImageIcon size={22} className="text-gray-500" />
             )}
