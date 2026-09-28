@@ -9,6 +9,23 @@ import { useStore } from "@/store/useStore";
 
 export function Hero() {
   const storeBanners = useStore((state) => state.heroBanners);
+  const setHeroBanners = useStore((state) => state.setHeroBanners);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`);
+        const data = await res.json();
+        if (data.success && data.data && data.data.length > 0) {
+          setHeroBanners(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch hero banners:", err);
+      }
+    };
+    fetchBanners();
+  }, [setHeroBanners]);
+
   const HERO_BANNERS = storeBanners.filter((b) => b.active);
 
   const [currentIndex, setCurrentIndex] = useState(0);

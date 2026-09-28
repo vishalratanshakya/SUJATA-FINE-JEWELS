@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useStore, HeroBanner } from "@/store/useStore";
 import { toast } from "react-hot-toast";
 import {
@@ -18,6 +18,22 @@ export default function AdminBannersPage() {
   const addHeroBanner = useStore((s) => s.addHeroBanner);
   const announcementBar = useStore((s) => s.announcementBar);
   const updateAnnouncementBar = useStore((s) => s.updateAnnouncementBar);
+  const setHeroBanners = useStore((s) => s.setHeroBanners);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setHeroBanners(data.data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBanners();
+  }, [setHeroBanners]);
 
   // ── Editing state ──
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -45,12 +61,27 @@ export default function AdminBannersPage() {
     setEditForm({});
   };
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (!editingId) return;
     if (!editForm.heading?.trim()) { toast.error("Heading is required"); return; }
-    updateHeroBanner(editingId, editForm);
-    toast.success("Banner updated!");
-    cancelEdit();
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${editingId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(editForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        updateHeroBanner(editingId, editForm);
+        toast.success("Banner updated!");
+        cancelEdit();
+      } else {
+        toast.error(data.message || "Failed to update banner");
+      }
+    } catch (err) {
+      toast.error("Server error");
+    }
   };
 
   const handleImageUpload = (bannerId: number) => {
@@ -58,33 +89,94 @@ export default function AdminBannersPage() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !uploadingId) return;
-    const objectUrl = URL.createObjectURL(file);
-    updateHeroBanner(uploadingId, { image: objectUrl });
-    toast.success("Banner image updated!");
-    setUploadingId(null);
-    e.target.value = "";
+    
+    toast.loading("Uploading image...", { id: "uploading" });
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        const objectUrl = data.url;
+        
+        const token = localStorage.getItem("token");
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${uploadingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ image: objectUrl }),
+        });
+        
+        updateHeroBanner(uploadingId, { image: objectUrl });
+        toast.success("Banner image updated!", { id: "uploading" });
+      } else {
+        toast.error("Failed to upload image", { id: "uploading" });
+      }
+    } catch (err) {
+      toast.error("Server error during upload", { id: "uploading" });
+    } finally {
+      setUploadingId(null);
+      e.target.value = "";
+    }
   };
 
-  const moveUp = (index: number) => {
+  const moveUp = async (index: number) => {
     if (index === 0) return;
     const newBanners = [...heroBanners];
     [newBanners[index - 1], newBanners[index]] = [newBanners[index], newBanners[index - 1]];
-    reorderHeroBanners(newBanners);
+    
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/reorder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ banners: newBanners }),
+      });
+      reorderHeroBanners(newBanners);
+    } catch (err) {
+      toast.error("Failed to reorder");
+    }
   };
 
-  const moveDown = (index: number) => {
+  const moveDown = async (index: number) => {
     if (index === heroBanners.length - 1) return;
     const newBanners = [...heroBanners];
     [newBanners[index], newBanners[index + 1]] = [newBanners[index + 1], newBanners[index]];
-    reorderHeroBanners(newBanners);
+    
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/reorder`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ banners: newBanners }),
+      });
+      reorderHeroBanners(newBanners);
+    } catch (err) {
+      toast.error("Failed to reorder");
+    }
   };
 
-  const toggleActive = (banner: HeroBanner) => {
-    updateHeroBanner(banner.id, { active: !banner.active });
-    toast.success(banner.active ? "Banner hidden" : "Banner shown");
+  const toggleActive = async (banner: HeroBanner) => {
+    const updatedState = { active: !banner.active };
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${banner.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updatedState),
+      });
+      updateHeroBanner(banner.id, updatedState);
+      toast.success(updatedState.active ? "Banner shown" : "Banner hidden");
+    } catch (err) {
+      toast.error("Server error");
+    }
   };
 
   const saveAnnouncement = () => {
@@ -106,12 +198,32 @@ export default function AdminBannersPage() {
     });
   };
 
-  const submitNewBanner = () => {
+  const submitNewBanner = async () => {
     if (!newBannerForm.heading?.trim()) { toast.error("Heading is required"); return; }
     if (!newBannerForm.image?.trim()) { toast.error("Image is required"); return; }
-    addHeroBanner(newBannerForm as Omit<HeroBanner, "id">);
-    toast.success("New banner created!");
-    setIsAddingNew(false);
+    
+    try {
+      const token = localStorage.getItem("token");
+      const nextId = heroBanners.length > 0 ? Math.max(...heroBanners.map((b) => b.id)) + 1 : 1;
+      const bannerData = { ...newBannerForm, id: nextId };
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(bannerData),
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        addHeroBanner(bannerData as HeroBanner);
+        toast.success("New banner created!");
+        setIsAddingNew(false);
+      } else {
+        toast.error(data.message || "Failed to create banner");
+      }
+    } catch (err) {
+      toast.error("Server error");
+    }
   };
 
   return (
@@ -493,10 +605,19 @@ export default function AdminBannersPage() {
                       <ArrowDown size={14} />
                     </button>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         if (window.confirm("Are you sure you want to delete this banner?")) {
-                          deleteHeroBanner(banner.id);
-                          toast.success("Banner deleted");
+                          try {
+                            const token = localStorage.getItem("token");
+                            await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${banner.id}`, {
+                              method: "DELETE",
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            deleteHeroBanner(banner.id);
+                            toast.success("Banner deleted");
+                          } catch (err) {
+                            toast.error("Failed to delete banner");
+                          }
                         }
                       }}
                       title="Delete banner"

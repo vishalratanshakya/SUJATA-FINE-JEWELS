@@ -11,6 +11,7 @@ import addressRoutes from "./routes/addressRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import certificateRoutes from "./routes/certificateRoutes";
 import aboutRoutes from "./routes/aboutRoutes";
+import heroBannerRoutes from "./routes/heroBannerRoutes";
 dotenv.config();
 
 const app = express();
@@ -36,6 +37,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/about", aboutRoutes);
+app.use("/api/hero-banners", heroBannerRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });
