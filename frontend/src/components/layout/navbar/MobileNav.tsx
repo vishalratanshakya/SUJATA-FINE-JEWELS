@@ -10,7 +10,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const [openAccordion, setOpenAccordion] = useState<"shop" | "collections" | null>("shop");
+  const [openAccordion, setOpenAccordion] = useState<"shop" | null>("shop");
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
 
@@ -29,7 +29,7 @@ export function MobileNav() {
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
-  const toggleAccordion = (name: "shop" | "collections") => {
+  const toggleAccordion = (name: "shop") => {
     setOpenAccordion(openAccordion === name ? null : name);
   };
 
@@ -77,6 +77,7 @@ export function MobileNav() {
               {/* Navigation Links */}
               <div className="flex flex-col px-6 py-4 pb-24">
                 <Link href="/" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">Home</Link>
+                <Link href="/catalogue" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">Catalogue</Link>
                 
                 {/* Shop Accordion */}
                 <div className="border-b border-charcoal/5">
@@ -115,38 +116,7 @@ export function MobileNav() {
                   </AnimatePresence>
                 </div>
 
-                {/* Collections Accordion */}
-                <div className="border-b border-charcoal/5">
-                  <button 
-                    onClick={() => toggleAccordion("collections")}
-                    className="w-full py-4 flex items-center justify-between text-sm tracking-widest uppercase font-medium hover:text-champagne transition-colors"
-                  >
-                    <span>Collections</span>
-                    {openAccordion === "collections" ? <ChevronUp size={16} strokeWidth={1} /> : <ChevronDown size={16} strokeWidth={1} />}
-                  </button>
-                  <AnimatePresence>
-                    {openAccordion === "collections" && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="py-2 pb-4 flex flex-col space-y-4 pl-4">
-                          {COLLECTIONS.map((col) => (
-                            <Link 
-                              key={col.slug} 
-                              href={`/collections/${col.slug}`}
-                              className="font-serif text-lg hover:text-champagne transition-colors"
-                            >
-                              {col.name}
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+
 
                 <Link href="/new-arrivals" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">New Arrivals</Link>
                 <Link href="/best-sellers" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">Best Sellers</Link>

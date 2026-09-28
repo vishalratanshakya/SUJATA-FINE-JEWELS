@@ -1,22 +1,44 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, ShoppingCart, Heart, MapPin, Mail, Phone, Calendar, ShieldCheck } from "lucide-react";
-import { useStore } from "@/store/useStore";
+import { toast } from "react-hot-toast";
 
 export default function CustomerDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const customerId = resolvedParams.id;
 
-  const customers = useStore((s) => s.customers);
-  const orders = useStore((s) => s.orders);
-  
-  const customer = customers.find((c) => c.id === customerId || c.email.toLowerCase() === customerId.toLowerCase());
+  const [customer, setCustomer] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Find customer specific orders
-  const customerOrders = orders.filter((o) => o.customerEmail.toLowerCase() === (customer?.email || customerId).toLowerCase());
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users/${customerId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setCustomer(data.user);
+        } else {
+          toast.error(data.message || "Failed to load profile");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCustomer();
+  }, [customerId]);
+
+  if (loading) {
+    return <div className="p-12 text-center text-gray-500">Loading customer profile...</div>;
+  }
 
   if (!customer) {
     return (
@@ -33,6 +55,9 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
     );
   }
 
+  const customerOrders = customer.orders || [];
+  const defaultAddress = customer.addresses?.find((a: any) => a.isDefault) || customer.addresses?.[0];
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -45,10 +70,9 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
           <h1 className="text-2xl font-serif text-gray-900">{customer.name}</h1>
           <p className="text-xs text-gray-500 mt-1">Customer Profile & Purchase History</p>
         </div>
-
         <div className="flex items-center space-x-3">
           <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
-            {customer.status === 'active' ? 'VIP Client' : 'Standard'}
+            {customer.totalOrders > 5 ? 'VIP Client' : 'Standard'}
           </span>
         </div>
       </div>
@@ -58,7 +82,7 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
             <div className="flex items-center space-x-4 border-b border-gray-100 pb-4">
-              <div className="w-14 h-14 bg-charcoal text-champagne rounded-full flex items-center justify-center font-serif text-xl font-bold">
+              <div className="w-14 h-14 bg-charcoal text-champagne rounded-full flex items-center justify-center font-serif text-xl font-bold uppercase">
                 {customer.name.charAt(0)}
               </div>
               <div>
@@ -74,11 +98,11 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
               </div>
               <div className="flex items-center justify-between py-1 border-b border-gray-50">
                 <span className="text-gray-400">Total Orders</span>
-                <span className="font-bold text-gray-900">{customer.totalOrders || customerOrders.length}</span>
+                <span className="font-bold text-gray-900">{customer.totalOrders}</span>
               </div>
               <div className="flex items-center justify-between py-1 border-b border-gray-50">
                 <span className="text-gray-400">Member Since</span>
-                <span>{customer.joinedDate ? new Date(customer.joinedDate).toLocaleDateString() : 'Jan 2024'}</span>
+                <span>{new Date(customer.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
@@ -93,7 +117,7 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
               </div>
               <div className="flex items-center space-x-2">
                 <Phone size={14} className="text-gray-400" />
-                <span>{customer.phone || '+91 98765 43210'}</span>
+                <span>{customer.phone || 'No phone provided'}</span>
               </div>
             </div>
           </div>
@@ -104,9 +128,17 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
             <div className="flex space-x-2.5 text-xs text-gray-600 leading-relaxed">
               <MapPin size={16} className="text-gray-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-gray-900">{customer.name}</p>
-                <p>123 Luxury Villa, Jubilee Hills</p>
-                <p>Hyderabad, Telangana - 500033</p>
+                {defaultAddress ? (
+                  <>
+                    <p className="font-semibold text-gray-900">{defaultAddress.fullName}</p>
+                    <p>{defaultAddress.addressLine1}</p>
+                    {defaultAddress.addressLine2 && <p>{defaultAddress.addressLine2}</p>}
+                    <p>{defaultAddress.city}, {defaultAddress.state} {defaultAddress.postalCode}</p>
+                    <p>{defaultAddress.country}</p>
+                  </>
+                ) : (
+                  <p className="text-gray-400">No address saved yet.</p>
+                )}
               </div>
             </div>
           </div>
@@ -126,13 +158,13 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
               </div>
             ) : (
               <div className="space-y-3">
-                {customerOrders.map((order) => (
-                  <div key={order.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                {customerOrders.map((order: any) => (
+                  <div key={order._id} className="p-4 bg-gray-50 rounded-lg border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center space-x-3">
-                        <span className="font-bold text-gray-900 text-sm">#{order.orderNumber}</span>
+                        <span className="font-bold text-gray-900 text-sm">#{order.orderId}</span>
                         <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
-                          order.status === "delivered" ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
+                          order.status === "DELIVERED" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
                         }`}>
                           {order.status}
                         </span>
@@ -141,9 +173,9 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
                     </div>
 
                     <div className="flex items-center space-x-4 justify-between sm:justify-end">
-                      <span className="font-bold text-gray-900 text-sm">₹{order.totalAmount.toLocaleString('en-IN')}</span>
+                      <span className="font-bold text-gray-900 text-sm">₹{(order.totalAmount || 0).toLocaleString('en-IN')}</span>
                       <Link 
-                        href={`/admin/orders/${order.id}`} 
+                        href={`/admin/orders/${order._id}`} 
                         className="px-3 py-1.5 bg-charcoal text-white rounded text-xs hover:bg-gray-800 transition-colors"
                       >
                         View Order
@@ -153,15 +185,6 @@ export default function CustomerDetailsPage({ params }: { params: Promise<{ id: 
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Saved Wishlist */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-4">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-gray-900 border-b border-gray-100 pb-3 flex items-center space-x-2">
-              <Heart size={16} className="text-rose-500" />
-              <span>Saved Wishlist Items</span>
-            </h2>
-            <p className="text-xs text-gray-500">Customer currently has 2 items in saved wishlist (Solitaire Ring & Diamond Pendant).</p>
           </div>
         </div>
       </div>

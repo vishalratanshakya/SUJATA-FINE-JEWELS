@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
@@ -48,68 +48,41 @@ export default function AccountPage() {
 
 
   // Address State
-  const [addresses, setAddresses] = useState([
-    {
-      id: "addr-1",
-      title: "HOME",
-      isDefault: true,
-      name: "Aanya Sharma",
-      line1: "12, Green Avenue, South Extension",
-      line2: "New Delhi - 110049, Delhi",
-      country: "India",
-      phone: "+91 98765 43210",
-    },
-  ]);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        
+        const [addrRes, orderRes] = await Promise.all([
+          fetch(`${backendUrl}/api/addresses`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${backendUrl}/api/orders/my-orders`, { headers: { Authorization: `Bearer ${token}` } })
+        ]);
 
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [passForm, setPassForm] = useState({ old: "", newPass: "", confirm: "" });
+        if (addrRes.ok) {
+          const aData = await addrRes.json();
+          setAddresses(aData.data || []);
+        }
 
-  const recentOrders = [
-    {
-      id: "#SJ10018",
-      name: "Celestial Drop Pendant",
-      date: "12 May, 2025",
-      price: 42000,
-      itemCount: "1 Item",
-      status: "Delivered",
-      statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      image: products[1]?.images[0] || "/images/products/necklaces/necklace_placeholder.jpg",
-    },
-    {
-      id: "#SJ10017",
-      name: "Eternal Bloom Studs",
-      date: "08 May, 2025",
-      price: 68000,
-      itemCount: "1 Item",
-      status: "Delivered",
-      statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      image: products[2]?.images[0] || "/images/products/earrings/earrings_placeholder.jpg",
-    },
-    {
-      id: "#SJ10016",
-      name: "Luxe Solitaire Ring",
-      date: "01 May, 2025",
-      price: 78999,
-      itemCount: "1 Item",
-      status: "Processing",
-      statusColor: "bg-amber-50 text-amber-700 border-amber-200",
-      image: products[0]?.images[0] || "/images/products/rings/ring_placeholder.jpg",
-    },
-    {
-      id: "#SJ10015",
-      name: "Diamond Tennis Bracelet",
-      date: "25 Apr, 2025",
-      price: 124999,
-      itemCount: "1 Item",
-      status: "Delivered",
-      statusColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      image: products[3]?.images[0] || "/images/products/bracelets/bracelet_placeholder.jpg",
-    },
-  ];
+        if (orderRes.ok) {
+          const oData = await orderRes.json();
+          setRecentOrders(oData.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
 
-
+    fetchUserData();
+  }, []);
 
 
   const handleDeleteAddress = (id: string) => {
@@ -188,7 +161,7 @@ export default function AccountPage() {
           >
             <div className="flex items-center justify-between mb-3">
               <ShoppingBag size={22} className="text-[#B38E5D]" />
-              <span className="font-serif text-2xl font-bold text-[#2C2825]">18</span>
+              <span className="font-serif text-2xl font-bold text-[#2C2825]">{recentOrders.length}</span>
             </div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#2C2825]">TOTAL ORDERS</h4>
             <p className="text-[11px] text-[#B38E5D] font-medium mt-1 flex items-center space-x-1 group-hover:underline">
@@ -202,7 +175,7 @@ export default function AccountPage() {
           >
             <div className="flex items-center justify-between mb-3">
               <Package size={22} className="text-[#B38E5D]" />
-              <span className="font-serif text-2xl font-bold text-[#2C2825]">3</span>
+              <span className="font-serif text-2xl font-bold text-[#2C2825]">{recentOrders.filter(o => ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(o.status)).length}</span>
             </div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#2C2825]">PROCESSING</h4>
             <p className="text-[11px] text-[#B38E5D] font-medium mt-1 flex items-center space-x-1 group-hover:underline">
@@ -216,7 +189,7 @@ export default function AccountPage() {
           >
             <div className="flex items-center justify-between mb-3">
               <Check size={22} className="text-[#B38E5D]" />
-              <span className="font-serif text-2xl font-bold text-[#2C2825]">12</span>
+              <span className="font-serif text-2xl font-bold text-[#2C2825]">{recentOrders.filter(o => o.status === 'DELIVERED').length}</span>
             </div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#2C2825]">DELIVERED</h4>
             <p className="text-[11px] text-[#B38E5D] font-medium mt-1 flex items-center space-x-1 group-hover:underline">
@@ -257,29 +230,31 @@ export default function AccountPage() {
           </div>
 
           <div className="space-y-4">
-            {recentOrders.map((order) => (
+            {recentOrders.length === 0 ? (
+              <p className="text-sm text-gray-500 py-4">No recent orders found.</p>
+            ) : recentOrders.map((order) => (
               <div
-                key={order.id}
+                key={order._id}
                 className="p-4 rounded-xl border border-[#EAE4D9] bg-[#FAF8F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#2C2825] transition-colors"
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 relative rounded-lg overflow-hidden bg-white border border-[#EAE4D9] flex-shrink-0">
-                    <Image src={order.image} alt={order.name} fill className="object-cover" />
+                    <Image src={order.items[0]?.image || "/images/products/rings/ring_placeholder.jpg"} alt={order.items[0]?.productName || "Product"} fill className="object-cover" />
                   </div>
                   <div>
-                    <h4 className="font-serif text-base font-medium text-[#2C2825]">{order.name}</h4>
+                    <h4 className="font-serif text-base font-medium text-[#2C2825]">{order.items[0]?.productName || "Order"}</h4>
                     <p className="text-xs text-[#8C8275]">
-                      Order ID: <span className="font-mono">{order.id}</span> • {order.date}
+                      Order ID: <span className="font-mono">{order.orderId}</span> • {new Date(order.createdAt).toLocaleDateString()}
                     </p>
                     <p className="text-xs font-semibold text-[#2C2825] mt-1">
-                      {formatPrice(order.price)} <span className="text-[11px] font-normal text-[#8C8275]">({order.itemCount})</span>
+                      {formatPrice(order.totalAmount)} <span className="text-[11px] font-normal text-[#8C8275]">({order.items.length} Item{order.items.length > 1 ? "s" : ""})</span>
                     </p>
                   </div>
                 </div>
 
                 <div className="flex sm:flex-col items-center sm:items-end justify-between gap-2">
                   <span
-                    className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${order.statusColor}`}
+                    className={`text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border ${order.status === 'DELIVERED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}
                   >
                     {order.status}
                   </span>
@@ -310,15 +285,17 @@ export default function AccountPage() {
             </div>
 
             <div className="space-y-4">
-              {addresses.map((addr) => (
+              {addresses.length === 0 ? (
+                <p className="text-sm text-gray-500 py-2">No saved addresses.</p>
+              ) : addresses.map((addr) => (
                 <div
-                  key={addr.id}
+                  key={addr._id}
                   className="p-5 rounded-xl border border-[#EAE4D9] bg-[#FAF8F5] relative space-y-2"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-[#2C2825]">
-                        {addr.title}
+                        {addr.label}
                       </span>
                       {addr.isDefault && (
                         <span className="text-[9px] font-bold uppercase tracking-widest bg-[#B38E5D]/10 text-[#B38E5D] border border-[#B38E5D]/30 px-2 py-0.5 rounded">
@@ -327,7 +304,7 @@ export default function AccountPage() {
                       )}
                     </div>
                     <button
-                      onClick={() => handleDeleteAddress(addr.id)}
+                      onClick={() => handleDeleteAddress(addr._id)}
                       className="text-rose-500 hover:text-rose-700"
                       title="Delete"
                     >
@@ -335,10 +312,11 @@ export default function AccountPage() {
                     </button>
                   </div>
 
-                  <p className="font-serif text-base font-medium text-[#2C2825]">{addr.name}</p>
+                  <p className="font-serif text-base font-medium text-[#2C2825]">{addr.fullName}</p>
                   <p className="text-xs text-[#6B6357] leading-relaxed">
-                    {addr.line1}<br />
-                    {addr.line2}<br />
+                    {addr.addressLine1}<br />
+                    {addr.addressLine2 && <>{addr.addressLine2}<br /></>}
+                    {addr.city}, {addr.state} {addr.postalCode}<br />
                     {addr.country} • {addr.phone}
                   </p>
                 </div>

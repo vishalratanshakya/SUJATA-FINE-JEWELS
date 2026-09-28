@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getProfile, updateProfileInfo, getAllCustomers } from "../services/userService";
+import { getProfile, updateProfileInfo, getAllCustomers, getCustomerFullProfile } from "../services/userService";
 
 export const getMe = async (req: Request, res: Response) => {
   try {
@@ -39,6 +39,20 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.json({ success: true, count: customers.length, data: customers });
   } catch (error: any) {
     console.error("Get All Users Error:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const customer = await getCustomerFullProfile(id);
+    res.json({ success: true, user: customer });
+  } catch (error: any) {
+    console.error("Get User By ID Error:", error);
+    if (error.message === "User not found") {
+      return res.status(404).json({ success: false, message: error.message });
+    }
     res.status(500).json({ success: false, message: "Server error", error: error.message });
   }
 };

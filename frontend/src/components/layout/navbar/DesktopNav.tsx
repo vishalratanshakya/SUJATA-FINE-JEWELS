@@ -14,8 +14,8 @@ export function DesktopNav() {
 
   const mainLinks = [
     { label: "Home", href: "/" },
+    { label: "Catalogue", href: "/catalogue" },
     { label: "Shop", href: "/shop", hasMenu: true, menuType: "shop" },
-    { label: "Collections", href: "/collections", hasMenu: true, menuType: "collections" },
     { label: "New Arrivals", href: "/new-arrivals" },
     { label: "Best Sellers", href: "/best-sellers" },
     { label: "Our Story", href: "/about" },

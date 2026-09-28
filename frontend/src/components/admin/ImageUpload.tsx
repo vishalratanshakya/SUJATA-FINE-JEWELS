@@ -123,7 +123,7 @@ export function ImageUpload({ value, onChange, label, hideUrlInput }: ImageUploa
       />
 
       {value ? (
-        <div className="relative w-full aspect-square bg-gray-50 rounded-xl overflow-hidden border border-gray-200 group">
+        <div className="relative w-full h-64 bg-gray-50 rounded-xl overflow-hidden border border-gray-200 group">
           {value.startsWith("data:") || value.startsWith("http") || value.startsWith("/") ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={value} alt="Uploaded Image" className="w-full h-full object-contain" />

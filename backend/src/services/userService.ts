@@ -1,4 +1,6 @@
 import { User } from "../models/User";
+import { Order } from "../models/Order";
+import { Address } from "../models/Address";
 
 export const getProfile = async (userId: string) => {
   const user = await User.findById(userId).select("-passwordHash");
@@ -66,4 +68,22 @@ export const getAllCustomers = async () => {
   ]);
 
   return customers;
+};
+
+export const getCustomerFullProfile = async (customerId: string) => {
+  const user = await User.findById(customerId).select("-passwordHash");
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const orders = await Order.find({ customerId }).sort({ createdAt: -1 });
+  const addresses = await Address.find({ userId: customerId });
+
+  return {
+    ...user.toObject(),
+    orders,
+    addresses,
+    totalOrders: orders.length,
+    totalSpent: orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+  };
 };

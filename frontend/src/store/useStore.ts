@@ -247,7 +247,7 @@ const DEFAULT_HERO_BANNERS: HeroBanner[] = [
     description: "Discover our latest collection of handcrafted jewelry, designed to make every moment unforgettable.",
     cta: "Explore Collection",
     ctaUrl: "/shop",
-    image: "/images/hero/hero_2.jpg",
+    image: "https://images.unsplash.com/photo-1599643478514-4a52023028dd?q=80&w=2070&auto=format&fit=crop",
     active: true,
   }
 ];
