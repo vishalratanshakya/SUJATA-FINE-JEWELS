@@ -33,6 +33,7 @@ export function Hero() {
   };
 
   useEffect(() => {
+    if (HERO_BANNERS.length === 0) return;
 
     timerRef.current = setTimeout(() => {
       nextSlide();
@@ -49,7 +50,11 @@ export function Hero() {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     };
-  }, [currentIndex]);
+  }, [currentIndex, progress, HERO_BANNERS.length]);
+
+  if (HERO_BANNERS.length === 0) {
+    return null;
+  }
 
   return (
     <div 
@@ -71,6 +76,7 @@ export function Hero() {
               fill
               className="object-cover"
               priority
+              quality={100}
             />
             {/* Subtle gradient overlay to ensure text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-black/20 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/40 md:to-transparent" />

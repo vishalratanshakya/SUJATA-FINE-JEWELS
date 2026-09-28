@@ -95,21 +95,9 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group relative flex flex-col bg-[#FDFBF7] rounded-lg overflow-hidden border border-[#EAE4D9] hover:border-[#B38E5D] transition-all duration-300 shadow-sm hover:shadow-md h-full">
       {/* Product Image Container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F5]">
+      <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8F5]">
         
-        {/* Badges: Top Left */}
-        <div className="absolute top-2.5 left-2.5 z-20 flex flex-col gap-1.5 pointer-events-none">
-          {(product.isBestseller || product.isBestSeller) && (
-            <span className="bg-[#9A7635] text-white text-[9px] font-semibold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-2xs">
-              BEST SELLER
-            </span>
-          )}
-          {product.isNewArrival && (
-            <span className="bg-[#6B7C59] text-white text-[9px] font-semibold uppercase tracking-widest px-2.5 py-0.5 rounded-full shadow-2xs">
-              NEW ARRIVAL
-            </span>
-          )}
-        </div>
+
 
         {/* Wishlist Button: Top Right */}
         <button
@@ -147,9 +135,6 @@ export function ProductCard({ product }: { product: Product }) {
           <h3 className="font-serif text-sm sm:text-base text-[#2C2825] group-hover:text-[#B38E5D] transition-colors truncate">
             {product.name}
           </h3>
-          <p className="text-[11px] text-[#8C8275] tracking-wide truncate">
-            {product.metal} {product.stone ? `| ${product.stone}` : ""}
-          </p>
         </Link>
 
         {/* Price & Add to Bag Trigger */}

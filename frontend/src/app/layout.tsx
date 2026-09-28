@@ -33,15 +33,20 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "@/components/providers/Providers";
+import { StoreInitializer } from "@/components/providers/StoreInitializer";
+import { getProducts } from "@/lib/getProducts";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const products = await getProducts();
+
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} antialiased`}>
       <body className="min-h-screen flex flex-col font-sans bg-ivory text-charcoal" suppressHydrationWarning>
+        <StoreInitializer products={products} />
         <Providers>
           <Toaster position="top-right" />
           {children}

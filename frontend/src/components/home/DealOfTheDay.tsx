@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FEATURED_PRODUCTS } from "@/data/mockData";
+import { useStore } from "@/store/useStore";
 import { ArrowRight } from "lucide-react";
 
 export function DealOfTheDay() {
   const [timeLeft, setTimeLeft] = useState({ hours: 5, minutes: 24, seconds: 59 });
-  const dealProduct = FEATURED_PRODUCTS[0]; // Let's use the first featured product as the deal
+  const products = useStore((s) => s.products);
+  const dealProduct = products.length > 0 ? products[0] : null;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -21,6 +22,8 @@ export function DealOfTheDay() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  if (!dealProduct) return null;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {

@@ -139,18 +139,22 @@ export default function AdminProductsPage() {
 
                   return (
                     <tr key={product.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="px-6 py-4 flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gray-100 rounded relative overflow-hidden flex-shrink-0 border border-gray-100">
-                          <Image 
-                            src={product.images?.[0] || "/images/products/rings/ring_placeholder.jpg"} 
-                            alt={product.name} 
-                            fill 
-                            className="object-cover" 
-                          />
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900">{product.name}</div>
-                          <div className="text-xs text-gray-400 uppercase tracking-wide">{product.metal} • {product.stone || 'Solitaire'}</div>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-14 h-14 bg-gray-100 rounded relative overflow-hidden flex-shrink-0 border border-gray-100">
+                            <Image 
+                              src={product.images?.[0] || "/images/products/rings/ring_placeholder.jpg"} 
+                              alt={product.name} 
+                              fill 
+                              className="object-contain p-1" 
+                            />
+                          </div>
+                          <div className="min-w-[250px] max-w-[400px]">
+                            <div className="font-medium text-gray-900 line-clamp-2" title={product.name}>{product.name}</div>
+                            <div className="text-[11px] text-gray-500 uppercase tracking-wide line-clamp-1 mt-1" title={`${product.metal} • ${product.stone || 'Solitaire'}`}>
+                              {product.metal} • {product.stone || 'Solitaire'}
+                            </div>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 font-medium text-gray-700">{product.category}</td>

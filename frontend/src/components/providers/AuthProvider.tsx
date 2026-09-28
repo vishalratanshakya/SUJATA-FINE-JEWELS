@@ -30,7 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const initApp = async () => {
+      // Products are now initialized globally via StoreInitializer on the server.
+
       const token = localStorage.getItem("token");
       if (!token) {
         setIsLoading(false);
@@ -91,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    fetchUser();
+    initApp();
   }, []);
 
   const login = (token: string, userData: User) => {

@@ -121,7 +121,7 @@ export function SignatureProductCarousel() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={handleDragEnd}
-            className="w-full max-w-[1400px] h-[470px] md:h-[540px] relative flex items-center justify-center cursor-grab active:cursor-grabbing"
+            className="w-full max-w-[1400px] h-[520px] md:h-[620px] relative flex items-center justify-center cursor-grab active:cursor-grabbing"
             style={{ perspective: 1200 }}
           >
             {products.map((product, idx) => {
@@ -222,10 +222,10 @@ export function SignatureProductCarousel() {
                     damping: 28,
                     mass: 0.8,
                   }}
-                  className={`absolute rounded-2xl p-5 md:p-7 flex flex-col items-center justify-between border transition-shadow duration-300 ${
+                  className={`absolute rounded-2xl p-5 md:p-6 flex flex-col items-center justify-between border transition-shadow duration-300 ${
                     isCenter
-                      ? "w-[310px] sm:w-[370px] md:w-[420px] bg-[#FFFDF9] border-[#D5C9B8] shadow-2xl cursor-default"
-                      : "w-[260px] sm:w-[310px] md:w-[360px] bg-[#EFECE6]/95 border-[#E2DDD3] shadow-md cursor-pointer"
+                      ? "w-[290px] sm:w-[340px] md:w-[380px] bg-[#FFFDF9] border-[#D5C9B8] shadow-2xl cursor-default"
+                      : "w-[240px] sm:w-[280px] md:w-[310px] bg-[#EFECE6]/95 border-[#E2DDD3] shadow-md cursor-pointer"
                   }`}
                   style={{ transformStyle: "preserve-3d" }}
                 >
@@ -239,9 +239,7 @@ export function SignatureProductCarousel() {
                   )}
 
                   {/* Image container */}
-                  <div className={`relative w-full mb-4 flex items-center justify-center ${
-                    isCenter ? "h-[240px] sm:h-[280px] md:h-[320px]" : "h-[210px] sm:h-[250px] md:h-[280px]"
-                  }`}>
+                  <div className="relative w-full aspect-square mb-4 flex items-center justify-center rounded-lg bg-[#F9F8F6] overflow-hidden">
                     {isCenter ? (
                       <Link href={`/product/${product.slug}`} className="w-full h-full relative block group">
                         <Image
@@ -250,7 +248,7 @@ export function SignatureProductCarousel() {
                           fill
                           priority
                           sizes="(max-width: 768px) 370px, 420px"
-                          className="object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       </Link>
                     ) : (
@@ -259,7 +257,7 @@ export function SignatureProductCarousel() {
                         alt={product.name}
                         fill
                         sizes="(max-width: 768px) 310px, 360px"
-                        className="object-contain drop-shadow-lg"
+                        className="object-cover"
                       />
                     )}
                   </div>
@@ -267,15 +265,11 @@ export function SignatureProductCarousel() {
                   {/* Product Details */}
                   <div className="text-center w-full">
                     <h3 className={`font-serif text-[#2C2825] font-medium tracking-tight ${
-                      isCenter ? "text-xl md:text-2xl" : "text-base md:text-lg text-[#3D3732] line-clamp-1"
-                    }`}>
+                      isCenter ? "text-xl md:text-2xl line-clamp-2" : "text-base md:text-lg text-[#3D3732] line-clamp-1"
+                    }`} title={product.name}>
                       {product.name}
                     </h3>
                     
-                    <p className="text-xs text-[#8C8275] mt-1 font-light tracking-wider uppercase">
-                      {product.metal || "18K Gold"}, {product.stone || "Natural Diamonds"}
-                    </p>
-
                     <p className={`font-serif font-semibold text-[#1F1B18] ${
                       isCenter ? "text-lg md:text-xl mt-3" : "text-sm mt-2"
                     }`}>

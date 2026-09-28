@@ -38,6 +38,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [primaryImage, setPrimaryImage] = useState("");
   const [hoverImage, setHoverImage] = useState("");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [newGalleryImageUrl, setNewGalleryImageUrl] = useState("");
   const [model3D, setModel3D] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [isSignatureCarousel, setIsSignatureCarousel] = useState(false);
@@ -276,7 +277,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
   // --- Edit Form ---
   return (
-    <form onSubmit={handleSave} className="w-full">
+    <form onSubmit={handleSave} className="w-full pb-24">
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
         <div className="flex items-center space-x-3">
@@ -288,33 +289,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             <ArrowLeft size={20} />
           </Link>
           <h1 className="text-2xl font-serif text-gray-800">Edit Product</h1>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Link
-            href="/admin/products"
-            className="px-4 py-2 text-xs text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Cancel
-          </Link>
-          <button
-            type="submit"
-            disabled={isSubmitting || isSaved}
-            className={`flex items-center space-x-2 px-6 py-2 text-xs font-medium rounded transition-colors ${
-              isSaved
-                ? "bg-green-600 text-white"
-                : isSubmitting
-                ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-charcoal text-white hover:bg-gray-800"
-            }`}
-          >
-            {isSaved ? (
-              <><Check size={14} /><span>Saved!</span></>
-            ) : isSubmitting ? (
-              <span>Saving…</span>
-            ) : (
-              <span>Save Changes</span>
-            )}
-          </button>
         </div>
       </div>
 
@@ -789,7 +763,31 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   label="Add Gallery Image (+)"
                   value=""
                   onChange={(url) => addGalleryImage(url)}
+                  hideUrlInput={true}
                 />
+              </div>
+
+              {/* Add by URL */}
+              <div className="flex items-center space-x-2 pt-2">
+                <input
+                  type="text"
+                  value={newGalleryImageUrl}
+                  onChange={(e) => setNewGalleryImageUrl(e.target.value)}
+                  placeholder="Or enter gallery image URL..."
+                  className="flex-1 px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-charcoal"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (newGalleryImageUrl.trim()) {
+                      addGalleryImage(newGalleryImageUrl.trim());
+                      setNewGalleryImageUrl("");
+                    }
+                  }}
+                  className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold rounded-lg border border-gray-200"
+                >
+                  Add URL
+                </button>
               </div>
             </div>
 
@@ -936,37 +934,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Bottom Action Footer inside form */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center mb-16 mt-8">
-        <span className="text-xs text-gray-500">Review all details before publishing updates to shop storefront</span>
-        <div className="flex items-center space-x-4">
-          <Link
-            href="/admin/products"
-            className="px-5 py-2.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-200 rounded transition-colors"
-          >
-            Cancel
-          </Link>
-          <button
-            type="submit"
-            disabled={isSubmitting || isSaved}
-            className={`flex items-center space-x-2 px-8 py-2.5 text-xs font-medium rounded transition-colors shadow-sm ${
-              isSaved
-                ? "bg-green-600 text-white"
-                : isSubmitting
-                ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-charcoal text-white hover:bg-gray-800"
-            }`}
-          >
-            {isSaved ? (
-              <><Check size={14} /><span>Saved!</span></>
-            ) : isSubmitting ? (
-              <span>Saving…</span>
-            ) : (
-              <span>Save Changes</span>
-            )}
-          </button>
-        </div>
-      </div>
+
     </form>
   );
 }

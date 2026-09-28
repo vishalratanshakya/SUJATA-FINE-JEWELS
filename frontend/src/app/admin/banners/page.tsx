@@ -6,19 +6,26 @@ import { toast } from "react-hot-toast";
 import {
   Upload, ArrowUp, ArrowDown, Eye, EyeOff,
   Edit2, Check, X, Image as ImageIcon, Megaphone,
-  ExternalLink, ToggleLeft, ToggleRight,
+  ExternalLink, ToggleLeft, ToggleRight, Trash2
 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 export default function AdminBannersPage() {
   const heroBanners = useStore((s) => s.heroBanners);
   const updateHeroBanner = useStore((s) => s.updateHeroBanner);
   const reorderHeroBanners = useStore((s) => s.reorderHeroBanners);
+  const deleteHeroBanner = useStore((s) => s.deleteHeroBanner);
+  const addHeroBanner = useStore((s) => s.addHeroBanner);
   const announcementBar = useStore((s) => s.announcementBar);
   const updateAnnouncementBar = useStore((s) => s.updateAnnouncementBar);
 
   // ── Editing state ──
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<Partial<HeroBanner>>({});
+
+  // ── Adding New state ──
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newBannerForm, setNewBannerForm] = useState<Partial<HeroBanner>>({});
 
   // ── Image upload ──
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +91,27 @@ export default function AdminBannersPage() {
     updateAnnouncementBar(annForm);
     toast.success("Announcement bar updated!");
     setEditingAnn(false);
+  };
+
+  const handleAddNewBanner = () => {
+    setIsAddingNew(true);
+    setNewBannerForm({
+      heading: "",
+      description: "",
+      eyebrow: "",
+      image: "",
+      cta: "Discover More",
+      ctaUrl: "/shop",
+      active: false,
+    });
+  };
+
+  const submitNewBanner = () => {
+    if (!newBannerForm.heading?.trim()) { toast.error("Heading is required"); return; }
+    if (!newBannerForm.image?.trim()) { toast.error("Image is required"); return; }
+    addHeroBanner(newBannerForm as Omit<HeroBanner, "id">);
+    toast.success("New banner created!");
+    setIsAddingNew(false);
   };
 
   return (
@@ -235,20 +263,106 @@ export default function AdminBannersPage() {
             <h2 className="text-lg font-medium text-gray-800">Hero Banners</h2>
             <span className="text-xs text-gray-400">({heroBanners.filter(b => b.active).length} of {heroBanners.length} active)</span>
           </div>
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-1 text-xs text-blue-600 hover:underline"
-          >
-            <ExternalLink size={12} /><span>View Storefront</span>
-          </a>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleAddNewBanner}
+              className="px-4 py-1.5 bg-charcoal text-white text-xs font-medium rounded hover:bg-gray-800 transition-colors shadow-sm"
+            >
+              + Add Banner
+            </button>
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-1 text-xs text-blue-600 hover:underline"
+            >
+              <ExternalLink size={12} /><span>View Storefront</span>
+            </a>
+          </div>
         </div>
 
         {/* Hidden file input */}
         <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
 
         <div className="divide-y divide-gray-100">
+          {isAddingNew && (
+            <div className="p-6 bg-blue-50/30 border-b border-gray-100">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-sm text-gray-700">Create New Banner</span>
+                  <div className="flex space-x-2">
+                    <button onClick={submitNewBanner} className="flex items-center space-x-1 px-3 py-1.5 bg-charcoal text-white text-xs rounded hover:bg-gray-800">
+                      <Check size={12} /><span>Create Banner</span>
+                    </button>
+                    <button onClick={() => setIsAddingNew(false)} className="flex items-center space-x-1 px-3 py-1.5 border border-gray-200 text-xs rounded hover:border-gray-400">
+                      <X size={12} /><span>Cancel</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Eyebrow Text</label>
+                    <input
+                      type="text"
+                      value={newBannerForm.eyebrow ?? ''}
+                      onChange={(e) => setNewBannerForm({ ...newBannerForm, eyebrow: e.target.value })}
+                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
+                      placeholder="e.g. NEW COLLECTION"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">Heading <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={newBannerForm.heading ?? ''}
+                      onChange={(e) => setNewBannerForm({ ...newBannerForm, heading: e.target.value })}
+                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
+                      placeholder="e.g. Crafted for Your Forever Moments"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs text-gray-600 mb-1">Description</label>
+                    <textarea
+                      rows={2}
+                      value={newBannerForm.description ?? ''}
+                      onChange={(e) => setNewBannerForm({ ...newBannerForm, description: e.target.value })}
+                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
+                      placeholder="e.g. Exquisite jewellery, handcrafted with passion..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">CTA Button Text</label>
+                    <input
+                      type="text"
+                      value={newBannerForm.cta ?? ''}
+                      onChange={(e) => setNewBannerForm({ ...newBannerForm, cta: e.target.value })}
+                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
+                      placeholder="e.g. Discover More"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">CTA URL</label>
+                    <input
+                      type="text"
+                      value={newBannerForm.ctaUrl ?? ''}
+                      onChange={(e) => setNewBannerForm({ ...newBannerForm, ctaUrl: e.target.value })}
+                      className="w-full border border-gray-200 rounded p-2 text-sm font-mono focus:outline-none focus:border-charcoal bg-white"
+                      placeholder="e.g. /shop"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs text-gray-600 mb-1">Banner Image (Desktop 16:9, Mobile 4:5) <span className="text-red-500">*</span></label>
+                    <ImageUpload
+                      value={newBannerForm.image ?? ''}
+                      onChange={(url) => setNewBannerForm({ ...newBannerForm, image: url })}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {heroBanners.map((banner, index) => (
             <div key={banner.id} className={`p-6 ${!banner.active ? 'opacity-50' : ''}`}>
               {editingId === banner.id ? (
@@ -312,6 +426,13 @@ export default function AdminBannersPage() {
                         className="w-full border border-gray-200 rounded p-2 text-sm font-mono focus:outline-none focus:border-charcoal"
                       />
                     </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs text-gray-600 mb-1">Banner Image (Desktop 16:9, Mobile 4:5)</label>
+                      <ImageUpload
+                        value={editForm.image ?? ''}
+                        onChange={(url) => setEditForm({ ...editForm, image: url })}
+                      />
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -370,6 +491,18 @@ export default function AdminBannersPage() {
                       className="p-1.5 text-gray-400 hover:text-gray-700 border border-gray-200 rounded hover:border-gray-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ArrowDown size={14} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to delete this banner?")) {
+                          deleteHeroBanner(banner.id);
+                          toast.success("Banner deleted");
+                        }
+                      }}
+                      title="Delete banner"
+                      className="p-1.5 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:border-red-300 transition-colors"
+                    >
+                      <Trash2 size={14} />
                     </button>
                   </div>
 

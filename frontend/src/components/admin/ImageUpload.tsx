@@ -8,9 +8,10 @@ interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  hideUrlInput?: boolean;
 }
 
-export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, label, hideUrlInput }: ImageUploadProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -122,10 +123,10 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
       />
 
       {value ? (
-        <div className="relative w-full h-44 bg-gray-50 rounded-xl overflow-hidden border border-gray-200 group">
+        <div className="relative w-full aspect-square bg-gray-50 rounded-xl overflow-hidden border border-gray-200 group">
           {value.startsWith("data:") || value.startsWith("http") || value.startsWith("/") ? (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={value} alt="Uploaded Image" className="w-full h-full object-cover" />
+            <img src={value} alt="Uploaded Image" className="w-full h-full object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">Invalid Image URL</div>
           )}
@@ -152,7 +153,7 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
           onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
           onDragLeave={() => setDragActive(false)}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center space-y-2.5 ${
+          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center space-y-2.5 aspect-square ${
             dragActive ? "border-amber-500 bg-amber-50/50" : "border-gray-200 hover:border-charcoal bg-gray-50/50"
           }`}
         >
@@ -173,15 +174,17 @@ export function ImageUpload({ value, onChange, label }: ImageUploadProps) {
       )}
 
       {/* URL Fallback */}
-      <div className="pt-1">
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Or paste image URL (https://...)"
-          className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-charcoal text-gray-600"
-        />
-      </div>
+      {!hideUrlInput && (
+        <div className="pt-1">
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Or paste image URL (https://...)"
+            className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-charcoal text-gray-600"
+          />
+        </div>
+      )}
     </div>
   );
 }

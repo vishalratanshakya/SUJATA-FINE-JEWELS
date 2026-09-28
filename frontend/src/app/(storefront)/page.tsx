@@ -9,7 +9,7 @@ import { Bestsellers } from "@/components/home/Bestsellers";
 import { DealOfTheDay } from "@/components/home/DealOfTheDay";
 import { ShopByOccasion } from "@/components/home/ShopByOccasion";
 import { BlogSection } from "@/components/home/BlogSection";
-import { Community } from "@/components/home/Community";
+import { FeaturedMediaCarousel } from "@/components/home/FeaturedMediaCarousel";
 
 
 export default function Home() {
@@ -26,7 +26,7 @@ export default function Home() {
       <ShopByOccasion />
       <AIStylistSection />
       <BlogSection />
-      <Community />
+      <FeaturedMediaCarousel />
     </div>
   );
 }

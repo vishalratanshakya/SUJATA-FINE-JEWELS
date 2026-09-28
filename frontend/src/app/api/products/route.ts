@@ -1,22 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
 import { ProductModel } from "@/models/Product";
-import { FEATURED_PRODUCTS } from "@/data/mockData";
+
 
 export async function GET() {
   try {
     await connectToDatabase();
     let products = await ProductModel.find({}).sort({ createdAt: -1 });
 
-    if (products.length === 0) {
-      console.log("No products found in MongoDB Atlas. Auto-seeding initial products...");
-      products = await ProductModel.insertMany(
-        FEATURED_PRODUCTS.map((p) => ({
-          ...p,
-          description: `${p.name} - Handcrafted fine jewellery creation by SUJATA Fine Jewels.`,
-        }))
-      );
-    }
 
     return NextResponse.json({ success: true, products });
   } catch (error: any) {
@@ -34,6 +25,7 @@ export async function POST(req: Request) {
     const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
     const productPayload = {
+      ...body,
       id,
       slug,
       name: body.name,
@@ -52,7 +44,7 @@ export async function POST(req: Request) {
     };
 
     const product = await ProductModel.findOneAndUpdate(
-      { $or: [{ id }, { slug }] },
+      { id },
       { $set: productPayload },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );

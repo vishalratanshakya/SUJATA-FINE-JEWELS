@@ -10,7 +10,7 @@ export default function AdminSectionsHubPage() {
   const occasions = useStore((s) => s.occasions);
   const aiItems = useStore((s) => s.aiStylistItems);
   const articles = useStore((s) => s.journalArticles);
-  const posts = useStore((s) => s.communityPosts);
+  const posts = useStore((s) => s.featuredMediaItems);
   const accordions = useStore((s) => s.productAccordions);
 
   const sections = [
@@ -60,9 +60,9 @@ export default function AdminSectionsHubPage() {
       activeCount: articles.filter(a => a.active).length
     },
     {
-      title: "Worn by Our Community",
-      description: "Customer social gallery posts (@sujatafinejewels)",
-      href: "/admin/sections/community",
+      title: "Featured Product Media",
+      description: "Carousel of product images & videos",
+      href: "/admin/sections/featured-media",
       icon: Camera,
       color: "text-pink-600 bg-pink-50 border-pink-100",
       count: posts.length,

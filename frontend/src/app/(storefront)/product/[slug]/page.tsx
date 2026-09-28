@@ -251,13 +251,6 @@ export default function ProductPage() {
           {/* RIGHT: PRODUCT INFO & PURCHASE CONTROLS (40-45% width → 5 Cols) */}
           <div className="lg:col-span-5 flex flex-col justify-start">
             
-            {/* Category / Metadata */}
-            <div className="mb-2">
-              <span className="text-xs tracking-[0.25em] font-medium text-[#8C8275] uppercase">
-                {product.metal || "18K Gold"} • {product.stone || "Natural Diamond"}
-              </span>
-            </div>
-
             {/* Product Title */}
             <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#2C2825] font-medium tracking-tight mb-4 leading-tight">
               {product.name}

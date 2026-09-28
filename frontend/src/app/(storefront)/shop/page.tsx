@@ -1,8 +1,9 @@
-"use client";
-
 import { ProductListingTemplate } from "@/components/shop/ProductListingTemplate";
+import { getProducts } from "@/lib/getProducts";
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const initialProducts = await getProducts();
+
   return (
     <ProductListingTemplate
       title="SHOP ALL"
@@ -10,6 +11,7 @@ export default function ShopPage() {
       description="Explore our complete collection of exquisite, handcrafted fine jewellery. Timeless designs crafted for every moment."
       filterType="all"
       bannerImage="/images/products/rings/ring_placeholder.jpg"
+      initialProducts={initialProducts}
     />
   );
 }

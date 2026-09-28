@@ -3,16 +3,16 @@ import { connectToDatabase } from "@/lib/db";
 import { ProductModel } from "@/models/Product";
 import { OrderModel } from "@/models/Order";
 import { CertificateModel } from "@/models/Certificate";
-import { FEATURED_PRODUCTS } from "@/data/mockData";
+
 import { INITIAL_CERTIFICATES } from "@/data/certificates";
 
 export async function GET() {
   try {
     await connectToDatabase();
 
-    // 1. Seed Products
+    // 1. Seed Products (Skipped dummy products)
     await ProductModel.deleteMany({});
-    const dbProducts = await ProductModel.insertMany(FEATURED_PRODUCTS);
+    const dbProducts = [];
 
     // 2. Seed Certificates
     await CertificateModel.deleteMany({});

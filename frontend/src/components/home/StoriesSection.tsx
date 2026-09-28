@@ -4,55 +4,58 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, VolumeX, Volume2, Share2, Expand } from "lucide-react";
-import { FEATURED_PRODUCTS } from "@/data/mockData";
-
-// Mock data simulating what admin would upload
-const STORIES = [
-  {
-    id: 1,
-    type: "image", // or video
-    src: "/images/products/earrings/earrings_placeholder.jpg",
-    title: "EVERY HOUR IS DIAMOND HOUR",
-    subtitle: "Tea party",
-    productSlug: FEATURED_PRODUCTS[0].slug,
-    productName: FEATURED_PRODUCTS[0].name,
-    productImage: FEATURED_PRODUCTS[0].images[0],
-  },
-  {
-    id: 2,
-    type: "image",
-    src: "/images/products/necklaces/necklace_placeholder.jpg",
-    title: "THE ROYAL COLLECTION",
-    subtitle: "Evening Gala",
-    productSlug: FEATURED_PRODUCTS[1].slug,
-    productName: FEATURED_PRODUCTS[1].name,
-    productImage: FEATURED_PRODUCTS[1].images[0],
-  },
-  {
-    id: 3,
-    type: "image",
-    src: "/images/products/rings/ring_placeholder.jpg",
-    title: "SIGNATURE RINGS",
-    subtitle: "Everyday luxury",
-    productSlug: FEATURED_PRODUCTS[2].slug,
-    productName: FEATURED_PRODUCTS[2].name,
-    productImage: FEATURED_PRODUCTS[2].images[0],
-  },
-  {
-    id: 4,
-    type: "image",
-    src: "/images/products/bracelets/bracelet_placeholder.jpg",
-    title: "GOLDEN HOUR",
-    subtitle: "Weekend vibes",
-    productSlug: FEATURED_PRODUCTS[3].slug,
-    productName: FEATURED_PRODUCTS[3].name,
-    productImage: FEATURED_PRODUCTS[3].images[0],
-  }
-];
+import { useStore } from "@/store/useStore";
 
 export function StoriesSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const products = useStore((s) => s.products);
+
+  if (products.length < 4) return null;
+
+  // Simulate what admin would upload using real products
+  const STORIES = [
+    {
+      id: 1,
+      type: "image",
+      src: products[0].images[0] || "/images/products/earrings/earrings_placeholder.jpg",
+      title: "EVERY HOUR IS DIAMOND HOUR",
+      subtitle: "Tea party",
+      productSlug: products[0].slug,
+      productName: products[0].name,
+      productImage: products[0].images[0] || "/images/products/earrings/earrings_placeholder.jpg",
+    },
+    {
+      id: 2,
+      type: "image",
+      src: products[1].images[0] || "/images/products/necklaces/necklace_placeholder.jpg",
+      title: "THE ROYAL COLLECTION",
+      subtitle: "Evening Gala",
+      productSlug: products[1].slug,
+      productName: products[1].name,
+      productImage: products[1].images[0] || "/images/products/necklaces/necklace_placeholder.jpg",
+    },
+    {
+      id: 3,
+      type: "image",
+      src: products[2].images[0] || "/images/products/rings/ring_placeholder.jpg",
+      title: "SIGNATURE RINGS",
+      subtitle: "Everyday luxury",
+      productSlug: products[2].slug,
+      productName: products[2].name,
+      productImage: products[2].images[0] || "/images/products/rings/ring_placeholder.jpg",
+    },
+    {
+      id: 4,
+      type: "image",
+      src: products[3].images[0] || "/images/products/bracelets/bracelet_placeholder.jpg",
+      title: "GOLDEN HOUR",
+      subtitle: "Weekend vibes",
+      productSlug: products[3].slug,
+      productName: products[3].name,
+      productImage: products[3].images[0] || "/images/products/bracelets/bracelet_placeholder.jpg",
+    }
+  ];
 
   // Auto-scroll or infinite loop could be added here
   

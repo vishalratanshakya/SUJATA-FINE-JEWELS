@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { FEATURED_PRODUCTS } from '@/data/mockData';
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -219,18 +219,15 @@ export type JournalArticleItem = {
   active: boolean;
 };
 
-export type CommunityPostItem = {
+export type FeaturedMediaItem = {
   id: string;
-  username?: string;
-  handle: string;
-  userAvatar?: string;
-  location?: string;
+  title: string;
   image: string;
-  caption: string;
-  likes?: number;
-  productTagged?: string;
+  videoUrl: string;
+  link: string;
   active: boolean;
 };
+
 
 export type ProductAccordionItem = {
   id: string;
@@ -242,58 +239,7 @@ export type ProductAccordionItem = {
 
 // ─── Default Data ─────────────────────────────────────────────────────────────
 
-const DEFAULT_HERO_BANNERS: HeroBanner[] = [
-  {
-    id: 1,
-    eyebrow: 'TIMELESS ELEGANCE',
-    heading: 'Crafted for Your Forever Moments',
-    description: "Exquisite jewellery, handcrafted with passion, designed to celebrate life's most precious moments.",
-    cta: 'Explore Collection',
-    ctaUrl: '/shop/collections/timeless',
-    image: '/images/products/rings/ring_placeholder.jpg',
-    active: true,
-  },
-  {
-    id: 2,
-    eyebrow: 'THE ART OF CRAFTSMANSHIP',
-    heading: 'Where Heritage Meets Brilliance',
-    description: 'Every piece tells a story of generations of master artisans perfecting their craft.',
-    cta: 'Discover Our Story',
-    ctaUrl: '/about',
-    image: '/images/products/necklaces/necklace_placeholder.jpg',
-    active: true,
-  },
-  {
-    id: 3,
-    eyebrow: 'NEW COLLECTION',
-    heading: 'Designed to Be Remembered',
-    description: 'Discover our latest arrivals featuring modern silhouettes and classic elegance.',
-    cta: 'Shop New Arrivals',
-    ctaUrl: '/new-arrivals',
-    image: '/images/products/earrings/earrings_placeholder.jpg',
-    active: true,
-  },
-  {
-    id: 4,
-    eyebrow: 'DIAMOND STORIES',
-    heading: 'A Brilliance That Lasts Forever',
-    description: 'Ethically sourced, masterfully cut diamonds that capture the light and your heart.',
-    cta: 'Shop Diamonds',
-    ctaUrl: '/shop/diamond',
-    image: '/images/products/bracelets/bracelet_placeholder.jpg',
-    active: true,
-  },
-  {
-    id: 5,
-    eyebrow: 'SIGNATURE JEWELS',
-    heading: 'Made for Your Most Precious Moments',
-    description: 'The Sujata Signature Collection. Iconic designs for the modern visionary.',
-    cta: 'View Signature Collection',
-    ctaUrl: '/collections/signature',
-    image: '/images/products/pendants/pendant_placeholder.jpg',
-    active: true,
-  },
-];
+const DEFAULT_HERO_BANNERS: HeroBanner[] = [];
 
 const DEFAULT_ANNOUNCEMENT_BAR: AnnouncementBar = {
   message: '✨ Free shipping on orders above ₹50,000 — Use code FREESHIP',
@@ -363,10 +309,7 @@ const DEFAULT_ORDERS: Order[] = [
     customerName: 'Priya Sharma',
     customerEmail: 'priya.sharma@example.com',
     customerPhone: '+91 98765 43210',
-    items: [
-      { product: FEATURED_PRODUCTS[0], quantity: 1 },
-      { product: FEATURED_PRODUCTS[2], quantity: 1 }
-    ],
+    items: [],
     totalAmount: 147000,
     status: 'delivered',
     shippingAddress: '42 Marine Drive, Flat 8A, Mumbai, Maharashtra 400020',
@@ -381,9 +324,7 @@ const DEFAULT_ORDERS: Order[] = [
     customerName: 'Ananya Verma',
     customerEmail: 'ananya.v@example.com',
     customerPhone: '+91 98112 33445',
-    items: [
-      { product: FEATURED_PRODUCTS[1], quantity: 1 }
-    ],
+    items: [],
     totalAmount: 185000,
     status: 'processing',
     shippingAddress: '15 Jubilee Hills, Road No 36, Hyderabad, Telangana 500033',
@@ -397,9 +338,7 @@ const DEFAULT_ORDERS: Order[] = [
     customerName: 'Rohan Mehta',
     customerEmail: 'rohan.mehta@example.com',
     customerPhone: '+91 99201 88765',
-    items: [
-      { product: FEATURED_PRODUCTS[3], quantity: 1 }
-    ],
+    items: [],
     totalAmount: 92000,
     status: 'pending',
     shippingAddress: '78 MG Road, Indiranagar, Bengaluru, Karnataka 560038',
@@ -536,6 +475,7 @@ interface StoreState {
   addProduct: (product: Omit<Product, 'id'> & { id?: string }) => void;
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
+  setProducts: (products: Product[]) => void;
   getProductById: (id: string) => Product | undefined;
 
 
@@ -559,6 +499,8 @@ interface StoreState {
   heroBanners: HeroBanner[];
   updateHeroBanner: (id: number, updates: Partial<HeroBanner>) => void;
   reorderHeroBanners: (banners: HeroBanner[]) => void;
+  deleteHeroBanner: (id: number) => void;
+  addHeroBanner: (banner: Omit<HeroBanner, "id">) => void;
 
   // Announcement Bar
   announcementBar: AnnouncementBar;
@@ -616,10 +558,10 @@ interface StoreState {
   updateJournalArticle: (id: string, updates: Partial<JournalArticleItem>) => void;
   deleteJournalArticle: (id: string) => void;
 
-  communityPosts: CommunityPostItem[];
-  addCommunityPost: (post: Omit<CommunityPostItem, 'id'>) => void;
-  updateCommunityPost: (id: string, updates: Partial<CommunityPostItem>) => void;
-  deleteCommunityPost: (id: string) => void;
+  featuredMediaItems: FeaturedMediaItem[];
+  addFeaturedMedia: (item: Omit<FeaturedMediaItem, 'id'>) => void;
+  updateFeaturedMedia: (id: string, updates: Partial<FeaturedMediaItem>) => void;
+  deleteFeaturedMedia: (id: string) => void;
 
   productAccordions: ProductAccordionItem[];
   addProductAccordion: (acc: Omit<ProductAccordionItem, 'id'>) => void;
@@ -679,7 +621,7 @@ export const useStore = create<StoreState>()(
       },
 
       // --- Admin Products ---
-      products: FEATURED_PRODUCTS,
+      products: [],
 
 
       addProduct: (productData) => {
@@ -732,6 +674,10 @@ export const useStore = create<StoreState>()(
           wishlist: state.wishlist.filter((p) => p.id !== id),
           recentlyViewed: state.recentlyViewed.filter((p) => p.id !== id),
         }));
+      },
+
+      setProducts: (products) => {
+        set({ products });
       },
 
       getProductById: (id) => {
@@ -842,18 +788,35 @@ export const useStore = create<StoreState>()(
         set((state) => ({ journalArticles: state.journalArticles.filter((j) => j.id !== id) }));
       },
 
-      communityPosts: [],
-      addCommunityPost: (post) => {
-        const newItem: CommunityPostItem = { ...post, id: `post-${Date.now()}` };
-        set((state) => ({ communityPosts: [newItem, ...state.communityPosts] }));
+      featuredMediaItems: [
+        {
+          id: "fm-1",
+          title: "Surat Grandeur Solitaire Necklace",
+          image: "/images/products/necklaces/necklace_placeholder.jpg",
+          videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+          link: "/product/surat-grandeur-solitaire-diamond-necklace",
+          active: true,
+        },
+        {
+          id: "fm-2",
+          title: "Radiant Halo Diamond Ring",
+          image: "/images/products/rings/ring_placeholder.jpg",
+          videoUrl: "",
+          link: "/product/radiant-halo-diamond-ring",
+          active: true,
+        }
+      ],
+      addFeaturedMedia: (item) => {
+        const newItem: FeaturedMediaItem = { ...item, id: `fm-${Date.now()}` };
+        set((state) => ({ featuredMediaItems: [newItem, ...state.featuredMediaItems] }));
       },
-      updateCommunityPost: (id, updates) => {
+      updateFeaturedMedia: (id, updates) => {
         set((state) => ({
-          communityPosts: state.communityPosts.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+          featuredMediaItems: state.featuredMediaItems.map((p) => (p.id === id ? { ...p, ...updates } : p)),
         }));
       },
-      deleteCommunityPost: (id) => {
-        set((state) => ({ communityPosts: state.communityPosts.filter((p) => p.id !== id) }));
+      deleteFeaturedMedia: (id) => {
+        set((state) => ({ featuredMediaItems: state.featuredMediaItems.filter((p) => p.id !== id) }));
       },
 
       productAccordions: [],
@@ -883,6 +846,21 @@ export const useStore = create<StoreState>()(
 
       reorderHeroBanners: (banners) => {
         set({ heroBanners: banners });
+      },
+
+      deleteHeroBanner: (id) => {
+        set((state) => ({
+          heroBanners: state.heroBanners.filter((b) => b.id !== id),
+        }));
+      },
+
+      addHeroBanner: (banner) => {
+        set((state) => {
+          const nextId = Math.max(0, ...state.heroBanners.map(b => b.id)) + 1;
+          return {
+            heroBanners: [...state.heroBanners, { ...banner, id: nextId }],
+          };
+        });
       },
 
       // --- Announcement Bar ---
@@ -1036,7 +1014,7 @@ export const useStore = create<StoreState>()(
       setWishlist: (wishlist) => set({ wishlist }),
 
       // --- Recently Viewed ---
-      recentlyViewed: FEATURED_PRODUCTS.slice(0, 4),
+      recentlyViewed: [],
 
       removeFromRecentlyViewed: (productId) => {
         set((state) => ({
@@ -1059,20 +1037,28 @@ export const useStore = create<StoreState>()(
         },
         setItem: (name, value) => {
           try {
+            const sanitizeUrl = (url: string | undefined, fallback = '/images/products/rings/ring_placeholder.jpg') => {
+              if (!url) return '';
+              if (url.startsWith('data:') && url.length > 50000) {
+                return fallback;
+              }
+              return url;
+            };
+
             const sanitizeProduct = (p: any) => {
-              const sanitizeUrl = (url: string | undefined) => {
-                if (!url) return '';
-                if (url.startsWith('data:') && url.length > 50000) {
-                  return '/images/products/rings/ring_placeholder.jpg';
-                }
-                return url;
-              };
               return {
                 ...p,
                 primaryImage: sanitizeUrl(p.primaryImage),
                 hoverImage: sanitizeUrl(p.hoverImage),
-                images: (p.images || []).map(sanitizeUrl),
-                galleryImages: (p.galleryImages || []).map(sanitizeUrl),
+                images: (p.images || []).map((img: string) => sanitizeUrl(img)),
+                galleryImages: (p.galleryImages || []).map((img: string) => sanitizeUrl(img)),
+              };
+            };
+
+            const sanitizeHeroBanner = (b: any) => {
+              return {
+                ...b,
+                image: sanitizeUrl(b.image, '/images/products/necklaces/necklace_placeholder.jpg')
               };
             };
 
@@ -1086,11 +1072,14 @@ export const useStore = create<StoreState>()(
                   product: sanitizeProduct(item.product)
                 })),
                 wishlist: (value?.state?.wishlist || []).map(sanitizeProduct),
+                heroBanners: (value?.state?.heroBanners || []).map(sanitizeHeroBanner),
               },
             };
             localStorage.setItem(name, JSON.stringify(sanitizedValue));
           } catch (e) {
-            console.warn('LocalStorage write failed completely.', e);
+            if (typeof window !== "undefined") {
+              console.warn('LocalStorage write failed completely.', e);
+            }
           }
         },
         removeItem: (name) => {
@@ -1115,11 +1104,8 @@ export const useStore = create<StoreState>()(
         return {
           ...currentState,
           ...persisted,
-          products: mergedProducts.length > 0 ? mergedProducts : FEATURED_PRODUCTS,
-          heroBanners:
-            persisted.heroBanners && persisted.heroBanners.length > 0
-              ? persisted.heroBanners
-              : DEFAULT_HERO_BANNERS,
+          products: mergedProducts,
+          heroBanners: persisted.heroBanners && persisted.heroBanners.length > 0 ? persisted.heroBanners : DEFAULT_HERO_BANNERS,
           announcementBar: persisted.announcementBar ?? DEFAULT_ANNOUNCEMENT_BAR,
           coupons:
             persisted.coupons && persisted.coupons.length > 0
@@ -1128,7 +1114,7 @@ export const useStore = create<StoreState>()(
           recentlyViewed:
             persisted.recentlyViewed !== undefined
               ? persisted.recentlyViewed
-              : FEATURED_PRODUCTS.slice(0, 4),
+              : [],
           occasions:
             persisted.occasions && persisted.occasions.length > 0
               ? persisted.occasions

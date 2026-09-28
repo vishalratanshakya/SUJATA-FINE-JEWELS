@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { FilterSidebar } from "@/components/shop/FilterSidebar";
 import { ProductCard } from "@/components/product/ProductCard";
-import { FEATURED_PRODUCTS } from "@/data/mockData";
+
 import { SlidersHorizontal, X } from "lucide-react";
 
 interface ProductListingTemplateProps {
@@ -15,6 +15,7 @@ interface ProductListingTemplateProps {
   filterType?: "all" | "new_arrivals" | "best_sellers";
   emptyTitle?: string;
   emptyDescription?: string;
+  initialProducts?: any[];
 }
 
 import { useStore } from "@/store/useStore";
@@ -27,6 +28,7 @@ export function ProductListingTemplate({
   filterType = "all",
   emptyTitle = "No Jewellery Found",
   emptyDescription = "Try adjusting your filters to discover more SUJATA creations.",
+  initialProducts = [],
 }: ProductListingTemplateProps) {
   const storeProducts = useStore((s) => s.products);
 
@@ -56,31 +58,16 @@ export function ProductListingTemplate({
     setSelectedCollection("");
   };
 
-  const [productsList, setProductsList] = useState<any[]>(storeProducts);
+  const [productsList, setProductsList] = useState<any[]>(
+    initialProducts.length > 0 ? initialProducts : storeProducts
+  );
 
-  // Sync with store products & try backend API
+  // Sync with store products if they get updated
   useEffect(() => {
-    if (storeProducts && storeProducts.length > 0) {
+    if (storeProducts && storeProducts.length > 0 && initialProducts.length === 0) {
       setProductsList(storeProducts);
     }
-  }, [storeProducts]);
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const res = await fetch("/api/products");
-        const data = await res.json();
-        if (data.success && data.products && data.products.length > 0) {
-          const storeIds = new Set(storeProducts.map((p) => p.id));
-          const apiOnlyProducts = data.products.filter((p: any) => !storeIds.has(p.id));
-          setProductsList([...storeProducts, ...apiOnlyProducts]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch products from API:", err);
-      }
-    }
-    fetchProducts();
-  }, [storeProducts]);
+  }, [storeProducts, initialProducts]);
 
   const allProducts = useMemo(() => {
     return productsList;
