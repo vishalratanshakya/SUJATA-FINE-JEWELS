@@ -43,6 +43,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [model3D, setModel3D] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [isSignatureCarousel, setIsSignatureCarousel] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isExploreCollection, setIsExploreCollection] = useState(false);
+  const [isBridalWedding, setIsBridalWedding] = useState(false);
+  const [isLuxuryGifting, setIsLuxuryGifting] = useState(false);
+  const [isBehindTheCraft, setIsBehindTheCraft] = useState(false);
+  const [isVerifiedReviews, setIsVerifiedReviews] = useState(false);
+  const [isDealOfTheDay, setIsDealOfTheDay] = useState(false);
+  const [isShopByOccasion, setIsShopByOccasion] = useState(false);
   const [productOccasions, setProductOccasions] = useState<string[]>([]);
   const [productDetails, setProductDetails] = useState("");
   const [diamondInfo, setDiamondInfo] = useState("");
@@ -106,6 +114,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setGalleryImages(gallery);
 
     setIsSignatureCarousel(!!product.isSignatureCarousel);
+    setIsFeatured(!!product.isFeatured);
+    setIsExploreCollection(!!product.isExploreCollection);
+    setIsBridalWedding(!!product.isBridalWedding);
+    setIsLuxuryGifting(!!product.isLuxuryGifting);
+    setIsBehindTheCraft(!!product.isBehindTheCraft);
+    setIsVerifiedReviews(!!product.isVerifiedReviews);
+    setIsDealOfTheDay(!!product.isDealOfTheDay);
+    setIsShopByOccasion(!!product.isShopByOccasion);
     setProductOccasions(product.occasions || []);
 
     const sizes = product.availableSizes || [];
@@ -238,6 +254,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       hoverImage,
       galleryImages,
       isSignatureCarousel,
+      isFeatured,
+      isExploreCollection,
+      isBridalWedding,
+      isLuxuryGifting,
+      isBehindTheCraft,
+      isVerifiedReviews,
+      isDealOfTheDay,
+      isShopByOccasion,
       occasions: productOccasions,
       availableSizes: finalAvailableSizes,
       sizeStock: finalSizeStock,
@@ -1037,8 +1061,76 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                 <span className="text-gray-800 font-medium">Show in 3D Perspective Carousel (Homepage)</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300" />
+                <input 
+                  type="checkbox" 
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
                 <span className="text-gray-700">Featured Collection</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isExploreCollection}
+                  onChange={(e) => setIsExploreCollection(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Explore Collection</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer pt-3 border-t border-gray-100 mt-2">
+                <input 
+                  type="checkbox" 
+                  checked={isBridalWedding}
+                  onChange={(e) => setIsBridalWedding(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Bridal & Wedding Collection</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isLuxuryGifting}
+                  onChange={(e) => setIsLuxuryGifting(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Luxury Gifting Studio</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isBehindTheCraft}
+                  onChange={(e) => setIsBehindTheCraft(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Behind the Craft</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isVerifiedReviews}
+                  onChange={(e) => setIsVerifiedReviews(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Verified Customer Reviews</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isDealOfTheDay}
+                  onChange={(e) => setIsDealOfTheDay(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Deal of the Day</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isShopByOccasion}
+                  onChange={(e) => setIsShopByOccasion(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Shop by Occasion</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input type="checkbox" className="rounded border-gray-300" />

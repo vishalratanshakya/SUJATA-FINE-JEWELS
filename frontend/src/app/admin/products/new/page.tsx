@@ -44,6 +44,14 @@ export default function NewProductPage() {
     isBestSeller: false,
     isNewArrival: false,
     isSignatureCarousel: false,
+    isFeatured: false,
+    isExploreCollection: false,
+    isBridalWedding: false,
+    isLuxuryGifting: false,
+    isBehindTheCraft: false,
+    isVerifiedReviews: false,
+    isDealOfTheDay: false,
+    isShopByOccasion: false,
     selectedOccasions: [] as string[],
     productDetails: "",
     diamondInfo: "",
@@ -196,6 +204,14 @@ export default function NewProductPage() {
       isBestseller: formData.isBestSeller,
       isNewArrival: formData.isNewArrival,
       isSignatureCarousel: formData.isSignatureCarousel,
+      isFeatured: formData.isFeatured,
+      isExploreCollection: formData.isExploreCollection,
+      isBridalWedding: formData.isBridalWedding,
+      isLuxuryGifting: formData.isLuxuryGifting,
+      isBehindTheCraft: formData.isBehindTheCraft,
+      isVerifiedReviews: formData.isVerifiedReviews,
+      isDealOfTheDay: formData.isDealOfTheDay,
+      isShopByOccasion: formData.isShopByOccasion,
       occasions: formData.selectedOccasions,
       availableSizes: finalAvailableSizes,
       sizeStock: finalSizeStock,
@@ -888,11 +904,91 @@ export default function NewProductPage() {
               <label className="flex items-center space-x-2.5 cursor-pointer">
                 <input 
                   type="checkbox" 
+                  checked={formData.isFeatured}
+                  onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Featured Collection</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isExploreCollection}
+                  onChange={(e) => setFormData({...formData, isExploreCollection: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Explore Collection</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
                   checked={formData.isSignatureCarousel}
                   onChange={(e) => setFormData({...formData, isSignatureCarousel: e.target.checked})}
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
                 />
                 <span className="text-xs font-medium text-gray-800">Feature in Signature 3D Carousel</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer mt-4 border-t border-gray-100 pt-3">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isBridalWedding}
+                  onChange={(e) => setFormData({...formData, isBridalWedding: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Bridal & Wedding Collection</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isLuxuryGifting}
+                  onChange={(e) => setFormData({...formData, isLuxuryGifting: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Luxury Gifting Studio</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isBehindTheCraft}
+                  onChange={(e) => setFormData({...formData, isBehindTheCraft: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Behind the Craft</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isVerifiedReviews}
+                  onChange={(e) => setFormData({...formData, isVerifiedReviews: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Verified Customer Reviews</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isDealOfTheDay}
+                  onChange={(e) => setFormData({...formData, isDealOfTheDay: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Deal of the Day</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isShopByOccasion}
+                  onChange={(e) => setFormData({...formData, isShopByOccasion: e.target.checked})}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-xs font-medium text-gray-800">Shop by Occasion</span>
               </label>
             </div>
           </div>

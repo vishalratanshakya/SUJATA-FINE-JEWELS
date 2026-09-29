@@ -14,6 +14,10 @@ import aboutRoutes from "./routes/aboutRoutes";
 import heroBannerRoutes from "./routes/heroBannerRoutes";
 import announcementBarRoutes from "./routes/announcementBarRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
+import bridalRoutes from "./routes/bridalRoutes";
+import giftingRoutes from "./routes/giftingRoutes";
+import craftStoryRoutes from "./routes/craftStoryRoutes";
+import reviewRoutes from "./routes/reviewRoutes";
 dotenv.config();
 
 const app = express();
@@ -42,6 +46,10 @@ app.use("/api/about", aboutRoutes);
 app.use("/api/hero-banners", heroBannerRoutes);
 app.use("/api/announcement-bar", announcementBarRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/bridal-collections", bridalRoutes);
+app.use("/api/gifting-collections", giftingRoutes);
+app.use("/api/craft-stories", craftStoryRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });

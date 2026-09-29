@@ -5,6 +5,13 @@ import { SignatureProductCarousel } from "@/components/home/SignatureProductCaro
 import { DealOfTheDay } from "@/components/home/DealOfTheDay";
 import { Bestsellers } from "@/components/home/Bestsellers";
 
+import { ExploreCollection } from "@/components/home/ExploreCollection";
+import { BridalCollectionSection } from "@/components/home/BridalCollectionSection";
+import { GiftingStudioSection } from "@/components/home/GiftingStudioSection";
+import { BehindTheCraftSection } from "@/components/home/BehindTheCraftSection";
+import { CustomerReviewsSection } from "@/components/home/CustomerReviewsSection";
+import { ShopByOccasionSection } from "@/components/home/ShopByOccasion";
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -12,8 +19,14 @@ export default function Home() {
       <ShopByCategory />
       <Bestsellers />
       <FeaturedCollection />
+      <ExploreCollection />
+      <ShopByOccasionSection />
+      <BridalCollectionSection />
       <SignatureProductCarousel />
       <DealOfTheDay />
+      <GiftingStudioSection />
+      <BehindTheCraftSection />
+      <CustomerReviewsSection />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Flame, Box, FolderKanban, Sparkles, BookOpen, Camera, Layers, ArrowRight } from "lucide-react";
+import { Flame, Box, FolderKanban, Sparkles, BookOpen, Camera, Layers, ArrowRight, Gift, Film, MessageSquare } from "lucide-react";
 import { useStore } from "@/store/useStore";
+import { useEffect, useState } from "react";
 
 export default function AdminSectionsHubPage() {
   const deals = useStore((s) => s.deals);
@@ -12,8 +13,98 @@ export default function AdminSectionsHubPage() {
   const articles = useStore((s) => s.journalArticles);
   const posts = useStore((s) => s.featuredMediaItems);
   const accordions = useStore((s) => s.productAccordions);
+  const [bridalCount, setBridalCount] = useState({ total: 0, active: 0 });
+  const [giftingCount, setGiftingCount] = useState({ total: 0, active: 0 });
+  const [craftCount, setCraftCount] = useState({ total: 0, active: 0 });
+  const [reviewCount, setReviewCount] = useState({ total: 0, active: 0 });
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/bridal-collections`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setBridalCount({
+            total: data.data.length,
+            active: data.data.filter((d: any) => d.isActive).length
+          });
+        }
+      })
+      .catch(console.error);
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/gifting-collections`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setGiftingCount({
+            total: data.data.length,
+            active: data.data.filter((d: any) => d.isActive).length
+          });
+        }
+      })
+      .catch(console.error);
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/craft-stories`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setCraftCount({
+            total: data.data.length,
+            active: data.data.filter((d: any) => d.isActive).length
+          });
+        }
+      })
+      .catch(console.error);
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/reviews`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setReviewCount({
+            total: data.data.length,
+            active: data.data.filter((d: any) => d.isApproved).length
+          });
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const sections = [
+    {
+      title: "Bridal & Wedding",
+      description: "Manage luxury bridal collections on storefront",
+      href: "/admin/sections/bridal-collection",
+      icon: Sparkles,
+      color: "text-rose-600 bg-rose-50 border-rose-100",
+      count: bridalCount.total,
+      activeCount: bridalCount.active
+    },
+    {
+      title: "Luxury Gifting Studio",
+      description: "Curated gift collections by occasion",
+      href: "/admin/sections/gifting-studio",
+      icon: Gift,
+      color: "text-amber-600 bg-amber-50 border-amber-100",
+      count: giftingCount.total,
+      activeCount: giftingCount.active
+    },
+    {
+      title: "Behind the Craft",
+      description: "Manage videos and stories of jewelry making",
+      href: "/admin/sections/behind-the-craft",
+      icon: Film,
+      color: "text-indigo-600 bg-indigo-50 border-indigo-100",
+      count: craftCount.total,
+      activeCount: craftCount.active
+    },
+    {
+      title: "Verified Reviews",
+      description: "Manage customer testimonials and approvals",
+      href: "/admin/sections/reviews",
+      icon: MessageSquare,
+      color: "text-emerald-600 bg-emerald-50 border-emerald-100",
+      count: reviewCount.total,
+      activeCount: reviewCount.active
+    },
     {
       title: "Deal of the Day",
       description: "Flash sales, price cuts, and countdown timers",

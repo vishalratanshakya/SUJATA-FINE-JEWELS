@@ -45,6 +45,14 @@ export type Product = {
   isBestSeller?: boolean;
   isBestseller?: boolean;
   isNewArrival?: boolean;
+  isFeatured?: boolean;
+  isExploreCollection?: boolean;
+  isBridalWedding?: boolean;
+  isLuxuryGifting?: boolean;
+  isBehindTheCraft?: boolean;
+  isVerifiedReviews?: boolean;
+  isDealOfTheDay?: boolean;
+  isShopByOccasion?: boolean;
   inStock?: boolean;
   stock?: number;
   occasions?: string[];

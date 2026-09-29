@@ -9,7 +9,8 @@ import { ArrowRight } from "lucide-react";
 export function DealOfTheDay() {
   const [timeLeft, setTimeLeft] = useState({ hours: 5, minutes: 24, seconds: 59 });
   const products = useStore((s) => s.products);
-  const dealProduct = products.length > 0 ? products[0] : null;
+  const dealProducts = products.filter(p => p.isDealOfTheDay);
+  const dealProduct = dealProducts.length > 0 ? dealProducts[0] : null;
 
   useEffect(() => {
     const timer = setInterval(() => {

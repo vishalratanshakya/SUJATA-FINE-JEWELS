@@ -48,7 +48,8 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
       { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
       { name: "Customers", href: "/admin/customers", icon: Users },
       { name: "Collections", href: "/admin/collections", icon: FolderKanban },
-      { name: "Homepage", href: "/admin/banners", icon: LayoutGrid },
+      { name: "Hero Banners", href: "/admin/banners", icon: LayoutGrid },
+      { name: "Homepage Sections", href: "/admin/sections", icon: LayoutGrid },
     ],
   },
 

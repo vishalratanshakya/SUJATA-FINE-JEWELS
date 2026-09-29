@@ -4,19 +4,28 @@ import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { ProductCard } from "@/components/product/ProductCard";
 
-export function FeaturedCollection() {
+export function ShopByOccasionSection() {
   const products = useStore((s) => s.products);
-  const displayProducts = products.filter((p) => p.isFeatured);
+  const displayProducts = products.filter((p) => p.isShopByOccasion);
+
+  if (displayProducts.length === 0) {
+    return null;
+  }
 
   return (
-    <section className="py-12 md:py-20 bg-pearl">
+    <section className="py-12 md:py-20 bg-ivory">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         
         <div className="flex flex-row justify-between items-center mb-8 md:mb-12">
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-charcoal tracking-wide">
-            FEATURED COLLECTION
-          </h2>
-          <Link href="/collections/featured" className="text-xs tracking-widest uppercase text-charcoal/60 hover:text-champagne transition-colors flex items-center space-x-2">
+          <div>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-charcoal tracking-wide mb-2">
+              Shop by Occasion
+            </h2>
+            <p className="text-gray-500 text-sm md:text-base">
+              Find the perfect piece for your special moments
+            </p>
+          </div>
+          <Link href="/catalogue?category=All" className="text-xs tracking-widest uppercase text-charcoal/60 hover:text-champagne transition-colors flex items-center space-x-2">
             <span>VIEW ALL</span>
             <span className="w-6 h-[1px] bg-current inline-block" />
           </Link>
