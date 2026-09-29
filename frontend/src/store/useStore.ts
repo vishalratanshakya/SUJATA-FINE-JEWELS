@@ -41,6 +41,8 @@ export type Product = {
   primaryImage?: string;
   hoverImage?: string;
   galleryImages?: string[];
+  videoUrl?: string;
+  model3DUrl?: string;
   isSignatureCarousel?: boolean;
   isBestSeller?: boolean;
   isBestseller?: boolean;

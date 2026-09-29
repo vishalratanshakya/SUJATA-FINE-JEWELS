@@ -200,6 +200,8 @@ export default function NewProductPage() {
       primaryImage: finalPrimaryImage,
       hoverImage: finalHoverImage,
       galleryImages,
+      videoUrl,
+      model3DUrl: model3D,
       isBestSeller: formData.isBestSeller,
       isBestseller: formData.isBestSeller,
       isNewArrival: formData.isNewArrival,

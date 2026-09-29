@@ -22,36 +22,26 @@ export function FileUpload({
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (file: File) => {
+  const handleFileChange = async (file: File) => {
     setUploading(true);
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      if (e.target?.result) {
-        const dataUrl = e.target.result as string;
-        onChange(dataUrl);
-
-        try {
-          const body = new FormData();
-          body.append("dataUrl", dataUrl);
-          const res = await fetch("/api/upload", {
-            method: "POST",
-            body,
-          });
-          const data = await res.json();
-          if (data.success && data.url) {
-            onChange(data.url);
-          }
-        } catch {
-          // Fallback
-        }
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        onChange(data.url);
       }
+    } catch {
+      // Fallback
+    } finally {
       setUploading(false);
-    };
-    reader.onerror = () => {
-      setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {

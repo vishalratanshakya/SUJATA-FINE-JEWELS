@@ -112,6 +112,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setPrimaryImage(primary);
     setHoverImage(hover);
     setGalleryImages(gallery);
+    setModel3D(product.model3DUrl || "");
+    setVideoUrl(product.videoUrl || "");
 
     setIsSignatureCarousel(!!product.isSignatureCarousel);
     setIsFeatured(!!product.isFeatured);
@@ -253,6 +255,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       primaryImage,
       hoverImage,
       galleryImages,
+      videoUrl,
+      model3DUrl: model3D,
       isSignatureCarousel,
       isFeatured,
       isExploreCollection,

@@ -11,6 +11,8 @@ export interface IProductDoc extends Document {
   primaryImage?: string;
   hoverImage?: string;
   galleryImages?: string[];
+  videoUrl?: string;
+  model3DUrl?: string;
   description: string;
   metal: string;
   purity?: string;
@@ -56,6 +58,8 @@ const ProductSchema = new Schema<IProductDoc>(
     primaryImage: { type: String },
     hoverImage: { type: String },
     galleryImages: [{ type: String }],
+    videoUrl: { type: String },
+    model3DUrl: { type: String },
     description: { type: String, default: "Exquisite handcrafted fine jewellery piece from SUJATA Fine Jewels." },
     metal: { type: String, required: true },
     purity: { type: String, default: "750 (18K)" },

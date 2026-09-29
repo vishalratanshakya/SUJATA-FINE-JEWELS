@@ -15,8 +15,9 @@ export function BehindTheCraftSection() {
     return null;
   }
 
-  const defaultVideoUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ"; // Placeholder video
-  const defaultThumbnailUrl = "https://images.unsplash.com/photo-1589128777085-f852e7284483?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80";
+  const mainProduct = craftProducts[0];
+  const defaultVideoUrl = mainProduct.videoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+  const defaultThumbnailUrl = mainProduct.primaryImage || mainProduct.images?.[0] || "https://images.unsplash.com/photo-1589128777085-f852e7284483?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80";
 
   return (
     <section className="py-16 md:py-24 bg-charcoal text-white overflow-hidden">
@@ -81,14 +82,23 @@ export function BehindTheCraftSection() {
             <X size={24} />
           </button>
           
-          <div className="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden relative shadow-2xl border border-white/10">
-            <iframe
-              src={`${activeVideo}?autoplay=1`}
-              title="Craft Story Video"
-              className="w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+          <div className="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden relative shadow-2xl border border-white/10 flex justify-center items-center">
+            {activeVideo.includes("youtube.com") || activeVideo.includes("vimeo.com") ? (
+              <iframe
+                src={`${activeVideo}${activeVideo.includes('?') ? '&' : '?'}autoplay=1`}
+                title="Craft Story Video"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <video
+                src={activeVideo}
+                className="w-full h-full"
+                controls
+                autoPlay
+              />
+            )}
           </div>
         </div>
       )}
