@@ -19,7 +19,16 @@ export interface IProductDoc extends Document {
   stone?: string;
   isNewArrival?: boolean;
   isBestseller?: boolean;
+  isBestSeller?: boolean;
+  isFeatured?: boolean;
+  isExploreCollection?: boolean;
+  isSignatureCarousel?: boolean;
+  isBridalWedding?: boolean;
+  isLuxuryGifting?: boolean;
+  isBehindTheCraft?: boolean;
+  isVerifiedReviews?: boolean;
   isDealOfTheDay?: boolean;
+  isShopByOccasion?: boolean;
   stock: number;
   availableSizes?: string[];
   sizeStock?: Record<string, number>;
@@ -55,7 +64,16 @@ const ProductSchema = new Schema<IProductDoc>(
     stone: { type: String },
     isNewArrival: { type: Boolean, default: false },
     isBestseller: { type: Boolean, default: false },
+    isBestSeller: { type: Boolean, default: false },
+    isFeatured: { type: Boolean, default: false },
+    isExploreCollection: { type: Boolean, default: false },
+    isSignatureCarousel: { type: Boolean, default: false },
+    isBridalWedding: { type: Boolean, default: false },
+    isLuxuryGifting: { type: Boolean, default: false },
+    isBehindTheCraft: { type: Boolean, default: false },
+    isVerifiedReviews: { type: Boolean, default: false },
     isDealOfTheDay: { type: Boolean, default: false },
+    isShopByOccasion: { type: Boolean, default: false },
     stock: { type: Number, default: 10 },
     availableSizes: [{ type: String }],
     sizeStock: { type: Map, of: Number },
