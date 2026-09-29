@@ -18,29 +18,43 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "No file or data provided" }, { status: 400 });
     }
 
-    let fileToUpload = dataUrlStr;
-
-    if (file && !fileToUpload) {
+    if (file) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const mimeType = file.type || "image/jpeg";
-      fileToUpload = `data:${mimeType};base64,${buffer.toString("base64")}`;
+      
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+          { folder: "Sujata Fine Jewels", resource_type: "auto" },
+          (error, result) => {
+            if (error) {
+              resolve(NextResponse.json({ success: false, error: error.message }, { status: 500 }));
+            } else {
+              resolve(NextResponse.json({
+                success: true,
+                url: result?.secure_url,
+                public_id: result?.public_id,
+              }));
+            }
+          }
+        ).end(buffer);
+      });
     }
 
-    if (!fileToUpload) {
-      return NextResponse.json({ success: false, error: "Invalid file content" }, { status: 400 });
+    // Fallback for dataUrlStr
+    if (dataUrlStr) {
+      const uploadResponse = await cloudinary.uploader.unsigned_upload(dataUrlStr, "Sujata Fine Jewels", {
+        folder: "Sujata Fine Jewels",
+        resource_type: "auto",
+      });
+
+      return NextResponse.json({
+        success: true,
+        url: uploadResponse.secure_url,
+        public_id: uploadResponse.public_id,
+      });
     }
 
-    const uploadResponse = await cloudinary.uploader.unsigned_upload(fileToUpload, "Sujata Fine Jewels", {
-      folder: "Sujata Fine Jewels",
-      resource_type: "auto",
-    });
-
-    return NextResponse.json({
-      success: true,
-      url: uploadResponse.secure_url,
-      public_id: uploadResponse.public_id,
-    });
+    return NextResponse.json({ success: false, error: "Invalid file content" }, { status: 400 });
   } catch (error: any) {
     console.error("Cloudinary Upload Error:", error);
     return NextResponse.json({ success: false, error: error.message || "Failed to upload to Cloudinary" }, { status: 500 });

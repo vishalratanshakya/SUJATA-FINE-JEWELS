@@ -5,6 +5,7 @@ import { Plus, Edit, Trash2, Camera, Film } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { FileUpload } from "@/components/admin/FileUpload";
 
 export default function AdminBehindTheCraftPage() {
   const [stories, setStories] = useState<any[]>([]);
@@ -246,14 +247,12 @@ export default function AdminBehindTheCraftPage() {
                     />
                   </div>
                   <div>
-                    <label className="block font-medium text-gray-700 mb-1">Video URL (MP4, YouTube, Vimeo) *</label>
-                    <input
-                      type="text"
-                      required
+                    <FileUpload
+                      label="Video URL (MP4, YouTube, Vimeo) *"
+                      accept="video/*,.mp4,.webm"
                       value={formState.videoUrl}
-                      onChange={(e) => setFormState({ ...formState, videoUrl: e.target.value })}
+                      onChange={(url) => setFormState({ ...formState, videoUrl: url })}
                       placeholder="e.g. https://www.youtube.com/watch?v=..."
-                      className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal"
                     />
                   </div>
                   
