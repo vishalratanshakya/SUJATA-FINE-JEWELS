@@ -9,6 +9,7 @@ export interface IHeroBanner extends Document {
   ctaUrl: string;
   image: string;
   active: boolean;
+  displayType: 'MAIN_BANNER' | 'HERO_CARD';
 }
 
 const heroBannerSchema = new Schema(
@@ -21,6 +22,7 @@ const heroBannerSchema = new Schema(
     ctaUrl: { type: String, required: true },
     image: { type: String, required: true },
     active: { type: Boolean, default: true },
+    displayType: { type: String, enum: ['MAIN_BANNER', 'HERO_CARD'], default: 'MAIN_BANNER' },
   },
   { timestamps: true }
 );

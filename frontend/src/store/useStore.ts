@@ -88,6 +88,7 @@ export type HeroBanner = {
   ctaUrl: string;
   image: string;
   active: boolean;
+  displayType?: 'MAIN_BANNER' | 'HERO_CARD';
 };
 
 export type AnnouncementBar = {

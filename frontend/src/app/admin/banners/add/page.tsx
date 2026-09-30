@@ -21,6 +21,7 @@ export default function AddBannerPage() {
     cta: "Discover More",
     ctaUrl: "/shop",
     active: false,
+    displayType: "MAIN_BANNER",
   });
 
   const submitNewBanner = async () => {
@@ -64,6 +65,17 @@ export default function AddBannerPage() {
       <div className="bg-white rounded shadow-sm border border-gray-100 p-8">
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Display Type <span className="text-red-500">*</span></label>
+              <select
+                value={newBannerForm.displayType || 'MAIN_BANNER'}
+                onChange={(e) => setNewBannerForm({ ...newBannerForm, displayType: e.target.value as 'MAIN_BANNER' | 'HERO_CARD' })}
+                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:border-charcoal focus:ring-1 focus:ring-charcoal bg-white transition-all"
+              >
+                <option value="MAIN_BANNER">Main Hero Banner (Left Carousel)</option>
+                <option value="HERO_CARD">Hero Card (Right Grid)</option>
+              </select>
+            </div>
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2">Eyebrow Text</label>
               <input

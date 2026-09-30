@@ -423,6 +423,17 @@ export default function AdminBannersPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                      <label className="block text-xs text-gray-600 mb-1">Display Type <span className="text-red-500">*</span></label>
+                      <select
+                        value={editForm.displayType || 'MAIN_BANNER'}
+                        onChange={(e) => setEditForm({ ...editForm, displayType: e.target.value as 'MAIN_BANNER' | 'HERO_CARD' })}
+                        className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal bg-white"
+                      >
+                        <option value="MAIN_BANNER">Main Hero Banner (Left Carousel)</option>
+                        <option value="HERO_CARD">Hero Card (Right Grid)</option>
+                      </select>
+                    </div>
+                    <div>
                       <label className="block text-xs text-gray-600 mb-1">Eyebrow Text</label>
                       <input
                         type="text"
@@ -501,6 +512,9 @@ export default function AdminBannersPage() {
                     <p className="font-medium text-gray-800 truncate">{banner.heading}</p>
                     <p className="text-xs text-gray-500 truncate mt-0.5">{banner.description}</p>
                     <div className="flex items-center space-x-2 mt-2">
+                      <span className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${banner.displayType === 'HERO_CARD' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                        {banner.displayType === 'HERO_CARD' ? 'Hero Card' : 'Main Banner'}
+                      </span>
                       <span className="text-xs bg-gray-100 px-2 py-0.5 rounded font-mono text-gray-600">{banner.ctaUrl}</span>
                     </div>
                   </div>
