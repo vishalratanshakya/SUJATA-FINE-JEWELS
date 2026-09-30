@@ -16,6 +16,7 @@ interface ProductListingTemplateProps {
   emptyTitle?: string;
   emptyDescription?: string;
   initialProducts?: any[];
+  categoryFilter?: string;
 }
 
 import { useStore } from "@/store/useStore";
@@ -29,6 +30,7 @@ export function ProductListingTemplate({
   emptyTitle = "No Jewellery Found",
   emptyDescription = "Try adjusting your filters to discover more SUJATA creations.",
   initialProducts = [],
+  categoryFilter,
 }: ProductListingTemplateProps) {
   const storeProducts = useStore((s) => s.products);
 
@@ -81,6 +83,20 @@ export function ProductListingTemplate({
       }
       if (filterType === "best_sellers" && !("isBestseller" in product ? product.isBestseller : (product as any).isBestSeller)) {
         return false;
+      }
+
+      // Filter by categoryFilter prop if provided (for CategoryPage)
+      if (categoryFilter) {
+        const pCat = (product.category || "").toLowerCase().trim();
+        const targetCat = categoryFilter.toLowerCase().trim();
+        let matchesCategory = false;
+        if (targetCat === "all" || targetCat === "catalogue" || targetCat === "shop") matchesCategory = true;
+        else if (pCat === targetCat) matchesCategory = true;
+        else if (targetCat === "rings" && pCat === "earrings") matchesCategory = false;
+        else if (pCat.endsWith("s") && pCat.slice(0, -1) === targetCat) matchesCategory = true;
+        else if (targetCat.endsWith("s") && targetCat.slice(0, -1) === pCat) matchesCategory = true;
+        
+        if (!matchesCategory) return false;
       }
 
       // 2. Sidebar filters

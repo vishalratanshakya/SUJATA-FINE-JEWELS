@@ -1,69 +1,33 @@
 "use client";
 
 import { use } from "react";
-import { FilterSidebar } from "@/components/shop/FilterSidebar";
-import { ProductCard } from "@/components/product/ProductCard";
-import { useStore } from "@/store/useStore";
+import { ProductListingTemplate } from "@/components/shop/ProductListingTemplate";
 
 export default function CategoryPage(props: { params: Promise<{ category: string }> }) {
   const params = use(props.params);
   const category = params.category || "";
   
-  const storeProducts = useStore((s) => s.products);
   const formattedCategory = category ? category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ') : "Catalogue";
 
-  const categoryProducts = storeProducts.filter((p) => {
-    const pCat = (p.category || "").toLowerCase().trim();
-    const targetCat = category.toLowerCase().trim();
-    if (targetCat === "all" || targetCat === "catalogue" || targetCat === "shop") return true;
-    if (pCat === targetCat) return true;
-    if (targetCat === "rings" && pCat === "earrings") return false;
-    if (pCat.endsWith("s") && pCat.slice(0, -1) === targetCat) return true;
-    if (targetCat.endsWith("s") && targetCat.slice(0, -1) === pCat) return true;
-    return pCat === targetCat;
-  });
-  const displayProducts = categoryProducts;
+  const bannerImage = category.toLowerCase().trim() === 'necklaces' 
+      ? '/images/products/necklaces/necklace_placeholder.jpg'
+      : category.toLowerCase().trim() === 'earrings'
+      ? '/images/products/earrings/earrings_placeholder.jpg'
+      : category.toLowerCase().trim() === 'bracelets'
+      ? '/images/products/bracelets/bracelet_placeholder.jpg'
+      : category.toLowerCase().trim() === 'bangles'
+      ? '/images/products/bangles/bangle_placeholder.jpg'
+      : category.toLowerCase().trim() === 'pendants'
+      ? '/images/products/pendants/pendant_placeholder.jpg'
+      : '/images/products/rings/ring_placeholder.jpg';
 
   return (
-    <div className="bg-ivory pt-24 pb-20 min-h-screen">
-      
-      {/* Category Banner / Header */}
-      <div className="text-center py-16 px-4 border-b border-charcoal/5 mb-8 bg-pearl">
-        <span className="text-[10px] tracking-[0.3em] uppercase text-charcoal/50 mb-4 block">Collection</span>
-        <h1 className="font-serif text-4xl md:text-5xl text-charcoal mb-4 uppercase">{formattedCategory}</h1>
-        <p className="text-sm text-charcoal/60 max-w-lg mx-auto">
-          Discover our curated selection of {formattedCategory.toLowerCase()}, crafted to elevate your everyday elegance.
-        </p>
-      </div>
-
-      <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <div className="flex flex-col lg:flex-row gap-12">
-          
-          <div className="hidden lg:block">
-            <FilterSidebar />
-          </div>
-
-          <div className="flex-1">
-            <div className="flex justify-between items-center mb-8 pb-4 border-b border-charcoal/5">
-              <span className="text-xs tracking-widest text-charcoal/50 uppercase">SHOWING {displayProducts.length} RESULTS</span>
-              <div className="flex items-center space-x-4">
-                <button className="lg:hidden text-xs tracking-widest text-charcoal uppercase underline underline-offset-4">Filters</button>
-                <select className="bg-transparent text-xs tracking-widest uppercase text-charcoal border-none focus:ring-0 outline-none cursor-pointer">
-                  <option>Sort By: Featured</option>
-                  <option>Price: Low to High</option>
-                  <option>Price: High to Low</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {displayProducts.map((product, i) => (
-                <ProductCard key={`${product.id}-${i}`} product={product} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ProductListingTemplate
+      title={formattedCategory}
+      description={`Discover our curated selection of ${formattedCategory.toLowerCase()}, crafted to elevate your everyday elegance.`}
+      bannerImage={bannerImage}
+      categoryFilter={category}
+      filterType="all"
+    />
   );
 }
