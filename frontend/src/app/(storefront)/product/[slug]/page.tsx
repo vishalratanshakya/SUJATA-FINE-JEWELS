@@ -104,9 +104,9 @@ export default function ProductPage() {
     )
   );
 
-  const mediaItems = imageList.map(url => ({ type: "image" as const, url }));
+  const mediaItems: { type: "image" | "video"; url: string }[] = imageList.map(url => ({ type: "image", url }));
   if (product.videoUrl && product.videoUrl.trim()) {
-    mediaItems.push({ type: "video" as const, url: product.videoUrl });
+    mediaItems.push({ type: "video", url: product.videoUrl });
   }
 
   if (mediaItems.length === 0) {
