@@ -1,8 +1,9 @@
 import { connectToDatabase } from "@/lib/db";
 import { ProductModel } from "@/models/Product";
-import { cache } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 
-export const getProducts = cache(async () => {
+export const getProducts = async () => {
+  noStore();
   try {
     await connectToDatabase();
     const productsDocs = await ProductModel.find({}).sort({ createdAt: -1 }).lean();
@@ -11,4 +12,4 @@ export const getProducts = cache(async () => {
     console.error("Error fetching products:", err);
     return [];
   }
-});
+};

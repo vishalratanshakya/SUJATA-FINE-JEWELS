@@ -37,7 +37,7 @@ export function Navbar() {
       }${
         isScrolled 
           ? "bg-ivory/95 backdrop-blur-md shadow-sm text-charcoal border-b border-charcoal/5" 
-          : (isHome ? "bg-transparent text-white" : "bg-transparent text-charcoal")
+          : "bg-transparent text-charcoal"
       }`}
     >
       <div className="max-w-[1920px] mx-auto px-4 md:px-8 h-[72px] md:h-[82px] flex items-center justify-between">

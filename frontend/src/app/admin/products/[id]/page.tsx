@@ -35,6 +35,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [price, setPrice] = useState("");
   const [originalPrice, setOriginalPrice] = useState("");
   const [discountPercentage, setDiscountPercentage] = useState("");
+  const [sku, setSku] = useState("");
   const [rating, setRating] = useState("");
   const [primaryImage, setPrimaryImage] = useState("");
   const [hoverImage, setHoverImage] = useState("");
@@ -42,6 +43,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [newGalleryImageUrl, setNewGalleryImageUrl] = useState("");
   const [model3D, setModel3D] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
+  const [isBestSeller, setIsBestSeller] = useState(false);
+  const [isNewArrival, setIsNewArrival] = useState(false);
   const [isSignatureCarousel, setIsSignatureCarousel] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
   const [isExploreCollection, setIsExploreCollection] = useState(false);
@@ -98,6 +101,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setPrice(product.price ? String(product.price) : "");
     setOriginalPrice(product.originalPrice ? String(product.originalPrice) : "");
     setDiscountPercentage(product.discountPercentage ? String(product.discountPercentage) : "");
+    setSku(product.sku || "");
     setRating(product.rating ? String(product.rating) : "");
     setProductDetails(product.productDetails || "");
     setDiamondInfo(product.diamondInfo || "");
@@ -115,6 +119,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setModel3D(product.model3DUrl || "");
     setVideoUrl(product.videoUrl || "");
 
+    setIsBestSeller(!!product.isBestseller || !!product.isBestSeller);
+    setIsNewArrival(!!product.isNewArrival);
     setIsSignatureCarousel(!!product.isSignatureCarousel);
     setIsFeatured(!!product.isFeatured);
     setIsExploreCollection(!!product.isExploreCollection);
@@ -250,6 +256,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       price: Number(price),
       originalPrice: originalPrice ? Number(originalPrice) : undefined,
       discountPercentage: discountPercentage ? Number(discountPercentage) : undefined,
+      sku: sku.trim(),
       rating: rating ? Number(rating) : undefined,
       images: allImages,
       primaryImage,
@@ -257,6 +264,9 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       galleryImages,
       videoUrl,
       model3DUrl: model3D,
+      isBestSeller,
+      isBestseller: isBestSeller,
+      isNewArrival,
       isSignatureCarousel,
       isFeatured,
       isExploreCollection,
@@ -471,6 +481,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal"
                   min="0"
                   placeholder="Before discount"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">SKU Code</label>
+                <input
+                  type="text"
+                  value={sku}
+                  onChange={(e) => setSku(e.target.value)}
+                  className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal font-mono"
                 />
               </div>
               <div>
@@ -1058,6 +1077,24 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               <label className="flex items-center space-x-2 cursor-pointer pt-1">
                 <input
                   type="checkbox"
+                  checked={isBestSeller}
+                  onChange={(e) => setIsBestSeller(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
+                />
+                <span className="text-gray-800 font-medium">Mark as Best Seller</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={isNewArrival}
+                  onChange={(e) => setIsNewArrival(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
+                />
+                <span className="text-gray-800 font-medium">Mark as New Arrival</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
                   checked={isSignatureCarousel}
                   onChange={(e) => setIsSignatureCarousel(e.target.checked)}
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
@@ -1135,10 +1172,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
                 />
                 <span className="text-gray-700">Shop by Occasion</span>
-              </label>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-gray-700">Best Seller</span>
               </label>
             </div>
           </div>

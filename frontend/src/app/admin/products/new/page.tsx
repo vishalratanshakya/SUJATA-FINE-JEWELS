@@ -150,17 +150,17 @@ export default function NewProductPage() {
       return;
     }
 
-    const categoryPlaceholder = formData.category.toLowerCase() === 'necklaces' 
+    const categoryPlaceholder = formData.category.toLowerCase() === 'necklaces'
       ? '/images/products/necklaces/necklace_placeholder.jpg'
       : formData.category.toLowerCase() === 'earrings'
-      ? '/images/products/earrings/earrings_placeholder.jpg'
-      : formData.category.toLowerCase() === 'bracelets'
-      ? '/images/products/bracelets/bracelet_placeholder.jpg'
-      : formData.category.toLowerCase() === 'bangles'
-      ? '/images/products/bangles/bangle_placeholder.jpg'
-      : formData.category.toLowerCase() === 'pendants'
-      ? '/images/products/pendants/pendant_placeholder.jpg'
-      : '/images/products/rings/ring_placeholder.jpg';
+        ? '/images/products/earrings/earrings_placeholder.jpg'
+        : formData.category.toLowerCase() === 'bracelets'
+          ? '/images/products/bracelets/bracelet_placeholder.jpg'
+          : formData.category.toLowerCase() === 'bangles'
+            ? '/images/products/bangles/bangle_placeholder.jpg'
+            : formData.category.toLowerCase() === 'pendants'
+              ? '/images/products/pendants/pendant_placeholder.jpg'
+              : '/images/products/rings/ring_placeholder.jpg';
 
     const finalPrimaryImage = primaryImage || categoryPlaceholder;
     const finalHoverImage = hoverImage || categoryPlaceholder;
@@ -169,8 +169,8 @@ export default function NewProductPage() {
     const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const allImages = [finalPrimaryImage, finalHoverImage, ...galleryImages].filter(Boolean);
 
-    const finalCategory = formData.category === "Other" && formData.customCategory.trim() 
-      ? formData.customCategory.trim() 
+    const finalCategory = formData.category === "Other" && formData.customCategory.trim()
+      ? formData.customCategory.trim()
       : formData.category;
 
     // Sizing determination
@@ -230,17 +230,23 @@ export default function NewProductPage() {
     addProduct(productPayload);
 
     try {
-      await fetch("/api/products", {
+      const response = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(productPayload),
       });
-    } catch (err) {
-      console.error("Error saving product to MongoDB Atlas:", err);
-    }
 
-    toast.success(`Product "${formData.name}" created & saved to database!`);
-    router.push("/admin/products");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save product");
+      }
+
+      toast.success(`Product "${formData.name}" created & saved to database!`);
+      router.push("/admin/products");
+    } catch (err: any) {
+      console.error("Error saving product to MongoDB Atlas:", err);
+      toast.error(err.message || "Failed to save product to database.");
+    }
   };
 
   return (
@@ -274,56 +280,56 @@ export default function NewProductPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
+
         {/* Main Details */}
         <div className="md:col-span-2 space-y-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">Basic Product Details</h2>
-            
+
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Product Title *</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 required
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="e.g. Royal Solitaire Diamond Ring" 
-                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g. Royal Solitaire Diamond Ring"
+                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
               />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Product Description *</label>
-              <textarea 
+              <textarea
                 required
                 rows={4}
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                placeholder="Describe the craftsmanship, diamond details, design inspiration, and specifications of this jewellery piece..." 
-                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none" 
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Describe the craftsmanship, diamond details, design inspiration, and specifications of this jewellery piece..."
+                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-2">Metal Specification</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.metal}
-                  onChange={(e) => setFormData({...formData, metal: e.target.value})}
-                  placeholder="e.g. 18K Yellow Gold" 
-                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
+                  onChange={(e) => setFormData({ ...formData, metal: e.target.value })}
+                  placeholder="e.g. 18K Yellow Gold"
+                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-2">Gemstone / Diamond Spec</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.stone}
-                  onChange={(e) => setFormData({...formData, stone: e.target.value})}
-                  placeholder="e.g. VVS1 Diamond 1.25 Carat" 
-                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
+                  onChange={(e) => setFormData({ ...formData, stone: e.target.value })}
+                  placeholder="e.g. VVS1 Diamond 1.25 Carat"
+                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
                 />
               </div>
             </div>
@@ -331,30 +337,30 @@ export default function NewProductPage() {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-2">Selling Price (₹) *</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   required
                   value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-2">Original Price (₹)</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   value={formData.originalPrice}
-                  onChange={(e) => setFormData({...formData, originalPrice: e.target.value})}
-                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal" 
+                  onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-2">SKU Code</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={formData.sku}
-                  onChange={(e) => setFormData({...formData, sku: e.target.value})}
-                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal font-mono" 
+                  onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal font-mono"
                 />
               </div>
             </div>
@@ -371,45 +377,45 @@ export default function NewProductPage() {
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Product Details Accordion Text</label>
-              <textarea 
+              <textarea
                 rows={3}
                 value={formData.productDetails}
-                onChange={(e) => setFormData({...formData, productDetails: e.target.value})}
-                placeholder="Specific craftsmanship, finish, hallmark info..." 
-                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none" 
+                onChange={(e) => setFormData({ ...formData, productDetails: e.target.value })}
+                placeholder="Specific craftsmanship, finish, hallmark info..."
+                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none"
               />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Diamond & Gemstone Info Accordion Text</label>
-              <textarea 
+              <textarea
                 rows={3}
                 value={formData.diamondInfo}
-                onChange={(e) => setFormData({...formData, diamondInfo: e.target.value})}
-                placeholder="Diamond cut, clarity, color grade, certification body..." 
-                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none" 
+                onChange={(e) => setFormData({ ...formData, diamondInfo: e.target.value })}
+                placeholder="Diamond cut, clarity, color grade, certification body..."
+                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none"
               />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Shipping & Returns Accordion Text</label>
-              <textarea 
+              <textarea
                 rows={2}
                 value={formData.shippingReturns}
-                onChange={(e) => setFormData({...formData, shippingReturns: e.target.value})}
-                placeholder="Insured delivery terms, return window, exchange policies..." 
-                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none" 
+                onChange={(e) => setFormData({ ...formData, shippingReturns: e.target.value })}
+                placeholder="Insured delivery terms, return window, exchange policies..."
+                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none"
               />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Care Instructions Accordion Text</label>
-              <textarea 
+              <textarea
                 rows={2}
                 value={formData.careInstructions}
-                onChange={(e) => setFormData({...formData, careInstructions: e.target.value})}
-                placeholder="Maintenance, storage, cleaning tips..." 
-                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none" 
+                onChange={(e) => setFormData({ ...formData, careInstructions: e.target.value })}
+                placeholder="Maintenance, storage, cleaning tips..."
+                className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none"
               />
             </div>
           </div>
@@ -445,11 +451,10 @@ export default function NewProductPage() {
                           key={size}
                           type="button"
                           onClick={() => handleSizeToggle(size)}
-                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                            isSelected
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${isSelected
                               ? "bg-charcoal text-white border-charcoal shadow-xs"
                               : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                          }`}
+                            }`}
                         >
                           {isSelected ? `✓ Size ${size}` : `+ Size ${size}`}
                         </button>
@@ -556,11 +561,10 @@ export default function NewProductPage() {
                               key={size}
                               type="button"
                               onClick={() => handleSizeToggle(size)}
-                              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                                isSelected
+                              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${isSelected
                                   ? "bg-charcoal text-white border-charcoal shadow-xs"
                                   : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                              }`}
+                                }`}
                             >
                               {isSelected ? `✓ ${size}` : `+ ${size}`}
                             </button>
@@ -641,11 +645,10 @@ export default function NewProductPage() {
                         key={len}
                         type="button"
                         onClick={() => handleNecklaceLengthToggle(len)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                          isSelected
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${isSelected
                             ? "bg-charcoal text-white border-charcoal shadow-xs"
                             : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                        }`}
+                          }`}
                       >
                         {isSelected ? `✓ ${len}` : `+ ${len}`}
                       </button>
@@ -707,11 +710,10 @@ export default function NewProductPage() {
                         key={opt}
                         type="button"
                         onClick={() => handlePendantOptionToggle(opt)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                          isSelected
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${isSelected
                             ? "bg-charcoal text-white border-charcoal shadow-xs"
                             : "bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400"
-                        }`}
+                          }`}
                       >
                         {isSelected ? `✓ ${opt}` : `+ ${opt}`}
                       </button>
@@ -727,7 +729,7 @@ export default function NewProductPage() {
               <h2 className="text-base font-semibold text-gray-900">Media Assets</h2>
               <p className="text-xs text-gray-500 mt-0.5">Upload primary cover image, hover image, and gallery view assets.</p>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Primary Image */}
               <div className="space-y-1">
@@ -850,12 +852,12 @@ export default function NewProductPage() {
         <div className="space-y-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">Category & Badges</h2>
-            
+
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">Jewellery Category</label>
-              <select 
+              <select
                 value={formData.category}
-                onChange={(e) => setFormData({...formData, category: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal bg-white"
               >
                 <option value="Rings">Rings</option>
@@ -866,7 +868,7 @@ export default function NewProductPage() {
                 <option value="Pendants">Pendants</option>
                 <option value="Other">Other / Custom Category</option>
               </select>
-              
+
               {formData.category === "Other" && (
                 <div className="mt-3">
                   <label className="block text-xs font-medium text-gray-700 mb-1">Custom Category Name *</label>
@@ -874,7 +876,7 @@ export default function NewProductPage() {
                     type="text"
                     required
                     value={formData.customCategory}
-                    onChange={(e) => setFormData({...formData, customCategory: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, customCategory: e.target.value })}
                     placeholder="e.g. Necklace & Earring Sets, Bridal Suite"
                     className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
                   />
@@ -884,111 +886,111 @@ export default function NewProductPage() {
 
             <div className="space-y-3 pt-2">
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isBestSeller}
-                  onChange={(e) => setFormData({...formData, isBestSeller: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isBestSeller: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Mark as Best Seller</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isNewArrival}
-                  onChange={(e) => setFormData({...formData, isNewArrival: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isNewArrival: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Mark as New Arrival</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isFeatured}
-                  onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Featured Collection</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isExploreCollection}
-                  onChange={(e) => setFormData({...formData, isExploreCollection: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isExploreCollection: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Explore Collection</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isSignatureCarousel}
-                  onChange={(e) => setFormData({...formData, isSignatureCarousel: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isSignatureCarousel: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Feature in Signature 3D Carousel</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer mt-4 border-t border-gray-100 pt-3">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isBridalWedding}
-                  onChange={(e) => setFormData({...formData, isBridalWedding: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isBridalWedding: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Bridal & Wedding Collection</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isLuxuryGifting}
-                  onChange={(e) => setFormData({...formData, isLuxuryGifting: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isLuxuryGifting: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Luxury Gifting Studio</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isBehindTheCraft}
-                  onChange={(e) => setFormData({...formData, isBehindTheCraft: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isBehindTheCraft: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Behind the Craft</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isVerifiedReviews}
-                  onChange={(e) => setFormData({...formData, isVerifiedReviews: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isVerifiedReviews: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Verified Customer Reviews</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isDealOfTheDay}
-                  onChange={(e) => setFormData({...formData, isDealOfTheDay: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isDealOfTheDay: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Deal of the Day</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={formData.isShopByOccasion}
-                  onChange={(e) => setFormData({...formData, isShopByOccasion: e.target.checked})}
-                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                  onChange={(e) => setFormData({ ...formData, isShopByOccasion: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Shop by Occasion</span>
               </label>
@@ -1001,11 +1003,11 @@ export default function NewProductPage() {
             <div className="space-y-2 text-xs">
               {globalOccasions.map((occ) => (
                 <label key={occ.id} className="flex items-center space-x-2.5 cursor-pointer hover:bg-gray-50 p-1 rounded">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={formData.selectedOccasions.includes(occ.id)}
                     onChange={() => handleOccasionToggle(occ.id)}
-                    className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                    className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                   />
                   <span className="text-gray-700 font-medium">{occ.name}</span>
                 </label>

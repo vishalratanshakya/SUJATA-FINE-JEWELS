@@ -74,9 +74,9 @@ export function Hero() {
   }
 
   return (
-    <div className="w-full flex flex-col md:flex-row min-h-[100dvh] md:h-screen">
+    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[100dvh] md:h-screen gap-4">
       {/* ── LEFT SIDE: MAIN HERO BANNER CAROUSEL ── */}
-      <div className={`relative w-full ${HERO_CARDS.length > 0 ? 'md:w-1/2' : 'md:w-full'} h-[60vh] md:h-full bg-charcoal overflow-hidden`}>
+      <div className={`relative w-full md:w-[60%] h-[60vh] md:h-full bg-charcoal overflow-hidden rounded-3xl shadow-sm`}>
         {MAIN_BANNERS.length > 0 ? (
           <>
             <AnimatePresence initial={false}>
@@ -208,9 +208,9 @@ export function Hero() {
       </div>
 
       {/* ── RIGHT SIDE: 4 HERO CARDS GRID ── */}
-      {HERO_CARDS.length > 0 && (
-        <div className="w-full md:w-1/2 h-[50vh] md:h-full bg-gray-100">
-          <div className={`w-full h-full grid ${HERO_CARDS.length === 1 ? 'grid-cols-1 grid-rows-1' : HERO_CARDS.length === 2 ? 'grid-cols-1 md:grid-cols-2 grid-rows-2 md:grid-rows-1' : HERO_CARDS.length === 3 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2 grid-rows-2'} gap-[1px] bg-white`}>
+      <div className="w-full md:w-[40%] h-[50vh] md:h-full">
+        {HERO_CARDS.length > 0 ? (
+          <div className={`w-full h-full grid ${HERO_CARDS.length === 1 ? 'grid-cols-1 grid-rows-1' : HERO_CARDS.length === 2 ? 'grid-cols-1 md:grid-cols-2 grid-rows-2 md:grid-rows-1' : HERO_CARDS.length === 3 ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2 grid-rows-2'} gap-4`}>
             {HERO_CARDS.map((card, idx) => {
               // For 3 items, make the first one take full width on top
               const isFullWidth = HERO_CARDS.length === 3 && idx === 0;
@@ -218,7 +218,7 @@ export function Hero() {
                 <Link
                   key={card.id}
                   href={card.ctaUrl || "#"}
-                  className={`relative block group overflow-hidden bg-gray-100 ${isFullWidth ? 'col-span-2 row-span-1' : 'col-span-1 row-span-1'}`}
+                  className={`relative block group overflow-hidden bg-gray-100 rounded-3xl shadow-sm ${isFullWidth ? 'col-span-2 row-span-1' : 'col-span-1 row-span-1'}`}
                 >
                   {card.image && (
                     <Image 
@@ -229,8 +229,14 @@ export function Hero() {
                       sizes="(max-width: 768px) 50vw, 25vw"
                     />
                   )}
+                  {/* Persistent Badge */}
+                  {card.eyebrow && (
+                    <div className="absolute top-4 left-4 bg-[#1C1A19] text-champagne text-[9px] md:text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full z-10 shadow-sm whitespace-nowrap">
+                      {card.eyebrow}
+                    </div>
+                  )}
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-6 text-center">
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-start justify-end p-6 text-left z-20">
                     <h3 className="text-white font-serif text-xl lg:text-2xl mb-4 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                       {card.heading}
                     </h3>
@@ -244,8 +250,17 @@ export function Hero() {
               );
             })}
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="relative block overflow-hidden bg-gray-100 rounded-3xl shadow-sm border border-gray-200 border-dashed flex flex-col items-center justify-center text-gray-400">
+                <span className="text-xs uppercase tracking-widest">Empty Hero Card</span>
+                <span className="text-[9px] mt-1">(Add via Admin)</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
