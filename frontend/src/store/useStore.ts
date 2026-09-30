@@ -36,6 +36,7 @@ export type Product = {
   price: number;
   originalPrice?: number;
   discountPercentage?: number;
+  sku?: string;
   rating?: number;
   images: string[];
   primaryImage?: string;

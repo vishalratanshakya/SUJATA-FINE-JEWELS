@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       
-      return new Promise((resolve, reject) => {
+      return new Promise<Response>((resolve, reject) => {
         cloudinary.uploader.upload_stream(
           { folder: "Sujata Fine Jewels", resource_type: "auto" },
           (error, result) => {
