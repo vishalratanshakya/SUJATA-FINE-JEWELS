@@ -22,7 +22,13 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const id = body.id || `prod-${Date.now()}`;
-    const slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    let slug = body.slug || body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    
+    // Ensure slug is unique
+    const existing = await ProductModel.findOne({ slug, id: { $ne: id } });
+    if (existing) {
+      slug = `${slug}-${Date.now()}`;
+    }
 
     const productPayload = {
       ...body,

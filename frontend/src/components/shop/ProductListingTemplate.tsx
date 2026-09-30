@@ -64,10 +64,10 @@ export function ProductListingTemplate({
 
   // Sync with store products if they get updated
   useEffect(() => {
-    if (storeProducts && storeProducts.length > 0 && initialProducts.length === 0) {
+    if (storeProducts && storeProducts.length > 0) {
       setProductsList(storeProducts);
     }
-  }, [storeProducts, initialProducts]);
+  }, [storeProducts]);
 
   const allProducts = useMemo(() => {
     return productsList;

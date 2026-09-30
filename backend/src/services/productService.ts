@@ -17,6 +17,16 @@ export class ProductService {
   }
 
   async createProduct(data: any) {
+    if (!data.slug && data.name) {
+      data.slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    }
+    const existing = await Product.findOne({ slug: data.slug });
+    if (existing) {
+      data.slug = `${data.slug}-${Date.now()}`;
+    }
+    if (!data.id) {
+      data.id = `prod-${Date.now()}`;
+    }
     return await Product.create(data);
   }
 
