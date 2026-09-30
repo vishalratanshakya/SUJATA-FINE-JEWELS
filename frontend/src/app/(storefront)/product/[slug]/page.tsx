@@ -93,7 +93,7 @@ export default function ProductPage() {
   };
 
   // Image Gallery Handlers (Primary + Hover + Gallery Images)
-  const currentImages = Array.from(
+  const imageList = Array.from(
     new Set(
       [
         product.primaryImage,
@@ -104,14 +104,21 @@ export default function ProductPage() {
     )
   );
 
-  const displayImages = currentImages.length > 0 ? currentImages : ["/images/products/rings/ring_placeholder.jpg"];
+  const mediaItems = imageList.map(url => ({ type: "image" as const, url }));
+  if (product.videoUrl && product.videoUrl.trim()) {
+    mediaItems.push({ type: "video" as const, url: product.videoUrl });
+  }
+
+  if (mediaItems.length === 0) {
+    mediaItems.push({ type: "image", url: "/images/products/rings/ring_placeholder.jpg" });
+  }
 
   const handleNextLightboxImage = () => {
-    setLightboxIndex((prev) => (prev + 1) % currentImages.length);
+    setLightboxIndex((prev) => (prev + 1) % mediaItems.length);
   };
 
   const handlePrevLightboxImage = () => {
-    setLightboxIndex((prev) => (prev - 1 + currentImages.length) % currentImages.length);
+    setLightboxIndex((prev) => (prev - 1 + mediaItems.length) % mediaItems.length);
   };
 
   // Accordion Toggle
@@ -155,7 +162,7 @@ export default function ProductPage() {
         >
           <div className="flex-1 w-0 flex items-center">
             <div className="relative w-14 h-14 rounded overflow-hidden flex-shrink-0 bg-white/10 border border-white/20 mr-4">
-              <Image src={displayImages[0]} alt={product.name} fill className="object-cover" />
+              <Image src={mediaItems[0].type === "image" ? mediaItems[0].url : "/images/products/rings/ring_placeholder.jpg"} alt={product.name} fill className="object-cover" />
             </div>
             <div>
               <p className="text-xs font-semibold uppercase text-[#C5A880] tracking-widest flex items-center gap-1">
@@ -207,32 +214,47 @@ export default function ProductPage() {
             
             {/* Vertical Thumbnails (Scrollbar Hidden) */}
             <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-y-auto no-scrollbar max-h-[400px] md:max-h-[460px] lg:max-h-[480px] md:w-20 flex-shrink-0">
-              {displayImages.map((img, idx) => (
+              {mediaItems.map((media, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  aria-label={`View image ${idx + 1}`}
+                  aria-label={`View media ${idx + 1}`}
                   className={`aspect-square relative w-16 md:w-20 rounded-lg overflow-hidden border-2 transition-all duration-300 flex-shrink-0 ${
                     activeImageIndex === idx
                       ? "border-[#2C2825] shadow-md scale-[1.02]"
                       : "border-[#E2DDD3] opacity-70 hover:opacity-100 hover:border-[#8C8275]"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  {media.type === "video" ? (
+                    <video src={media.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={media.url} alt="" className="w-full h-full object-cover" />
+                  )}
                 </button>
               ))}
             </div>
 
             {/* Main Primary Image Viewer (Compact Fixed Height) */}
             <div className="flex-1 relative w-full h-[400px] md:h-[460px] lg:h-[480px] bg-[#F7F5F0] rounded-2xl border border-[#EAE4D9] overflow-hidden shadow-sm group flex-shrink-0 self-start">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                key={activeImageIndex}
-                src={displayImages[activeImageIndex] || displayImages[0]}
-                alt={product.name}
-                className="w-full h-full object-cover transition-opacity duration-300 group-hover:scale-105"
-              />
+              {mediaItems[activeImageIndex].type === "video" ? (
+                <video
+                  key={activeImageIndex}
+                  src={mediaItems[activeImageIndex].url}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  key={activeImageIndex}
+                  src={mediaItems[activeImageIndex].url}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-opacity duration-300 group-hover:scale-105"
+                />
+              )}
 
               {/* Expand Fullscreen Button */}
               <button
@@ -240,7 +262,7 @@ export default function ProductPage() {
                   setLightboxIndex(activeImageIndex);
                   setIsLightboxOpen(true);
                 }}
-                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md border border-[#D5C9B8] text-[#2C2825] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#2C2825] hover:text-white shadow-sm"
+                className={`absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md border border-[#D5C9B8] text-[#2C2825] flex items-center justify-center transition-all duration-300 hover:bg-[#2C2825] hover:text-white shadow-sm ${mediaItems[activeImageIndex].type === "video" ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
                 aria-label="Expand Fullscreen"
               >
                 <Maximize2 size={18} />
@@ -666,7 +688,7 @@ export default function ProductPage() {
           </div>
           <div className="w-full lg:w-1/2 relative h-[320px] md:h-[400px] rounded-xl overflow-hidden">
             <Image
-              src={currentImages[0]}
+              src={mediaItems.find(m => m.type === "image")?.url || "/images/products/rings/ring_placeholder.jpg"}
               alt={product.name}
               fill
               className="object-cover"
@@ -726,12 +748,22 @@ export default function ProductPage() {
           </button>
 
           <div className="relative w-full max-w-4xl h-[75vh]">
-            <Image
-              src={currentImages[lightboxIndex]}
-              alt={product.name}
-              fill
-              className="object-contain"
-            />
+            {mediaItems[lightboxIndex].type === "video" ? (
+              <video
+                src={mediaItems[lightboxIndex].url}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <Image
+                src={mediaItems[lightboxIndex].url}
+                alt={product.name}
+                fill
+                className="object-contain"
+              />
+            )}
           </div>
         </div>
       )}
