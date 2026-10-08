@@ -4,11 +4,74 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useStore } from "@/store/useStore";
-import { ArrowRight, Sparkles, Heart } from "lucide-react";
+import { Heart, ArrowRight, Sparkles } from "lucide-react";
+
+import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export function CuratedHeritageSection() {
+  const router = useRouter();
   const allProducts = useStore((s) => s.products);
   const curatedProducts = allProducts.filter((p) => p.isCuratedHeritage);
+  const wishlist = useStore((s) => s.wishlist);
+  const toggleWishlist = useStore((s) => s.toggleWishlist);
+  const { isAuthenticated } = useAuth();
+
+  const handleWishlist = async (e: React.MouseEvent, product: any) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      window.location.href = "/login";
+      return;
+    }
+
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${backendUrl}/api/wishlist/${product.id}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const isInWishlist = isWishlisted(product);
+        toggleWishlist(product);
+        if (!isInWishlist) {
+          toast.success("Added to wishlist", {
+            duration: 3000,
+            style: {
+              borderRadius: "9999px",
+              padding: "8px 16px",
+              fontSize: "12px",
+              minWidth: "auto",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              border: "1px solid #EAE4D9",
+              background: "#FDFBF7",
+              color: "#2C2825"
+            },
+            iconTheme: { primary: "#2C2825", secondary: "#FDFBF7" }
+          });
+        } else {
+          toast("Removed from wishlist", {
+            duration: 3000,
+            style: {
+              borderRadius: "9999px",
+              padding: "8px 16px",
+              fontSize: "12px",
+              minWidth: "auto",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              border: "1px solid #EAE4D9",
+              background: "#FDFBF7",
+              color: "#2C2825"
+            }
+          });
+        }
+      }
+    } catch (err) {
+      toast.error("Failed to update wishlist");
+    }
+  };
+
+  const isWishlisted = (product: any) => wishlist.some((item: any) => item.id === product?.id);
 
   const mockProducts = [
     {
@@ -135,8 +198,11 @@ export function CuratedHeritageSection() {
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                   <span>Curated Suite</span>
                 </span>
-                <button className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors">
-                  <Heart size={14} />
+                <button 
+                  onClick={(e) => handleWishlist(e, p1)}
+                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+                >
+                  <Heart size={14} className={isWishlisted(p1) ? "fill-current text-red-500" : ""} />
                 </button>
               </div>
 
@@ -191,10 +257,16 @@ export function CuratedHeritageSection() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
                 
-                <div className="absolute top-4 left-4">
+                <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                   <span className="px-2 py-1 bg-amber-600 text-white text-[10px] font-bold tracking-widest uppercase rounded">
                     Certified
                   </span>
+                  <button 
+                    onClick={(e) => handleWishlist(e, p2)}
+                    className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+                  >
+                    <Heart size={14} className={isWishlisted(p2) ? "fill-current text-red-500" : ""} />
+                  </button>
                 </div>
                 
                 <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
@@ -241,6 +313,15 @@ export function CuratedHeritageSection() {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                 
+                <div className="absolute top-4 right-4 z-10">
+                  <button 
+                    onClick={(e) => handleWishlist(e, p3)}
+                    className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+                  >
+                    <Heart size={14} className={isWishlisted(p3) ? "fill-current text-red-500" : ""} />
+                  </button>
+                </div>
+                
                 <div className="absolute bottom-6 left-4 right-4 text-center">
                   <h3 className="font-serif text-sm md:text-base text-white uppercase tracking-wider mb-2 line-clamp-2">
                     {p3.name}
@@ -279,6 +360,15 @@ export function CuratedHeritageSection() {
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute top-4 right-4 z-10">
+                  <button 
+                    onClick={(e) => handleWishlist(e, p4)}
+                    className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+                  >
+                    <Heart size={14} className={isWishlisted(p4) ? "fill-current text-red-500" : ""} />
+                  </button>
+                </div>
                 
                 <div className="absolute bottom-6 left-4 right-4 text-center">
                   <h3 className="font-serif text-sm md:text-base text-white uppercase tracking-wider mb-2 line-clamp-2">
@@ -333,8 +423,11 @@ export function CuratedHeritageSection() {
                     </span>
                   ) : null}
                 </div>
-                <button className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors">
-                  <Heart size={14} />
+                <button 
+                  onClick={(e) => handleWishlist(e, p5)}
+                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+                >
+                  <Heart size={14} className={isWishlisted(p5) ? "fill-current text-red-500" : ""} />
                 </button>
               </div>
 

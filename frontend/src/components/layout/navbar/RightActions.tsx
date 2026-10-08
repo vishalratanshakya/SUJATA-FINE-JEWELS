@@ -25,7 +25,7 @@ export function RightActions() {
   const cartCount = isMounted ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
   
   // Real auth state
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <div className="flex-1 flex justify-end items-center space-x-5 md:space-x-6 relative">
@@ -50,7 +50,9 @@ export function RightActions() {
       </Link>
 
       {/* User Account Link / Login */}
-      {isAuthenticated ? (
+      {isLoading ? (
+        <div className="w-[85px] h-4 bg-gray-200 animate-pulse rounded my-4"></div>
+      ) : isAuthenticated ? (
         <Link 
           href="/account" 
           aria-label="Account" 
