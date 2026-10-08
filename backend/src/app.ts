@@ -18,6 +18,8 @@ import bridalRoutes from "./routes/bridalRoutes";
 import giftingRoutes from "./routes/giftingRoutes";
 import craftStoryRoutes from "./routes/craftStoryRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
+import contactRoutes from "./routes/contactRoutes";
+import newsletterRoutes from "./routes/newsletterRoutes";
 dotenv.config();
 
 const app = express();
@@ -50,6 +52,8 @@ app.use("/api/bridal-collections", bridalRoutes);
 app.use("/api/gifting-collections", giftingRoutes);
 app.use("/api/craft-stories", craftStoryRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/newsletter", newsletterRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });

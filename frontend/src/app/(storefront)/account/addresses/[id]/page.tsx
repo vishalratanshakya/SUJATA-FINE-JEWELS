@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { AccountLayoutWrapper } from "@/components/account/AccountLayoutWrapper";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Navigation, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter, useParams } from "next/navigation";
 
@@ -24,6 +24,50 @@ export default function EditAddressPage() {
     pincode: "",
     isDefault: false,
   });
+
+  const [isLocating, setIsLocating] = useState(false);
+
+  const fetchLiveLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await response.json();
+          
+          if (data && data.address) {
+            setForm((prev) => ({
+              ...prev,
+              house: data.address.house_number || data.address.building || prev.house,
+              street: data.address.road || data.address.suburb || data.address.neighbourhood || prev.street,
+              city: data.address.city || data.address.town || data.address.state_district || prev.city,
+              state: data.address.state || prev.state,
+              pincode: data.address.postcode || prev.pincode,
+            }));
+            toast.success("Location fetched successfully!");
+          } else {
+            toast.error("Could not resolve address from location");
+          }
+        } catch (error) {
+          console.error("Error fetching location:", error);
+          toast.error("Failed to fetch address details");
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        toast.error("Unable to retrieve your location. Please check browser permissions.");
+        setIsLocating(false);
+      }
+    );
+  };
 
   useEffect(() => {
     // Fetch address details
@@ -145,19 +189,38 @@ export default function EditAddressPage() {
 
         {/* Edit Address Form */}
         <form onSubmit={handleSave} className="space-y-6 max-w-2xl">
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825] mb-2">
-              Address Type
-            </label>
-            <select
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full sm:w-1/2 border border-[#E2DDD3] rounded-xl p-3.5 text-sm focus:outline-none focus:border-[#2C2825] bg-white font-medium text-[#2C2825]"
-            >
-              <option value="HOME">HOME</option>
-              <option value="WORK">WORK</option>
-              <option value="OTHER">OTHER</option>
-            </select>
+          <div className="flex flex-col space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2C2825]">
+                Address Type
+              </label>
+              <button
+                type="button"
+                onClick={fetchLiveLocation}
+                disabled={isLocating}
+                className="flex items-center space-x-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1.5 rounded-full disabled:opacity-50"
+              >
+                {isLocating ? <Loader2 size={14} className="animate-spin" /> : <Navigation size={14} />}
+                <span>{isLocating ? "Locating..." : "Use Live Location"}</span>
+              </button>
+            </div>
+            
+            <div className="flex space-x-3">
+              {["HOME", "WORK", "OTHER"].map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => setForm({ ...form, title: type })}
+                  className={`px-6 py-2.5 rounded-xl border text-xs font-bold tracking-wider transition-all ${
+                    form.title === type
+                      ? "bg-[#2C2825] border-[#2C2825] text-white shadow-sm"
+                      : "bg-white border-[#E2DDD3] text-[#6B6357] hover:border-[#2C2825] hover:text-[#2C2825]"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -1,7 +1,38 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { FaFacebook, FaInstagram, FaYoutube, FaTwitter } from "react-icons/fa";
+import { toast } from "react-hot-toast";
 
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setIsSubscribing(true);
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const res = await fetch(`${backendUrl}/api/newsletter/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message || "Thank you for subscribing!");
+        setEmail("");
+      } else {
+        toast.error(data.message || "Subscription failed. Please try again.");
+      }
+    } catch (err) {
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
   return (
     <footer className="bg-black text-ivory/80 pt-20 pb-10 px-4 md:px-8 text-sm">
       <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
@@ -55,14 +86,17 @@ export function Footer() {
           <p className="mb-4 text-xs leading-relaxed">
             Be the first to know about new collections and exclusive offers.
           </p>
-          <form className="flex flex-col space-y-3">
+          <form onSubmit={handleSubscribe} className="flex flex-col space-y-3">
             <input 
               type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Your email address" 
               className="bg-transparent border-b border-ivory/30 pb-2 px-1 text-ivory placeholder:text-ivory/50 focus:outline-none focus:border-champagne transition-colors"
+              required
             />
-            <button type="submit" className="self-start text-xs uppercase tracking-widest text-champagne hover:text-white transition-colors py-2">
-              Subscribe
+            <button type="submit" disabled={isSubscribing} className="self-start text-xs uppercase tracking-widest text-champagne hover:text-white transition-colors py-2 disabled:opacity-50">
+              {isSubscribing ? "Subscribing..." : "Subscribe"}
             </button>
           </form>
         </div>

@@ -85,9 +85,24 @@ export default function AccountPage() {
   }, []);
 
 
-  const handleDeleteAddress = (id: string) => {
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
-    toast.success("Address deleted");
+  const handleDeleteAddress = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this address?")) return;
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${backendUrl}/api/addresses/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setAddresses((prev) => prev.filter((a) => a._id !== id && a.id !== id));
+        toast.success("Address deleted");
+      } else {
+        toast.error("Failed to delete address");
+      }
+    } catch (err) {
+      toast.error("An error occurred while deleting address");
+    }
   };
 
   const formatPrice = (p: number) =>
