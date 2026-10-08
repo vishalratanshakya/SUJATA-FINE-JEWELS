@@ -23,7 +23,14 @@ export interface IOrder extends Document {
     line1: string;
     line2?: string;
     phone: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
   };
+  paymentMethod?: string;
+  couponCode?: string;
+  discountAmount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -58,7 +65,14 @@ const OrderSchema = new Schema<IOrder>(
       line1: { type: String, required: true },
       line2: { type: String },
       phone: { type: String, required: true },
+      city: { type: String },
+      state: { type: String },
+      postalCode: { type: String },
+      country: { type: String, default: "India" },
     },
+    paymentMethod: { type: String, default: "COD" },
+    couponCode: { type: String },
+    discountAmount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

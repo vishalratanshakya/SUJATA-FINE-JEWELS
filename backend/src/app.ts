@@ -20,6 +20,7 @@ import craftStoryRoutes from "./routes/craftStoryRoutes";
 import reviewRoutes from "./routes/reviewRoutes";
 import contactRoutes from "./routes/contactRoutes";
 import newsletterRoutes from "./routes/newsletterRoutes";
+import couponRoutes from "./routes/couponRoutes";
 dotenv.config();
 
 const app = express();
@@ -54,6 +55,7 @@ app.use("/api/craft-stories", craftStoryRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/newsletter", newsletterRoutes);
+app.use("/api/coupons", couponRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });
