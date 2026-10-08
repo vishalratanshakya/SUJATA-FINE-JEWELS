@@ -7,6 +7,8 @@ export interface IProductDoc extends Document {
   category: string;
   price: number;
   originalPrice?: number;
+  discountPercentage?: number;
+  rating?: number;
   images: string[];
   primaryImage?: string;
   hoverImage?: string;
@@ -26,6 +28,7 @@ export interface IProductDoc extends Document {
   isExploreCollection?: boolean;
   isSignatureCarousel?: boolean;
   isBridalWedding?: boolean;
+  isTrendingSociety?: boolean;
   isLuxuryGifting?: boolean;
   isBehindTheCraft?: boolean;
   isVerifiedReviews?: boolean;
@@ -55,6 +58,8 @@ const ProductSchema = new Schema<IProductDoc>(
     category: { type: String, required: true },
     price: { type: Number, required: true },
     originalPrice: { type: Number },
+    discountPercentage: { type: Number, default: 0 },
+    rating: { type: Number, default: 5 },
     images: [{ type: String, required: true }],
     primaryImage: { type: String },
     hoverImage: { type: String },
@@ -74,6 +79,7 @@ const ProductSchema = new Schema<IProductDoc>(
     isExploreCollection: { type: Boolean, default: false },
     isSignatureCarousel: { type: Boolean, default: false },
     isBridalWedding: { type: Boolean, default: false },
+    isTrendingSociety: { type: Boolean, default: false },
     isLuxuryGifting: { type: Boolean, default: false },
     isBehindTheCraft: { type: Boolean, default: false },
     isVerifiedReviews: { type: Boolean, default: false },

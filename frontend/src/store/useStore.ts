@@ -51,6 +51,7 @@ export type Product = {
   isFeatured?: boolean;
   isExploreCollection?: boolean;
   isBridalWedding?: boolean;
+  isTrendingSociety?: boolean;
   isLuxuryGifting?: boolean;
   isBehindTheCraft?: boolean;
   isVerifiedReviews?: boolean;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 import { SHOP_CATEGORIES, COLLECTIONS } from "@/data/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -13,6 +14,11 @@ export function MobileNav() {
   const [openAccordion, setOpenAccordion] = useState<"shop" | null>("shop");
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close menu when route changes
   useEffect(() => {
@@ -43,10 +49,11 @@ export function MobileNav() {
         <Menu size={24} strokeWidth={1} />
       </button>
 
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -126,10 +133,12 @@ export function MobileNav() {
                   <Link href="/contact" className="text-sm tracking-widest uppercase text-charcoal/60 hover:text-champagne transition-colors">Contact</Link>
                 </div>
               </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }

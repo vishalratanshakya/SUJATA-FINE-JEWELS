@@ -5,10 +5,15 @@ import { ProductCard } from "@/components/product/ProductCard";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-export function Bestsellers() {
+export function TrendingInSocietySection() {
   const products = useStore((s) => s.products);
-  const bestSellers = products.filter(p => p.isBestSeller || p.isBestseller);
-  const displayProducts = bestSellers.length > 0 ? bestSellers : products;
+  const trendingProducts = products.filter(p => p.isTrendingSociety);
+  
+  if (trendingProducts.length === 0) {
+    return null;
+  }
+
+  const displayProducts = trendingProducts;
 
   return (
     <section className="py-8 md:py-12 bg-white relative">
@@ -17,7 +22,7 @@ export function Bestsellers() {
         <div className="flex flex-row items-center justify-between mb-10 md:mb-16 gap-4">
           <div className="text-left">
             <h2 className="font-serif text-3xl md:text-4xl text-charcoal mb-4 tracking-wide">
-              BESTSELLERS
+              TRENDING IN SOCIETY
             </h2>
             <div className="flex justify-start">
               <div className="w-16 h-[1px] bg-champagne flex items-center justify-center">
@@ -25,7 +30,7 @@ export function Bestsellers() {
               </div>
             </div>
           </div>
-          <Link href="/catalogue?category=All" className="text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors flex items-center space-x-1">
+          <Link href="/catalogue?trending=true" className="text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors flex items-center space-x-1">
             <span>View All</span>
             <ArrowRight size={16} />
           </Link>

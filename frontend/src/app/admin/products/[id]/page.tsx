@@ -49,6 +49,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [isFeatured, setIsFeatured] = useState(false);
   const [isExploreCollection, setIsExploreCollection] = useState(false);
   const [isBridalWedding, setIsBridalWedding] = useState(false);
+  const [isTrendingSociety, setIsTrendingSociety] = useState(false);
   const [isLuxuryGifting, setIsLuxuryGifting] = useState(false);
   const [isBehindTheCraft, setIsBehindTheCraft] = useState(false);
   const [isVerifiedReviews, setIsVerifiedReviews] = useState(false);
@@ -126,6 +127,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setIsFeatured(!!product.isFeatured);
     setIsExploreCollection(!!product.isExploreCollection);
     setIsBridalWedding(!!product.isBridalWedding);
+    setIsTrendingSociety(!!product.isTrendingSociety);
     setIsLuxuryGifting(!!product.isLuxuryGifting);
     setIsBehindTheCraft(!!product.isBehindTheCraft);
     setIsVerifiedReviews(!!product.isVerifiedReviews);
@@ -272,6 +274,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       isFeatured,
       isExploreCollection,
       isBridalWedding,
+      isTrendingSociety,
       isLuxuryGifting,
       isBehindTheCraft,
       isVerifiedReviews,
@@ -400,7 +403,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/* ── Main column ── */}
-        <div className="md:col-span-2 space-y-8">
+        <div className="md:col-span-2 space-y-8 order-2 md:order-1">
 
           {/* Basic Details */}
           <div className="bg-white p-6 rounded shadow-sm border border-gray-100 space-y-5">
@@ -1013,7 +1016,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         </div>
 
         {/* ── Sidebar ── */}
-        <div className="space-y-8">
+        <div className="space-y-8 order-1 md:order-2">
 
           {/* Organization */}
           <div className="bg-white p-6 rounded shadow-sm border border-gray-100 space-y-5">
@@ -1129,6 +1132,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
                 />
                 <span className="text-gray-700">Bridal & Wedding Collection</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer pt-3 border-t border-gray-100 mt-2">
+                <input 
+                  type="checkbox" 
+                  checked={isTrendingSociety}
+                  onChange={(e) => setIsTrendingSociety(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Trending in Society</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input 

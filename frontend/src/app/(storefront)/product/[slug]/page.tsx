@@ -244,14 +244,20 @@ export default function ProductPage() {
   return (
     <div className="bg-[#FAF8F5] pt-28 pb-24 min-h-screen">
       <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-12">
-        {/* BACK BUTTON */}
-        <button
-          onClick={() => router.back()}
-          className="flex items-center text-xs font-semibold tracking-widest uppercase text-[#2C2825] hover:text-[#B38E5D] transition-colors mb-8 group"
-        >
-          <ChevronLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
-          Back
-        </button>
+        {/* BREADCRUMBS */}
+        <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-8 overflow-x-auto whitespace-nowrap hide-scrollbar" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-[#B38E5D] transition-colors">Home</Link>
+          <span className="text-gray-400">/</span>
+          <Link href="/catalogue" className="hover:text-[#B38E5D] transition-colors">Shop</Link>
+          {product.category && (
+            <>
+              <span className="text-gray-400">/</span>
+              <Link href={`/catalogue?category=${product.category}`} className="hover:text-[#B38E5D] transition-colors">{product.category}</Link>
+            </>
+          )}
+          <span className="text-gray-400">/</span>
+          <span className="text-[#2C2825] font-medium">{product.name}</span>
+        </nav>
 
         {/* ── MAIN PRODUCT SECTION (2-Column Desktop Layout) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 mb-24 items-start">
@@ -283,7 +289,7 @@ export default function ProductPage() {
             </div>
 
             {/* Main Primary Image Viewer (Compact Fixed Height) */}
-            <div className="flex-1 relative w-full h-[400px] md:h-[460px] lg:h-[480px] bg-[#F7F5F0] rounded-2xl border border-[#EAE4D9] overflow-hidden shadow-sm group flex-shrink-0 self-start">
+            <div className="flex-1 relative w-full aspect-[4/3] sm:aspect-square md:aspect-auto md:h-[460px] lg:h-[480px] bg-[#F7F5F0] rounded-2xl border border-[#EAE4D9] overflow-hidden shadow-sm group flex-shrink-0 self-start">
               {mediaItems[activeImageIndex].type === "video" ? (
                 <video
                   key={activeImageIndex}
@@ -697,10 +703,10 @@ export default function ProductPage() {
 
         {/* ── YOU MAY ALSO ADORE SECTION ── */}
         {adoreProducts.length > 0 && (
-          <div className="mt-20 pt-16 border-t border-[#EAE4D9]">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div className="mt-8 pt-8 md:mt-10 md:pt-10 border-t border-[#EAE4D9]">
+            <div className="flex flex-row items-center justify-between mb-6 md:mb-8 gap-2">
               <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 mt-1">
+                <div className="hidden md:flex w-10 h-10 rounded-full bg-amber-50 text-amber-700 items-center justify-center shrink-0 mt-1">
                   <Flame size={20} />
                 </div>
                 <div>
@@ -708,22 +714,22 @@ export default function ProductPage() {
                     <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-semibold">
                       You May Also Adore
                     </h2>
-                    <span className="bg-[#6B46C1] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="hidden md:inline-flex bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       CURATED
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">Handpicked royal vault recommendations tailored to your taste</p>
+                  <p className="hidden md:block text-xs text-gray-500">Handpicked royal vault recommendations tailored to your taste</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
                 <Link
                   href="/catalogue"
-                  className="text-sm font-semibold text-[#6B46C1] hover:text-[#553C9A] transition-colors flex items-center"
+                  className="text-xs sm:text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors flex items-center shrink-0"
                 >
                   Discover All <ArrowRight size={16} className="ml-1" />
                 </Link>
-                <div className="hidden md:flex space-x-2">
+                <div className="hidden md:flex space-x-2 shrink-0">
                   <button onClick={() => scrollContainer(adoreScrollRef, 'left')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronLeft size={20} />
                   </button>
@@ -734,9 +740,9 @@ export default function ProductPage() {
               </div>
             </div>
 
-            <div ref={adoreScrollRef} className="flex overflow-x-auto hide-scrollbar gap-6 pb-8 snap-x">
+            <div ref={adoreScrollRef} className="flex overflow-x-auto hide-scrollbar gap-4 md:gap-6 pb-8 snap-x">
               {adoreProducts.map((prod) => (
-                <div key={prod.id} className="w-[85vw] sm:w-[45vw] md:w-[30vw] lg:w-[22%] shrink-0 snap-start">
+                <div key={prod.id} className="w-[calc(50vw-24px)] md:w-[calc(33vw-24px)] lg:w-[22%] shrink-0 snap-start">
                   <ProductCard product={prod} />
                 </div>
               ))}
@@ -746,10 +752,10 @@ export default function ProductPage() {
 
         {/* ── SIMILAR FINE DESIGNS SECTION ── */}
         {similarProducts.length > 0 && (
-          <div className="mt-20 pt-16 border-t border-[#EAE4D9]">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div className="mt-8 pt-8 md:mt-10 md:pt-10 border-t border-[#EAE4D9]">
+            <div className="flex flex-row items-center justify-between mb-6 md:mb-8 gap-2">
               <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-1">
+                <div className="hidden md:flex w-10 h-10 rounded-full bg-amber-50 text-amber-700 items-center justify-center shrink-0 mt-1">
                   <Gem size={20} />
                 </div>
                 <div>
@@ -757,22 +763,22 @@ export default function ProductPage() {
                     <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-semibold">
                       Similar Fine Designs
                     </h2>
-                    <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="hidden md:inline-flex bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       Matching
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">Explore comparable artisan creations with matching gemstone and gold purity</p>
+                  <p className="hidden md:block text-xs text-gray-500">Explore comparable artisan creations with matching gemstone and gold purity</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
                 <Link
                   href={`/catalogue?category=${product.category}`}
-                  className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center"
+                  className="text-xs sm:text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors flex items-center shrink-0"
                 >
-                  Explore Collection <ArrowRight size={16} className="ml-1" />
+                  Explore <span className="hidden sm:inline ml-1">Collection</span> <ArrowRight size={16} className="ml-1" />
                 </Link>
-                <div className="hidden md:flex space-x-2">
+                <div className="hidden md:flex space-x-2 shrink-0">
                   <button onClick={() => scrollContainer(similarScrollRef, 'left')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronLeft size={20} />
                   </button>
@@ -783,9 +789,9 @@ export default function ProductPage() {
               </div>
             </div>
 
-            <div ref={similarScrollRef} className="flex overflow-x-auto hide-scrollbar gap-6 pb-8 snap-x">
+            <div ref={similarScrollRef} className="flex overflow-x-auto hide-scrollbar gap-4 md:gap-6 pb-8 snap-x">
               {similarProducts.map((prod) => (
-                <div key={prod.id} className="w-[85vw] sm:w-[45vw] md:w-[30vw] lg:w-[22%] shrink-0 snap-start">
+                <div key={prod.id} className="w-[calc(50vw-24px)] md:w-[calc(33vw-24px)] lg:w-[22%] shrink-0 snap-start">
                   <ProductCard product={prod} />
                 </div>
               ))}
@@ -795,10 +801,10 @@ export default function ProductPage() {
 
         {/* ── RECENTLY VIEWED PIECES SECTION ── */}
         {historyProducts.length > 0 && (
-          <div className="mt-16 pt-16 border-t border-[#EAE4D9]">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+          <div className="mt-8 pt-8 md:mt-10 md:pt-10 border-t border-[#EAE4D9]">
+            <div className="flex flex-row items-center justify-between mb-6 md:mb-8 gap-2">
               <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 mt-1">
+                <div className="hidden md:flex w-10 h-10 rounded-full bg-amber-50 text-amber-700 items-center justify-center shrink-0 mt-1">
                   <History size={20} />
                 </div>
                 <div>
@@ -806,22 +812,22 @@ export default function ProductPage() {
                     <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-semibold">
                       Recently Viewed Pieces
                     </h2>
-                    <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="hidden md:inline-flex bg-amber-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                       History
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">Designs you have recently explored in your current shopping journey</p>
+                  <p className="hidden md:block text-xs text-gray-500">Designs you have recently explored in your current shopping journey</p>
                 </div>
               </div>
               
               <div className="flex items-center space-x-4">
                 <button
                   onClick={clearRecentlyViewed}
-                  className="text-sm font-semibold text-gray-500 hover:text-rose-600 transition-colors flex items-center"
+                  className="text-xs sm:text-sm font-semibold text-gray-500 hover:text-rose-600 transition-colors flex items-center shrink-0"
                 >
                   <Trash2 size={16} className="mr-1" /> Clear
                 </button>
-                <div className="hidden md:flex space-x-2">
+                <div className="hidden md:flex space-x-2 shrink-0">
                   <button onClick={() => scrollContainer(historyScrollRef, 'left')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronLeft size={20} />
                   </button>
@@ -832,9 +838,9 @@ export default function ProductPage() {
               </div>
             </div>
 
-            <div ref={historyScrollRef} className="flex overflow-x-auto hide-scrollbar gap-6 pb-8 snap-x">
+            <div ref={historyScrollRef} className="flex overflow-x-auto hide-scrollbar gap-4 md:gap-6 pb-8 snap-x">
               {historyProducts.map((prod) => (
-                <div key={prod.id} className="w-[85vw] sm:w-[45vw] md:w-[30vw] lg:w-[22%] shrink-0 snap-start">
+                <div key={prod.id} className="w-[calc(50vw-24px)] md:w-[calc(33vw-24px)] lg:w-[22%] shrink-0 snap-start">
                   <ProductCard product={prod} />
                 </div>
               ))}

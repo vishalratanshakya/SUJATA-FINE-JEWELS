@@ -48,7 +48,7 @@ export function BehindTheCraftSection() {
     : legacyCraftProducts;
 
   return (
-    <section className="py-16 md:py-24 bg-charcoal text-white overflow-hidden">
+    <section className="py-8 md:py-12 bg-charcoal text-white overflow-hidden">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 md:mb-16 gap-6">

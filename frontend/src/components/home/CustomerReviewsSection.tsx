@@ -15,7 +15,7 @@ export function CustomerReviewsSection() {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-gray-50 overflow-hidden border-t border-gray-100">
+    <section className="py-8 md:py-12 bg-gray-50 overflow-hidden border-t border-gray-100">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         
         <div className="text-center mb-12 md:mb-16">

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useStore } from "@/store/useStore";
 import { ProductCard } from "@/components/product/ProductCard";
+import { ArrowRight } from "lucide-react";
 
 export function GiftingStudioSection() {
   const allProducts = useStore((s) => s.products);
@@ -14,7 +15,7 @@ export function GiftingStudioSection() {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-[#FDFBF7] overflow-hidden">
+    <section className="py-8 md:py-12 bg-[#FDFBF7] overflow-hidden">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         <div className="text-center mb-10 md:mb-14 space-y-4">
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-amber-800 tracking-wide">
@@ -58,8 +59,9 @@ export function GiftingStudioSection() {
               </div>
               {giftingProducts.length > 6 && (
                 <div className="mt-8 text-center lg:text-left">
-                  <Link href={`/catalogue?category=Gifts`} className="inline-block border border-amber-800 text-amber-800 px-6 py-2 text-xs font-semibold tracking-widest uppercase hover:bg-amber-800 hover:text-white transition-colors">
-                    View All Gifts
+                  <Link href={`/catalogue?category=Gifts`} className="text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors inline-flex items-center space-x-1">
+                    <span>View All Gifts</span>
+                    <ArrowRight size={16} />
                   </Link>
                 </div>
               )}

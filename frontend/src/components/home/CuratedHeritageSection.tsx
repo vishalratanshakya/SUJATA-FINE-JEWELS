@@ -67,7 +67,7 @@ export function CuratedHeritageSection() {
   const p5 = displayProducts[4];
 
   return (
-    <section className="py-16 md:py-24 bg-white overflow-hidden">
+    <section className="py-8 md:py-12 bg-white overflow-hidden">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         {/* Header */}
         <motion.div 

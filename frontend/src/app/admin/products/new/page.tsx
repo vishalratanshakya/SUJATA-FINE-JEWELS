@@ -41,12 +41,16 @@ export default function NewProductPage() {
     price: "",
     originalPrice: "",
     sku: "",
+    slug: "",
+    discountPercentage: "",
+    rating: "",
     isBestSeller: false,
     isNewArrival: false,
     isSignatureCarousel: false,
     isFeatured: false,
     isExploreCollection: false,
     isBridalWedding: false,
+    isTrendingSociety: false,
     isLuxuryGifting: false,
     isBehindTheCraft: false,
     isVerifiedReviews: false,
@@ -164,7 +168,9 @@ export default function NewProductPage() {
     const finalHoverImage = hoverImage || "";
 
     const id = `prod-${Date.now()}`;
-    const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const slug = formData.slug.trim() 
+      ? formData.slug.trim().toLowerCase().replace(/[^a-z0-9\-]+/g, "-")
+      : formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const allImages = [finalPrimaryImage, finalHoverImage, ...galleryImages].filter(Boolean);
 
     const finalCategory = formData.category === "Other" && formData.customCategory.trim()
@@ -194,6 +200,8 @@ export default function NewProductPage() {
       stone: formData.stone,
       price: Number(formData.price),
       originalPrice: Number(formData.originalPrice),
+      discountPercentage: Number(formData.discountPercentage) || 0,
+      rating: Number(formData.rating) || 5,
       images: allImages,
       primaryImage: finalPrimaryImage,
       hoverImage: finalHoverImage,
@@ -207,6 +215,7 @@ export default function NewProductPage() {
       isFeatured: formData.isFeatured,
       isExploreCollection: formData.isExploreCollection,
       isBridalWedding: formData.isBridalWedding,
+      isTrendingSociety: formData.isTrendingSociety,
       isLuxuryGifting: formData.isLuxuryGifting,
       isBehindTheCraft: formData.isBehindTheCraft,
       isVerifiedReviews: formData.isVerifiedReviews,
@@ -281,7 +290,7 @@ export default function NewProductPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         {/* Main Details */}
-        <div className="md:col-span-2 space-y-8">
+        <div className="md:col-span-2 space-y-8 order-2 md:order-1">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">Basic Product Details</h2>
 
@@ -307,6 +316,18 @@ export default function NewProductPage() {
                 placeholder="Describe the craftsmanship, diamond details, design inspiration, and specifications of this jewellery piece..."
                 className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal resize-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Slug</label>
+              <input
+                type="text"
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal font-mono"
+                placeholder="auto-generated from name if empty"
+              />
+              <p className="text-xs text-gray-400 mt-1">Used in product URL: /product/<em>{formData.slug || "…"}</em></p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -360,6 +381,32 @@ export default function NewProductPage() {
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
                   className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">Discount %</label>
+                <input
+                  type="number"
+                  value={formData.discountPercentage}
+                  onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal"
+                  min="0"
+                  max="100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-700 mb-1">Rating (1–5)</label>
+                <input
+                  type="number"
+                  value={formData.rating}
+                  onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
+                  className="w-full border border-gray-200 rounded p-2 text-sm focus:outline-none focus:border-charcoal"
+                  min="1"
+                  max="5"
+                  step="0.1"
                 />
               </div>
             </div>
@@ -848,7 +895,7 @@ export default function NewProductPage() {
         </div>
 
         {/* Sidebar settings */}
-        <div className="space-y-8">
+        <div className="space-y-8 order-1 md:order-2">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
             <h2 className="text-base font-semibold text-gray-900 border-b border-gray-100 pb-3">Category & Badges</h2>
 
@@ -942,6 +989,16 @@ export default function NewProductPage() {
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Bridal & Wedding Collection</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer mt-4 border-t border-gray-100 pt-3">
+                <input
+                  type="checkbox"
+                  checked={formData.isTrendingSociety}
+                  onChange={(e) => setFormData({ ...formData, isTrendingSociety: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
+                />
+                <span className="text-xs font-medium text-gray-800">Trending in Society</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer">

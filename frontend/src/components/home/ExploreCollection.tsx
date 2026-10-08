@@ -18,7 +18,7 @@ export function ExploreCollection() {
   });
 
   return (
-    <section className="py-12 md:py-20 bg-white">
+    <section className="py-8 md:py-12 bg-white">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 md:mb-12 gap-6">
           <motion.div
@@ -59,16 +59,16 @@ export function ExploreCollection() {
         </div>
 
         <motion.div 
-          className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar pb-6 -mx-4 px-4 lg:mx-0 lg:px-0 lg:overflow-visible"
+          className="flex overflow-x-auto gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar pb-6"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
         >
-          {displayProducts.slice(0, 4).map((product, idx) => (
+          {displayProducts.slice(0, 8).map((product, idx) => (
             <motion.div 
               key={`${product.id}-${idx}`} 
-              className="w-[calc(80vw-24px)] sm:w-[calc(50vw-24px)] md:w-[calc(33vw-24px)] lg:w-auto flex-shrink-0 snap-start"
+              className="w-[calc(50vw-24px)] md:w-[calc(33vw-24px)] lg:w-[22%] flex-shrink-0 snap-start"
               variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
             >
               <ProductCard product={product} />

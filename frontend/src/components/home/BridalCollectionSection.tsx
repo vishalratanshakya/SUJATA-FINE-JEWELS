@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useStore } from "@/store/useStore";
-import { Play } from "lucide-react";
+import { Play, ArrowRight } from "lucide-react";
 
 export function BridalCollectionSection() {
   const allProducts = useStore((s) => s.products);
@@ -33,7 +33,7 @@ export function BridalCollectionSection() {
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-charcoal tracking-wide">
             Bridal & Wedding Collection
           </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base">
+          <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base mb-6">
             Curated masterpieces for your perfect day. Explore collections that celebrate eternal love.
           </p>
         </motion.div>

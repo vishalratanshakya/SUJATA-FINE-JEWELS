@@ -130,6 +130,12 @@ export function ProductCard({ product }: { product: Product }) {
         
 
 
+        {product.discountPercentage ? (
+          <div className="absolute top-3 left-3 z-20 bg-charcoal text-white text-[10px] font-semibold px-2 py-1 rounded tracking-wider uppercase shadow-sm">
+            {product.discountPercentage}% OFF
+          </div>
+        ) : null}
+
         {/* Wishlist Button: Top Right */}
         <button
           onClick={handleToggleWishlist}

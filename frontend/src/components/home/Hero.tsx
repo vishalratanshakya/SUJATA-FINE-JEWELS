@@ -94,9 +94,9 @@ export function Hero() {
   }
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[85vh] md:h-[85vh] gap-4">
+    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[75vh] md:h-[85vh] gap-4">
       {/* ── LEFT SIDE: MAIN HERO BANNER CAROUSEL ── */}
-      <div className={`relative w-full md:w-[60%] h-[60vh] md:h-full bg-charcoal overflow-hidden rounded-3xl shadow-sm`}>
+      <div className={`relative w-full md:w-[60%] h-[45vh] md:h-full bg-charcoal overflow-hidden rounded-3xl shadow-sm`}>
         {MAIN_BANNERS.length > 0 ? (
           <>
             <AnimatePresence initial={false}>
@@ -123,8 +123,8 @@ export function Hero() {
               </motion.div>
             </AnimatePresence>
 
-            <div className="relative flex-1 flex items-center md:absolute md:inset-0 z-10 md:bg-transparent">
-              <div className="px-4 md:px-12 w-full py-10 pb-20 md:py-12 md:pt-20">
+            <div className="relative h-full flex items-end md:items-center md:absolute md:inset-0 z-10 md:bg-transparent">
+              <div className="px-4 md:px-12 w-full pb-6 pt-10 md:py-12 md:pt-20">
                 <div className="max-w-xl text-ivory">
                   <AnimatePresence mode="wait">
                     <motion.div
@@ -146,7 +146,7 @@ export function Hero() {
                       
                       <motion.h1 
                         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                        className="font-serif text-4xl md:text-5xl lg:text-5xl leading-[1.15] mb-6 font-light"
+                        className="font-serif text-4xl md:text-5xl lg:text-5xl leading-[1.15] mb-4 md:mb-6 font-light"
                         dangerouslySetInnerHTML={{
                           __html: MAIN_BANNERS[currentIndex].heading.replace(
                             /Your Forever Moments|Heritage|Remembered|Lasts Forever|Most Precious Moments/,
@@ -158,7 +158,7 @@ export function Hero() {
                       {MAIN_BANNERS[currentIndex].description && (
                         <motion.p 
                           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                          className="text-sm md:text-base mb-10 max-w-sm font-light text-ivory/80 leading-relaxed line-clamp-3"
+                          className="hidden md:block text-sm md:text-base mb-10 max-w-sm font-light text-ivory/80 leading-relaxed line-clamp-3"
                         >
                           {MAIN_BANNERS[currentIndex].description}
                         </motion.p>
@@ -185,12 +185,6 @@ export function Hero() {
             {MAIN_BANNERS.length > 1 && (
               <>
                 <div className="absolute bottom-8 left-4 md:left-12 flex items-center space-x-8 z-20">
-                  <div className="flex items-center space-x-2 text-ivory/80 font-serif text-lg">
-                    <span>0{currentIndex + 1}</span>
-                    <span className="text-ivory/40 text-sm">/</span>
-                    <span className="text-ivory/40 text-sm">0{MAIN_BANNERS.length}</span>
-                  </div>
-                  
                   {/* Progress Bar */}
                   <div className="hidden md:block w-32 h-[1px] bg-white/20 relative">
                     <motion.div 

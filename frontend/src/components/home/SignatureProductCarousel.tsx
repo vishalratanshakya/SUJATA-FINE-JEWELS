@@ -115,7 +115,7 @@ export function SignatureProductCarousel() {
   };
 
   return (
-    <section className="py-20 md:py-28 bg-[#FAF8F5] overflow-hidden select-none border-y border-[#EAE4D9]">
+    <section className="py-8 md:py-12 bg-[#FAF8F5] overflow-hidden select-none border-y border-[#EAE4D9]">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
