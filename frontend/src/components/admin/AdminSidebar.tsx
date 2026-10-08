@@ -16,6 +16,7 @@ import {
   BookOpen,
   Boxes,
   Settings,
+  Mail,
   UserCheck,
   ChevronRight,
   Layers
@@ -48,9 +49,12 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
       { name: "Categories", href: "/admin/categories", icon: Layers },
       { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
       { name: "Customers", href: "/admin/customers", icon: Users },
+      { name: "Messages", href: "/admin/messages", icon: Mail },
       { name: "Collections", href: "/admin/collections", icon: FolderKanban },
       { name: "Hero Banners", href: "/admin/banners", icon: LayoutGrid },
       { name: "Homepage Sections", href: "/admin/sections", icon: LayoutGrid },
+      { name: "Catalogue Page", href: "/admin/catalogue", icon: LayoutGrid },
+      { name: "Contact Settings", href: "/admin/contact-settings", icon: Settings },
     ],
   },
 

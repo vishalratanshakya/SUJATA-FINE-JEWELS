@@ -35,16 +35,16 @@ export function Footer() {
   };
   return (
     <footer className="bg-black text-ivory/80 pt-20 pb-10 px-4 md:px-8 text-sm">
-      <div className="max-w-[1920px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+      <div className="max-w-[1920px] mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 mb-16">
         
         {/* Brand Column */}
-        <div className="lg:col-span-2">
+        <div className="col-span-2 md:col-span-4 lg:col-span-2">
           <Link href="/" className="flex flex-col text-white mb-6">
             <span className="font-serif text-3xl md:text-4xl tracking-wider leading-none">SUJATA</span>
             <span className="text-xs md:text-sm tracking-[0.4em] font-light mt-2 text-champagne">FINE JEWELS</span>
           </Link>
           <p className="font-serif italic text-lg text-ivory/60 max-w-sm">
-            Timeless Brilliance, Crafted Forever.
+            Timeless Brilliance, Crafted for You.
           </p>
           
           <div className="flex space-x-5 mt-8">
@@ -56,7 +56,7 @@ export function Footer() {
         </div>
 
         {/* Links Columns */}
-        <div>
+        <div className="col-span-1">
           <h4 className="text-white uppercase tracking-widest text-xs font-semibold mb-6">Shop</h4>
           <ul className="space-y-4">
             {["Rings", "Necklaces", "Earrings", "Bracelets", "Pendants", "Collections"].map((item) => (
@@ -69,7 +69,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <div>
+        <div className="col-span-1">
           <h4 className="text-white uppercase tracking-widest text-xs font-semibold mb-6">Customer Care</h4>
           <ul className="space-y-4">
             <li><Link href="/faq" className="hover:text-champagne transition-colors">FAQs</Link></li>
@@ -81,7 +81,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <div>
+        <div className="col-span-2 md:col-span-2 lg:col-span-1 mt-6 lg:mt-0">
           <h4 className="text-white uppercase tracking-widest text-xs font-semibold mb-6">Newsletter</h4>
           <p className="mb-4 text-xs leading-relaxed">
             Be the first to know about new collections and exclusive offers.

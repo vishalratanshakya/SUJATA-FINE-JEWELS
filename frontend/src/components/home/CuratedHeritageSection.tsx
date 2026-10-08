@@ -322,10 +322,17 @@ export function CuratedHeritageSection() {
               
               {/* Top Badges */}
               <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded flex items-center space-x-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  <span>Special Reserve</span>
-                </span>
+                <div className="flex flex-col items-start space-y-2">
+                  <span className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded flex items-center space-x-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span>Special Reserve</span>
+                  </span>
+                  {p5.discountPercentage ? (
+                    <span className="px-3 py-1 bg-charcoal text-white text-[10px] font-bold tracking-widest uppercase rounded shadow-sm">
+                      {p5.discountPercentage}% OFF
+                    </span>
+                  ) : null}
+                </div>
                 <button className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/50 transition-colors">
                   <Heart size={14} />
                 </button>
@@ -344,9 +351,6 @@ export function CuratedHeritageSection() {
 
               {/* Bottom Content */}
               <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center text-center">
-                <span className="text-amber-400 text-[10px] font-bold tracking-widest uppercase mb-2 bg-black/40 px-2 py-1 rounded backdrop-blur-sm">
-                  - 25%
-                </span>
                 <h3 className="font-serif text-xl text-white mb-6 uppercase tracking-wider line-clamp-2">
                   {p5.name}
                 </h3>

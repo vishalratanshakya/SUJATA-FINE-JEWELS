@@ -73,14 +73,21 @@ export function FileUpload({
       />
 
       {value ? (
-        <div className="relative w-full p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl flex items-center justify-between group transition-all">
+        <div className="relative w-full p-2 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between group transition-all">
           <div className="flex items-center space-x-3 truncate pr-2">
-            <div className="w-9 h-9 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-              <FileCheck size={18} />
-            </div>
+            {/* Show image preview if value is likely an image */}
+            {value.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) || accept?.includes("image") ? (
+              <div className="w-12 h-12 rounded-lg bg-gray-200 overflow-hidden shrink-0 shadow-xs">
+                <img src={value} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="w-12 h-12 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <FileCheck size={18} />
+              </div>
+            )}
             <div className="truncate">
-              <p className="text-xs font-semibold text-emerald-900 truncate">Asset File Attached</p>
-              <p className="text-[10px] text-emerald-700 truncate font-mono">{value.substring(0, 45)}...</p>
+              <p className="text-xs font-semibold text-gray-900 truncate">Asset File Attached</p>
+              <p className="text-[10px] text-gray-500 truncate font-mono">{value.substring(0, 45)}...</p>
             </div>
           </div>
 

@@ -12,6 +12,7 @@ interface ProductListingTemplateProps {
   eyebrow?: string;
   description: string;
   bannerImage?: string;
+  bannerVideo?: string;
   filterType?: "all" | "new_arrivals" | "best_sellers";
   emptyTitle?: string;
   emptyDescription?: string;
@@ -26,6 +27,7 @@ export function ProductListingTemplate({
   eyebrow = "THE FINEST. FOR FOREVER.",
   description,
   bannerImage = "/images/products/rings/ring_placeholder.jpg",
+  bannerVideo,
   filterType = "all",
   emptyTitle = "No Jewellery Found",
   emptyDescription = "Try adjusting your filters to discover more SUJATA creations.",
@@ -81,7 +83,7 @@ export function ProductListingTemplate({
       if (filterType === "new_arrivals" && !product.isNewArrival) {
         return false;
       }
-      if (filterType === "best_sellers" && !("isBestseller" in product ? product.isBestseller : (product as any).isBestSeller)) {
+      if (filterType === "best_sellers" && !(product.isBestseller || (product as any).isBestSeller)) {
         return false;
       }
 
@@ -196,13 +198,24 @@ export function ProductListingTemplate({
 
           {/* Banner Right Image */}
           <div className="lg:col-span-7 relative h-[260px] sm:h-[340px] md:h-[380px] w-full rounded-2xl overflow-hidden shadow-sm border border-[#EAE4D9]/40 bg-[#FAF8F5]">
-            <Image
-              src={bannerImage}
-              alt={`${title} Banner`}
-              fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority
-              className="object-cover object-center"
-            />
+            {bannerVideo ? (
+              <video
+                src={bannerVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover object-center"
+              />
+            ) : (
+              <Image
+                src={bannerImage}
+                alt={`${title} Banner`}
+                fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority
+                className="object-cover object-center"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-r from-[#FAF8F5] via-[#FAF8F5]/30 to-transparent w-1/3 hidden lg:block pointer-events-none" />
           </div>
 
@@ -247,44 +260,75 @@ export function ProductListingTemplate({
           </div>
         </div>
 
-        {/* Inline Mobile Filters (Expands below toolbar) */}
-        {isMobileFilterOpen && (
-          <div className="lg:hidden mb-8 p-4 bg-white border border-[#EAE4D9] rounded-xl shadow-sm">
-            <FilterSidebar
-              selectedCategories={selectedCategories}
-              selectedMetals={selectedMetals}
-              selectedPriceRange={selectedPriceRange}
-              selectedCollection={selectedCollection}
-              onCategoryChange={handleCategoryChange}
-              onMetalChange={handleMetalChange}
-              onPriceRangeChange={setSelectedPriceRange}
-              onCollectionChange={setSelectedCollection}
-              availableCategories={availableCategories}
-              availableMetals={availableMetals}
-              availableCollections={availableCollections}
-            />
-            <div className="mt-4 pt-4 border-t border-[#EAE4D9] flex gap-3">
+        {/* Mobile Filter Drawer */}
+        <div 
+          className={`fixed inset-0 z-50 lg:hidden transition-opacity duration-300 ${
+            isMobileFilterOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setIsMobileFilterOpen(false)}
+          />
+          
+          {/* Drawer (Left to Right, 70% width) */}
+          <div 
+            className={`absolute top-0 left-0 bottom-0 w-[70%] min-w-[280px] max-w-[360px] bg-[#FAF8F5] shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+              isMobileFilterOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-[#EAE4D9] bg-white">
+              <h2 className="font-serif text-lg text-[#2C2825]">FILTERS</h2>
+              <button 
+                onClick={() => setIsMobileFilterOpen(false)}
+                className="p-2 text-[#8C8275] hover:text-[#2C2825] transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-4 bg-white [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <FilterSidebar
+                selectedCategories={selectedCategories}
+                selectedMetals={selectedMetals}
+                selectedPriceRange={selectedPriceRange}
+                selectedCollection={selectedCollection}
+                onCategoryChange={handleCategoryChange}
+                onMetalChange={handleMetalChange}
+                onPriceRangeChange={setSelectedPriceRange}
+                onCollectionChange={setSelectedCollection}
+                availableCategories={availableCategories}
+                availableMetals={availableMetals}
+                availableCollections={availableCollections}
+              />
+            </div>
+            
+            {/* Sticky Bottom Actions */}
+            <div className="p-4 border-t border-[#EAE4D9] flex gap-3 bg-[#FAF8F5] mt-auto">
               <button
                 onClick={clearAllFilters}
-                className="flex-1 py-2.5 border border-[#EAE4D9] text-xs font-bold uppercase tracking-widest text-[#2C2825] rounded-lg"
+                className="flex-1 py-3 border border-[#EAE4D9] text-xs font-bold uppercase tracking-widest text-[#2C2825] rounded-lg bg-white shadow-sm"
               >
                 CLEAR
               </button>
               <button
                 onClick={() => setIsMobileFilterOpen(false)}
-                className="flex-1 py-2.5 bg-[#B38E5D] text-white text-xs font-bold uppercase tracking-widest rounded-lg"
+                className="flex-1 py-3 bg-[#B38E5D] text-white text-xs font-bold uppercase tracking-widest rounded-lg shadow-sm hover:bg-[#997746]"
               >
                 APPLY
               </button>
             </div>
           </div>
-        )}
+        </div>
 
         {/* 2-Column Content Layout (Desktop) */}
         <div className="flex gap-8 items-start">
           
           {/* Permanent Desktop Filter Sidebar */}
-          <div className="hidden lg:block w-64 shrink-0 sticky top-28">
+          <div className="hidden lg:block w-64 shrink-0 sticky top-28 h-[calc(100vh-120px)] overflow-y-auto pr-2 pb-8 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <FilterSidebar
               selectedCategories={selectedCategories}
               selectedMetals={selectedMetals}

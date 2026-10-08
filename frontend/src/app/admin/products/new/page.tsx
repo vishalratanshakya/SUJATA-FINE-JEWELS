@@ -62,7 +62,6 @@ export default function NewProductPage() {
     diamondInfo: "",
     shippingReturns: "Complimentary fully-insured shipping across India. Orders are typically dispatched within 3-5 business days. Enjoy a seamless 15-day return and exchange policy for unworn items in their original condition and packaging. Custom or engraved pieces are final sale.",
     careInstructions: "To maintain the brilliance of your jewelry, gently clean with a soft, lint-free cloth. Avoid exposure to harsh chemicals, perfumes, and cosmetics. Store in the provided Sujata Fine Jewels pouch or box when not in use.",
-    customCategory: "",
   });
 
   const handleOccasionToggle = (id: string) => {
@@ -150,10 +149,6 @@ export default function NewProductPage() {
       return;
     }
 
-    if (formData.category === "Other" && !formData.customCategory.trim()) {
-      toast.error("Please enter a Custom Category Name");
-      return;
-    }
     if (Number(formData.price) <= 0 || !formData.price) {
       toast.error("Please enter a valid Selling Price");
       return;
@@ -173,9 +168,7 @@ export default function NewProductPage() {
       : formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     const allImages = [finalPrimaryImage, finalHoverImage, ...galleryImages].filter(Boolean);
 
-    const finalCategory = formData.category === "Other" && formData.customCategory.trim()
-      ? formData.customCategory.trim()
-      : formData.category;
+    const finalCategory = formData.category;
 
     // Sizing determination
     const isRingCategory = formData.category === "Rings";
@@ -471,14 +464,14 @@ export default function NewProductPage() {
             <div className="border-b border-gray-100 pb-3 flex flex-col-reverse md:flex-row justify-between md:items-center items-start gap-3">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">
-                  {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category} Category Specifications
+                  {formData.category} Category Specifications
                 </h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Configure real-time available sizes, options, and variant stock for {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category}.
+                  Configure real-time available sizes, options, and variant stock for {formData.category}.
                 </p>
               </div>
               <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold rounded-full uppercase tracking-wider">
-                {formData.category === "Other" ? (formData.customCategory || "Custom") : formData.category}
+                {formData.category}
               </span>
             </div>
 
@@ -672,7 +665,7 @@ export default function NewProductPage() {
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-600 flex items-center space-x-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
                 <span>
-                  <strong>Standard / Free Size</strong> automatically applied for {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category}. No numeric size input required to publish.
+                  <strong>Standard / Free Size</strong> automatically applied for {formData.category}. No numeric size input required to publish.
                 </span>
               </div>
             )}
@@ -912,22 +905,7 @@ export default function NewProductPage() {
                 <option value="Bracelets">Bracelets</option>
                 <option value="Bangles">Bangles</option>
                 <option value="Pendants">Pendants</option>
-                <option value="Other">Other / Custom Category</option>
               </select>
-
-              {formData.category === "Other" && (
-                <div className="mt-3">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Custom Category Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.customCategory}
-                    onChange={(e) => setFormData({ ...formData, customCategory: e.target.value })}
-                    placeholder="e.g. Necklace & Earring Sets, Bridal Suite"
-                    className="w-full border border-gray-200 rounded p-2.5 text-sm focus:outline-none focus:border-charcoal"
-                  />
-                </div>
-              )}
             </div>
 
             <div className="space-y-3 pt-2">

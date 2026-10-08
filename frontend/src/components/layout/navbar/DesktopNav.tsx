@@ -16,9 +16,9 @@ export function DesktopNav() {
     { label: "Home", href: "/" },
     { label: "Catalogue", href: "/catalogue" },
     { label: "Shop", href: "/shop", hasMenu: true, menuType: "shop" },
-    { label: "New Arrivals", href: "/new-arrivals" },
     { label: "Best Sellers", href: "/best-sellers" },
-    { label: "Our Story", href: "/about" },
+    { label: "About Us", href: "/about" },
+    { label: "Contact Us", href: "/contact" },
   ];
 
   return (
@@ -85,6 +85,13 @@ export function DesktopNav() {
                           );
                         })}
                       </div>
+                      <Link 
+                        href="/catalogue" 
+                        className="inline-block mt-6 text-[11px] font-bold text-black uppercase tracking-widest border-b border-black/20 pb-1 hover:text-[#B38E5D] hover:border-[#B38E5D] transition-colors" 
+                        onClick={() => setActiveMenu(null)}
+                      >
+                        SHOP ALL &rarr;
+                      </Link>
                     </div>
 
                     {/* Vertical Divider */}
@@ -115,9 +122,11 @@ export function DesktopNav() {
                         fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300 flex flex-col justify-end p-5">
-                        <span className="text-white/90 text-[9px] uppercase tracking-[0.2em] mb-1">Featured</span>
-                        <span className="text-white font-serif text-xl">New Arrivals</span>
+                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1599643478514-4a0013f9f43c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-charcoal/20 group-hover:bg-charcoal/10 transition-colors duration-500" />
+                      <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                        <span className="text-white/90 text-[9px] uppercase tracking-[0.2em] mb-1">Our Heritage</span>
+                        <span className="text-white font-serif text-xl">About Us</span>
                       </div>
                     </div>
 

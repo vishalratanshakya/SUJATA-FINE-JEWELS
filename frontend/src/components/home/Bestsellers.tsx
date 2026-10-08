@@ -25,7 +25,7 @@ export function Bestsellers() {
               </div>
             </div>
           </div>
-          <Link href="/catalogue?category=All" className="text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors flex items-center space-x-1">
+          <Link href="/best-sellers" className="text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors flex items-center space-x-1">
             <span>View All</span>
             <ArrowRight size={16} />
           </Link>

@@ -125,12 +125,12 @@ export function MobileNav() {
 
 
 
-                <Link href="/new-arrivals" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">New Arrivals</Link>
                 <Link href="/best-sellers" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">Best Sellers</Link>
-                <Link href="/about" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">Our Story</Link>
+                <Link href="/about" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">About Us</Link>
+                <Link href="/contact" className="block py-4 text-sm tracking-widest uppercase border-b border-charcoal/5 font-medium hover:text-champagne transition-colors">Contact Us</Link>
 
                 <div className="pt-8 flex flex-col space-y-6">
-                  <Link href="/contact" className="text-sm tracking-widest uppercase text-charcoal/60 hover:text-champagne transition-colors">Contact</Link>
+
                 </div>
               </div>
               </motion.div>
