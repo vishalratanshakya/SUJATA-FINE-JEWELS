@@ -142,13 +142,24 @@ export default function AdminProductsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-4">
                           <div className="w-14 h-14 bg-gray-100 rounded relative overflow-hidden flex-shrink-0 border border-gray-100">
-                            <Image 
-                              src={product.images?.[0] || "/images/products/rings/ring_placeholder.jpg"} 
-                              alt={product.name} 
-                              fill 
-                              sizes="(max-width: 768px) 100vw, 56px"
-                              className="object-contain p-1" 
-                            />
+                            {(() => {
+                              const img = product.images?.[0] || product.primaryImage;
+                              const validImg = img && (img.startsWith('http') || img.startsWith('/') || img.startsWith('data:')) && !img.includes('_placeholder.jpg');
+                              if (!validImg && product.videoUrl) {
+                                return (
+                                  <video src={product.videoUrl} autoPlay muted loop playsInline className="object-cover w-full h-full" />
+                                );
+                              }
+                              return (
+                                <Image 
+                                  src={validImg ? img : "/images/products/rings/ring_placeholder.jpg"} 
+                                  alt={product.name} 
+                                  fill 
+                                  sizes="(max-width: 768px) 100vw, 56px"
+                                  className="object-contain p-1" 
+                                />
+                              );
+                            })()}
                           </div>
                           <div className="min-w-[250px] max-w-[400px]">
                             <div className="font-medium text-gray-900 line-clamp-2" title={product.name}>{product.name}</div>
@@ -190,8 +201,9 @@ export default function AdminProductsPage() {
                           {isNew ? "✨ New" : "+ Add New Badge"}
                         </button>
                       </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        <Link 
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
+                        <div className="flex justify-end items-center space-x-2">
+                          <Link 
                           href={`/admin/products/${product.id}`} 
                           className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors inline-flex rounded hover:bg-blue-50" 
                           title="Edit Product"
@@ -205,6 +217,7 @@ export default function AdminProductsPage() {
                         >
                           <Trash2 size={16} />
                         </button>
+                        </div>
                       </td>
                     </tr>
                   );

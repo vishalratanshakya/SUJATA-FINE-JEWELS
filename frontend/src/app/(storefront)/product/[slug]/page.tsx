@@ -205,6 +205,14 @@ export default function ProductPage() {
   return (
     <div className="bg-[#FAF8F5] pt-28 pb-24 min-h-screen">
       <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-12">
+        {/* BACK BUTTON */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center text-xs font-semibold tracking-widest uppercase text-[#2C2825] hover:text-[#B38E5D] transition-colors mb-8 group"
+        >
+          <ChevronLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
+          Back
+        </button>
 
         {/* ── MAIN PRODUCT SECTION (2-Column Desktop Layout) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 mb-24 items-start">
@@ -226,7 +234,7 @@ export default function ProductPage() {
                   }`}
                 >
                   {media.type === "video" ? (
-                    <video src={media.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                    <video src={media.url} className="w-full h-full object-cover" muted autoPlay playsInline preload="metadata" />
                   ) : (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={media.url} alt="" className="w-full h-full object-cover" />
@@ -242,9 +250,11 @@ export default function ProductPage() {
                   key={activeImageIndex}
                   src={mediaItems[activeImageIndex].url}
                   controls
+                  autoPlay
+                  muted
                   playsInline
                   preload="metadata"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-black/5"
                 />
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -752,6 +762,8 @@ export default function ProductPage() {
               <video
                 src={mediaItems[lightboxIndex].url}
                 controls
+                autoPlay
+                muted
                 playsInline
                 preload="metadata"
                 className="w-full h-full object-contain"

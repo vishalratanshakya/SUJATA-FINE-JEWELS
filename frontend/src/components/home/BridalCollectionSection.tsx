@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { ProductCard } from "@/components/product/ProductCard";
 
@@ -14,22 +15,34 @@ export function BridalCollectionSection() {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-white overflow-hidden">
+    <section className="py-8 md:py-12 bg-white overflow-hidden">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <div className="text-center mb-12 md:mb-16 space-y-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 md:mb-16 space-y-4"
+        >
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-charcoal tracking-wide">
             Bridal & Wedding Collection
           </h2>
           <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base">
             Curated masterpieces for your perfect day. Explore collections that celebrate eternal love.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 items-center">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
           
           {/* Static Banner / Cover */}
-          <div className="w-full lg:w-1/2">
-            <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden group">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="w-full lg:w-1/2 flex"
+          >
+            <div className="relative w-full h-full rounded-2xl overflow-hidden group min-h-[350px]">
               <Image 
                 src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
                 alt="Bridal Collection" 
@@ -46,23 +59,26 @@ export function BridalCollectionSection() {
                 </Link>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Bridal Products - Shop the Look */}
-          <div className="w-full lg:w-1/2">
-            <h4 className="font-serif text-xl text-charcoal mb-6 flex items-center space-x-4">
-              <span className="w-8 h-[1px] bg-champagne"></span>
-              <span>Shop The Look</span>
-            </h4>
-            
-            <div className="grid grid-cols-2 gap-4 md:gap-6">
-              {bridalProducts.slice(0, 4).map((product: any, pIdx: number) => (
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="w-full lg:w-1/2 flex flex-col justify-center"
+          >
+            <div className="w-full pl-0 lg:pl-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+              {bridalProducts.slice(0, 6).map((product: any, pIdx: number) => (
                 <div key={`${product.id}-${pIdx}`}>
                   <ProductCard product={product} />
                 </div>
               ))}
             </div>
-          </div>
+            </div>
+          </motion.div>
 
         </div>
       </div>

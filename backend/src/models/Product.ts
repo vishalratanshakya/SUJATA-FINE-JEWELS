@@ -35,6 +35,7 @@ export interface IProduct extends Document {
   isVerifiedReviews?: boolean;
   isDealOfTheDay?: boolean;
   isShopByOccasion?: boolean;
+  isCuratedHeritage?: boolean;
   stock: number;
   availableSizes?: string[];
   sizeStock?: Record<string, number>;
@@ -87,6 +88,7 @@ const ProductSchema = new Schema<IProduct>(
     isVerifiedReviews: { type: Boolean, default: false },
     isDealOfTheDay: { type: Boolean, default: false },
     isShopByOccasion: { type: Boolean, default: false },
+    isCuratedHeritage: { type: Boolean, default: false },
     stock: { type: Number, default: 10 },
     availableSizes: [{ type: String }],
     sizeStock: { type: Map, of: Number },

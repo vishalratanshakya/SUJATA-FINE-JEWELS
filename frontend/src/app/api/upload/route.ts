@@ -21,10 +21,13 @@ export async function POST(req: Request) {
     if (file) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const isVideo = file.type.startsWith('video/') || file.name?.match(/\.(mp4|webm|mov)$/i);
+      const rType = isVideo ? "video" : "auto";
       
       return new Promise<Response>((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: "Sujata Fine Jewels", resource_type: "auto" },
+        cloudinary.uploader.unsigned_upload_stream(
+          "Sujata Fine Jewels",
+          { folder: "Sujata Fine Jewels", resource_type: rType, chunk_size: 6000000 },
           (error, result) => {
             if (error) {
               resolve(NextResponse.json({ success: false, error: error.message }, { status: 500 }));

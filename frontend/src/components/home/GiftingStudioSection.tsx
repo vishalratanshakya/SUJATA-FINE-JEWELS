@@ -25,39 +25,45 @@ export function GiftingStudioSection() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-amber-50 overflow-hidden">
-          <div className="relative h-[300px] md:h-[400px] w-full">
-            <Image 
-              src="https://images.unsplash.com/photo-1549439602-43ebca2327af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-              alt="Gifts for Every Occasion" 
-              fill 
-              className="object-cover" 
-            />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-6 text-center">
-              <div className="max-w-xl">
-                <h3 className="font-serif text-3xl md:text-4xl text-white mb-4 drop-shadow-md">Gifts for Every Occasion</h3>
-                <p className="text-white/90 text-sm md:text-base drop-shadow">
-                  Hand-picked selections of our finest jewelry, perfect for celebrating life's special moments.
-                </p>
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
+          {/* Image Banner */}
+          <div className="w-full lg:w-1/2 flex">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden group min-h-[350px]">
+              <Image 
+                src="https://images.unsplash.com/photo-1549439602-43ebca2327af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
+                alt="Gifts for Every Occasion" 
+                fill 
+                className="object-cover group-hover:scale-105 transition-transform duration-700" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center p-8 md:p-12 text-center">
+                <div className="max-w-xl">
+                  <h3 className="font-serif text-3xl md:text-4xl text-white mb-4 drop-shadow-md">Gifts for Every Occasion</h3>
+                  <p className="text-white/90 text-sm md:text-base drop-shadow">
+                    Hand-picked selections of our finest jewelry, perfect for celebrating life's special moments.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="p-6 md:p-10">
-            <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 md:gap-6 snap-x snap-mandatory hide-scrollbar -mx-6 px-6 lg:mx-0 lg:px-0">
-              {giftingProducts.slice(0, 8).map((product: any, pIdx: number) => (
-                <div key={`${product.id}-${pIdx}`} className="w-[calc(80vw-48px)] sm:w-[calc(50vw-48px)] lg:w-auto flex-shrink-0 snap-start">
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
-            {giftingProducts.length > 8 && (
-              <div className="mt-8 text-center">
-                <Link href={`/catalogue?category=Gifts`} className="inline-block border border-amber-800 text-amber-800 px-8 py-3 text-xs font-semibold tracking-widest uppercase hover:bg-amber-800 hover:text-white transition-colors">
-                  View All Gifts
-                </Link>
+          {/* Product Grid */}
+          <div className="w-full lg:w-1/2 flex flex-col justify-center">
+            <div className="w-full pl-0 lg:pl-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+                {giftingProducts.slice(0, 6).map((product: any, pIdx: number) => (
+                  <div key={`${product.id}-${pIdx}`}>
+                    <ProductCard product={product} />
+                  </div>
+                ))}
               </div>
-            )}
+              {giftingProducts.length > 6 && (
+                <div className="mt-8 text-center lg:text-left">
+                  <Link href={`/catalogue?category=Gifts`} className="inline-block border border-amber-800 text-amber-800 px-6 py-2 text-xs font-semibold tracking-widest uppercase hover:bg-amber-800 hover:text-white transition-colors">
+                    View All Gifts
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

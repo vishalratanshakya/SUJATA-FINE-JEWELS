@@ -31,28 +31,32 @@ export function CustomerReviewsSection() {
           {reviewedProducts.map((product: any, idx: number) => (
             <div 
               key={product.id} 
-              className="w-[85vw] sm:w-[400px] flex-shrink-0 snap-center bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col justify-between"
+              className="w-[85vw] sm:w-[280px] flex-shrink-0 snap-center bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between"
             >
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="flex flex-col items-center justify-center text-center">
-                  <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-4 border border-gray-100">
+                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-3 border border-gray-100">
                     <Image 
-                      src={product.primaryImage || product.images?.[0]} 
+                      src={(() => {
+                        const img = product.primaryImage || product.images?.[0];
+                        if (img && (img.startsWith('http') || img.startsWith('/') || img.startsWith('data:'))) return img;
+                        return "/images/products/rings/ring_placeholder.jpg";
+                      })()} 
                       alt={product.name} 
                       fill 
                       className="object-cover" 
                     />
                   </div>
-                  <h3 className="font-serif text-xl text-charcoal">{product.name}</h3>
+                  <h3 className="font-serif text-lg text-charcoal line-clamp-1">{product.name}</h3>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 relative">
+                <div className="bg-gray-50 p-3 rounded-xl border border-gray-100 relative">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex space-x-1">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star 
                           key={i} 
-                          size={14} 
+                          size={12} 
                           className="text-amber-500 fill-amber-500" 
                         />
                       ))}

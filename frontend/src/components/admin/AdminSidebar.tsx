@@ -44,6 +44,7 @@ const SIDEBAR_SECTIONS: SidebarSection[] = [
     title: "STORE MANAGEMENT",
     items: [
       { name: "Products", href: "/admin/products", icon: Package },
+      { name: "Product Videos", href: "/admin/product-videos", icon: Package },
       { name: "Categories", href: "/admin/categories", icon: Layers },
       { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
       { name: "Customers", href: "/admin/customers", icon: Users },

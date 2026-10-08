@@ -54,6 +54,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [isVerifiedReviews, setIsVerifiedReviews] = useState(false);
   const [isDealOfTheDay, setIsDealOfTheDay] = useState(false);
   const [isShopByOccasion, setIsShopByOccasion] = useState(false);
+  const [isCuratedHeritage, setIsCuratedHeritage] = useState(false);
   const [productOccasions, setProductOccasions] = useState<string[]>([]);
   const [productDetails, setProductDetails] = useState("");
   const [diamondInfo, setDiamondInfo] = useState("");
@@ -105,8 +106,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setRating(product.rating ? String(product.rating) : "");
     setProductDetails(product.productDetails || "");
     setDiamondInfo(product.diamondInfo || "");
-    setShippingReturns(product.shippingReturns || "");
-    setCareInstructions(product.careInstructions || "");
+    setShippingReturns(product.shippingReturns || "Complimentary fully-insured shipping across India. Orders are typically dispatched within 3-5 business days. Enjoy a seamless 15-day return and exchange policy for unworn items in their original condition and packaging. Custom or engraved pieces are final sale.");
+    setCareInstructions(product.careInstructions || "To maintain the brilliance of your jewelry, gently clean with a soft, lint-free cloth. Avoid exposure to harsh chemicals, perfumes, and cosmetics. Store in the provided Sujata Fine Jewels pouch or box when not in use.");
 
     // Set Primary, Hover, and Gallery images from product fields or images array
     const primary = product.primaryImage || product.images?.[0] || "";
@@ -130,6 +131,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     setIsVerifiedReviews(!!product.isVerifiedReviews);
     setIsDealOfTheDay(!!product.isDealOfTheDay);
     setIsShopByOccasion(!!product.isShopByOccasion);
+    setIsCuratedHeritage(!!product.isCuratedHeritage);
     setProductOccasions(product.occasions || []);
 
     const sizes = product.availableSizes || [];
@@ -223,8 +225,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     if (!description.trim()) { toast.error("Product description is required."); return; }
     if (category === "Other" && !customCategory.trim()) { toast.error("Custom Category Name is required."); return; }
     if (!price || isNaN(Number(price)) || Number(price) <= 0) { toast.error("A valid price is required."); return; }
-    if (!primaryImage) { toast.error("Primary Product Image is required."); return; }
-    if (!hoverImage) { toast.error("Hover Product Image is required."); return; }
+    if (!primaryImage && !videoUrl) { toast.error("Please upload either a Primary Image or a Product Video."); return; }
 
     setIsSubmitting(true);
 
@@ -276,6 +277,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
       isVerifiedReviews,
       isDealOfTheDay,
       isShopByOccasion,
+      isCuratedHeritage,
       occasions: productOccasions,
       availableSizes: finalAvailableSizes,
       sizeStock: finalSizeStock,
@@ -1099,7 +1101,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   onChange={(e) => setIsSignatureCarousel(e.target.checked)}
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
-                <span className="text-gray-800 font-medium">Show in 3D Perspective Carousel (Homepage)</span>
+                <span className="text-gray-800 font-medium">Feature in Signature Pieces (Timeless Brilliance)</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input 
@@ -1172,6 +1174,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
                 />
                 <span className="text-gray-700">Shop by Occasion</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={isCuratedHeritage}
+                  onChange={(e) => setIsCuratedHeritage(e.target.checked)}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4" 
+                />
+                <span className="text-gray-700">Curated Heritage Suites</span>
               </label>
             </div>
           </div>

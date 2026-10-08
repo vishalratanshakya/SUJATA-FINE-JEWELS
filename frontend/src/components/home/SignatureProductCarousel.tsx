@@ -177,10 +177,10 @@ export function SignatureProductCarousel() {
                       : "bg-[#EFECE6]/95 border-[#E2DDD3] shadow-md scale-95 z-10 cursor-pointer opacity-70 hover:opacity-100"
                   }`}
                 >
-                  {/* Bestseller Badge for center */}
+                  {/* Badge for center */}
                   <div className={`absolute top-4 left-4 z-10 transition-opacity duration-500 ${isCenter ? 'opacity-100' : 'opacity-0'}`}>
                     <span className="bg-[#B38E5D] text-white text-[10px] uppercase tracking-widest font-semibold px-3.5 py-1 rounded-full shadow-sm">
-                      BESTSELLER
+                      SIGNATURE
                     </span>
                   </div>
 

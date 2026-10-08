@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       category: body.category || "Rings",
       price: Number(body.price) || 0,
       originalPrice: Number(body.originalPrice) || Number(body.price) || 0,
-      images: body.images && body.images.length > 0 ? body.images : [body.primaryImage || "/images/products/rings/ring_placeholder.jpg"],
+      images: body.images && body.images.length > 0 ? body.images : (body.videoUrl ? [] : [body.primaryImage || "/images/products/rings/ring_placeholder.jpg"]),
       primaryImage: body.primaryImage,
       hoverImage: body.hoverImage,
       galleryImages: body.galleryImages,
@@ -57,6 +57,7 @@ export async function POST(req: Request) {
       isVerifiedReviews: Boolean(body.isVerifiedReviews),
       isDealOfTheDay: Boolean(body.isDealOfTheDay),
       isShopByOccasion: Boolean(body.isShopByOccasion),
+      isCuratedHeritage: Boolean(body.isCuratedHeritage),
       stock: body.stock ?? 10,
       description: body.description || `${body.name} - Handcrafted fine jewellery creation by SUJATA Fine Jewels.`,
     };

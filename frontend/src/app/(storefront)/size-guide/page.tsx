@@ -1,8 +1,22 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+
 export default function SizeGuidePage() {
+  const router = useRouter();
+
   return (
     <div className="bg-ivory text-charcoal min-h-screen pt-32 pb-24 px-4 sm:px-8">
-      <div className="max-w-3xl mx-auto bg-white p-8 md:p-16 shadow-xs border border-charcoal/5">
-        <h1 className="font-serif text-4xl text-charcoal mb-4 text-center">Ring Size Guide</h1>
+      <div className="max-w-3xl mx-auto bg-white p-8 md:p-16 shadow-xs border border-charcoal/5 relative">
+        <button 
+          onClick={() => router.back()}
+          className="absolute top-8 left-8 flex items-center space-x-2 text-charcoal/60 hover:text-charcoal transition-colors text-sm font-medium tracking-wide"
+        >
+          <ArrowLeft size={16} />
+          <span>BACK</span>
+        </button>
+        <h1 className="font-serif text-4xl text-charcoal mb-4 text-center mt-6 md:mt-0">Ring Size Guide</h1>
         <p className="text-center text-charcoal/60 mb-12 text-sm max-w-md mx-auto leading-relaxed">
           Use our international ring size conversion chart to find your perfect fit.
         </p>

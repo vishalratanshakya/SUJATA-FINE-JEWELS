@@ -10,18 +10,24 @@ import { useStore } from "@/store/useStore";
 export function Hero() {
   const storeBanners = useStore((state) => state.heroBanners);
   const setHeroBanners = useStore((state) => state.setHeroBanners);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners`);
-        if (!res.ok) return;
+        if (!res.ok) {
+          setIsLoading(false);
+          return;
+        }
         const data = await res.json();
         if (data.success && data.data) {
           setHeroBanners(data.data);
         }
       } catch (err) {
         console.error("Failed to fetch hero banners:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchBanners();
@@ -69,12 +75,26 @@ export function Hero() {
     };
   }, [currentIndex, progress, MAIN_BANNERS.length]);
 
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[85vh] md:h-[85vh] gap-4">
+        <div className="w-full md:w-[60%] h-[60vh] md:h-full bg-gray-200/50 animate-pulse rounded-3xl" />
+        <div className="w-full md:w-[40%] h-[50vh] md:h-full grid grid-cols-2 grid-rows-2 gap-4">
+          <div className="bg-gray-200/50 animate-pulse rounded-3xl" />
+          <div className="bg-gray-200/50 animate-pulse rounded-3xl" />
+          <div className="bg-gray-200/50 animate-pulse rounded-3xl" />
+          <div className="bg-gray-200/50 animate-pulse rounded-3xl" />
+        </div>
+      </div>
+    );
+  }
+
   if (MAIN_BANNERS.length === 0 && HERO_CARDS.length === 0) {
     return null;
   }
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[100dvh] md:h-screen gap-4">
+    <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[85vh] md:h-[85vh] gap-4">
       {/* ── LEFT SIDE: MAIN HERO BANNER CAROUSEL ── */}
       <div className={`relative w-full md:w-[60%] h-[60vh] md:h-full bg-charcoal overflow-hidden rounded-3xl shadow-sm`}>
         {MAIN_BANNERS.length > 0 ? (

@@ -36,7 +36,7 @@ export function BehindTheCraftSection() {
   if (loading) return null;
   if (!story && legacyCraftProducts.length === 0) return null;
 
-  const defaultVideoUrl = story?.videoUrl || legacyCraftProducts[0]?.videoUrl;
+  const defaultVideoUrl = story?.videoUrl;
   const defaultThumbnailUrl = story?.thumbnailUrl || legacyCraftProducts[0]?.primaryImage || "https://images.unsplash.com/photo-1589128777085-f852e7284483?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80";
   
   const title = story?.title || "The Art of High Jewelry";
@@ -70,14 +70,14 @@ export function BehindTheCraftSection() {
                 <iframe
                   src={`${defaultVideoUrl}${defaultVideoUrl.includes('?') ? '&' : '?'}autoplay=1&mute=1&loop=1&playlist=${defaultVideoUrl.split('/').pop()?.split('?')[0] || ''}`}
                   title={title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
               ) : (
                 <video
                   src={defaultVideoUrl}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   autoPlay
                   muted
                   loop

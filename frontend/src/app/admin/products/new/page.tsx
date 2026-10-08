@@ -52,11 +52,12 @@ export default function NewProductPage() {
     isVerifiedReviews: false,
     isDealOfTheDay: false,
     isShopByOccasion: false,
+    isCuratedHeritage: false,
     selectedOccasions: [] as string[],
     productDetails: "",
     diamondInfo: "",
-    shippingReturns: "",
-    careInstructions: "",
+    shippingReturns: "Complimentary fully-insured shipping across India. Orders are typically dispatched within 3-5 business days. Enjoy a seamless 15-day return and exchange policy for unworn items in their original condition and packaging. Custom or engraved pieces are final sale.",
+    careInstructions: "To maintain the brilliance of your jewelry, gently clean with a soft, lint-free cloth. Avoid exposure to harsh chemicals, perfumes, and cosmetics. Store in the provided Sujata Fine Jewels pouch or box when not in use.",
     customCategory: "",
   });
 
@@ -149,21 +150,18 @@ export default function NewProductPage() {
       toast.error("Please enter a Custom Category Name");
       return;
     }
+    if (Number(formData.price) <= 0 || !formData.price) {
+      toast.error("Please enter a valid Selling Price");
+      return;
+    }
 
-    const categoryPlaceholder = formData.category.toLowerCase() === 'necklaces'
-      ? '/images/products/necklaces/necklace_placeholder.jpg'
-      : formData.category.toLowerCase() === 'earrings'
-        ? '/images/products/earrings/earrings_placeholder.jpg'
-        : formData.category.toLowerCase() === 'bracelets'
-          ? '/images/products/bracelets/bracelet_placeholder.jpg'
-          : formData.category.toLowerCase() === 'bangles'
-            ? '/images/products/bangles/bangle_placeholder.jpg'
-            : formData.category.toLowerCase() === 'pendants'
-              ? '/images/products/pendants/pendant_placeholder.jpg'
-              : '/images/products/rings/ring_placeholder.jpg';
+    if (!primaryImage && !videoUrl) {
+      toast.error("Please upload either a Primary Image or a Product Video");
+      return;
+    }
 
-    const finalPrimaryImage = primaryImage || categoryPlaceholder;
-    const finalHoverImage = hoverImage || categoryPlaceholder;
+    const finalPrimaryImage = primaryImage || "";
+    const finalHoverImage = hoverImage || "";
 
     const id = `prod-${Date.now()}`;
     const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -214,6 +212,7 @@ export default function NewProductPage() {
       isVerifiedReviews: formData.isVerifiedReviews,
       isDealOfTheDay: formData.isDealOfTheDay,
       isShopByOccasion: formData.isShopByOccasion,
+      isCuratedHeritage: formData.isCuratedHeritage,
       occasions: formData.selectedOccasions,
       availableSizes: finalAvailableSizes,
       sizeStock: finalSizeStock,
@@ -932,7 +931,7 @@ export default function NewProductPage() {
                   onChange={(e) => setFormData({ ...formData, isSignatureCarousel: e.target.checked })}
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
-                <span className="text-xs font-medium text-gray-800">Feature in Signature 3D Carousel</span>
+                <span className="text-xs font-medium text-gray-800">Feature in Signature Pieces (Timeless Brilliance)</span>
               </label>
 
               <label className="flex items-center space-x-2.5 cursor-pointer mt-4 border-t border-gray-100 pt-3">
@@ -993,6 +992,16 @@ export default function NewProductPage() {
                   className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
                 />
                 <span className="text-xs font-medium text-gray-800">Shop by Occasion</span>
+              </label>
+
+              <label className="flex items-center space-x-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isCuratedHeritage}
+                  onChange={(e) => setFormData({ ...formData, isCuratedHeritage: e.target.checked })}
+                  className="rounded border-gray-300 text-charcoal focus:ring-charcoal h-4 w-4"
+                />
+                <span className="text-xs font-medium text-gray-800">Curated Heritage Suites</span>
               </label>
             </div>
           </div>

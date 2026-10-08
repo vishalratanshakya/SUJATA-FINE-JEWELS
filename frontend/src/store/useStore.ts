@@ -56,6 +56,8 @@ export type Product = {
   isVerifiedReviews?: boolean;
   isDealOfTheDay?: boolean;
   isShopByOccasion?: boolean;
+  isCuratedHeritage?: boolean;
+  purity?: string;
   inStock?: boolean;
   stock?: number;
   occasions?: string[];

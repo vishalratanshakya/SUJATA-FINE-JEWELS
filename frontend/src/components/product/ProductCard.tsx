@@ -141,18 +141,50 @@ export function ProductCard({ product }: { product: Product }) {
           <Heart size={18} strokeWidth={1.5} className={mounted && isInWishlist ? "fill-rose-600 text-rose-600" : ""} fill={mounted && isInWishlist ? "currentColor" : "none"} />
         </button>
 
-        {/* Product Link Image */}
+        {/* Product Link Image or Video */}
         <Link href={`/product/${product.slug}`} className="block w-full h-full relative">
-          <Image
-            src={product.primaryImage || product.images[0] || "/images/products/rings/ring_placeholder.jpg"}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          />
-          {(product.hoverImage || product.images[1]) && (
+          {(() => {
+            const img1 = product.primaryImage;
+            const img2 = product.images?.[0];
+            
+            const isValidUrl = (url: string | undefined) => url && (url.startsWith('http') || url.startsWith('/') || url.startsWith('data:')) && !url.includes('_placeholder.jpg');
+            const validImg1 = isValidUrl(img1);
+            const validImg2 = isValidUrl(img2);
+            
+            if (!validImg1 && !validImg2 && product.videoUrl) {
+              return (
+                <video
+                  src={product.videoUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+              );
+            }
+
+            return (
+              <Image
+                src={validImg1 ? (img1 as string) : (validImg2 ? (img2 as string) : "/images/products/rings/ring_placeholder.jpg")}
+                alt={product.name}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+            );
+          })()}
+          
+          {(product.hoverImage || product.images?.[1]) && (
             <Image
-              src={product.hoverImage || product.images[1]}
+              src={(() => {
+                const img1 = product.hoverImage;
+                const img2 = product.images?.[1];
+                const isValidUrl = (url: string | undefined) => url && (url.startsWith('http') || url.startsWith('/') || url.startsWith('data:')) && !url.includes('_placeholder.jpg');
+                if (isValidUrl(img1)) return img1 as string;
+                if (isValidUrl(img2)) return img2 as string;
+                return "/images/products/rings/ring_placeholder.jpg";
+              })()}
               alt={`${product.name} hover view`}
               fill
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"

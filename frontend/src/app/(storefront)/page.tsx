@@ -7,6 +7,7 @@ import { Bestsellers } from "@/components/home/Bestsellers";
 
 import { ExploreCollection } from "@/components/home/ExploreCollection";
 import { BridalCollectionSection } from "@/components/home/BridalCollectionSection";
+import { CuratedHeritageSection } from "@/components/home/CuratedHeritageSection";
 import { GiftingStudioSection } from "@/components/home/GiftingStudioSection";
 import { BehindTheCraftSection } from "@/components/home/BehindTheCraftSection";
 import { CustomerReviewsSection } from "@/components/home/CustomerReviewsSection";
@@ -22,6 +23,7 @@ export default function Home() {
       <ExploreCollection />
       <ShopByOccasionSection />
       <BridalCollectionSection />
+      <CuratedHeritageSection />
       <SignatureProductCarousel />
       <DealOfTheDay />
       <GiftingStudioSection />

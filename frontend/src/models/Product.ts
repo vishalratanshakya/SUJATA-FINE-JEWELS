@@ -31,6 +31,7 @@ export interface IProductDoc extends Document {
   isVerifiedReviews?: boolean;
   isDealOfTheDay?: boolean;
   isShopByOccasion?: boolean;
+  isCuratedHeritage?: boolean;
   stock: number;
   availableSizes?: string[];
   sizeStock?: Record<string, number>;
@@ -78,6 +79,7 @@ const ProductSchema = new Schema<IProductDoc>(
     isVerifiedReviews: { type: Boolean, default: false },
     isDealOfTheDay: { type: Boolean, default: false },
     isShopByOccasion: { type: Boolean, default: false },
+    isCuratedHeritage: { type: Boolean, default: false },
     stock: { type: Number, default: 10 },
     availableSizes: [{ type: String }],
     sizeStock: { type: Map, of: Number },
@@ -94,5 +96,5 @@ const ProductSchema = new Schema<IProductDoc>(
   { timestamps: true }
 );
 
-export const ProductModel =
-  mongoose.models.Product || mongoose.model<IProductDoc>("Product", ProductSchema);
+delete mongoose.models.Product;
+export const ProductModel = mongoose.model<IProductDoc>("Product", ProductSchema);
