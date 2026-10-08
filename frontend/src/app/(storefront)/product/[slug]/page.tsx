@@ -22,6 +22,10 @@ import {
   ChevronRight,
   Sparkles,
   ShoppingBag,
+  History,
+  Gem,
+  Trash2,
+  ArrowRight
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -34,9 +38,18 @@ export default function ProductPage() {
   const addToCart = useStore((s) => s.addToCart);
   const toggleWishlist = useStore((s) => s.toggleWishlist);
   const wishlist = useStore((s) => s.wishlist);
+  const addToRecentlyViewed = useStore((s) => s.addToRecentlyViewed);
+  const recentlyViewed = useStore((s) => s.recentlyViewed);
+  const clearRecentlyViewed = useStore((s) => s.clearRecentlyViewed);
 
   // Find product dynamically
   const product = products.find((p) => p.slug === slug) || products[0];
+
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed(product);
+    }
+  }, [product?.id]); // Only trigger when product ID changes
 
   const isWishlisted = product ? wishlist.some((p) => p.id === product.id) : false;
 
@@ -199,8 +212,14 @@ export default function ProductPage() {
     router.push("/checkout");
   };
 
-  // Related products (4 items for 4-column layout)
-  const relatedProducts = products.filter((p) => p.id !== product.id).slice(0, 4);
+  // Related products and Recently viewed
+  let similarProducts = products.filter((p) => p.category === product?.category && p.id !== product?.id);
+  if (similarProducts.length === 0) {
+    similarProducts = products.filter((p) => p.id !== product?.id);
+  }
+  similarProducts = similarProducts.slice(0, 4);
+  
+  const historyProducts = recentlyViewed.filter((p) => p.id !== product?.id).slice(0, 4);
 
   return (
     <div className="bg-[#FAF8F5] pt-28 pb-24 min-h-screen">
@@ -315,36 +334,7 @@ export default function ProductPage() {
               {product.description || `Exquisite and timeless, the ${product.name} is meticulously handcrafted to celebrate your most precious moments. Features exceptional brilliance, clarity, and certified craftsmanship.`}
             </p>
 
-            {/* Metal Color Selector */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-xs tracking-widest uppercase font-semibold text-[#2C2825]">Metal Color</span>
-                <span className="text-xs text-[#8C8275] capitalize">{metalColor} Gold</span>
-              </div>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => setMetalColor("gold")}
-                  aria-label="Yellow Gold"
-                  className={`w-9 h-9 rounded-full bg-[#FFD700] border border-black/10 ring-2 ring-offset-2 transition-all ${
-                    metalColor === "gold" ? "ring-[#2C2825] scale-110" : "ring-transparent opacity-70"
-                  }`}
-                />
-                <button
-                  onClick={() => setMetalColor("rose")}
-                  aria-label="Rose Gold"
-                  className={`w-9 h-9 rounded-full bg-[#B76E79] border border-black/10 ring-2 ring-offset-2 transition-all ${
-                    metalColor === "rose" ? "ring-[#2C2825] scale-110" : "ring-transparent opacity-70"
-                  }`}
-                />
-                <button
-                  onClick={() => setMetalColor("white")}
-                  aria-label="White Gold"
-                  className={`w-9 h-9 rounded-full bg-[#E5E4E2] border border-black/10 ring-2 ring-offset-2 transition-all ${
-                    metalColor === "white" ? "ring-[#2C2825] scale-110" : "ring-transparent opacity-70"
-                  }`}
-                />
-              </div>
-            </div>
+            {/* Metal Color Selector Removed as per user request */}
 
             {/* Dynamic Category Specifications Selector */}
             {/* 1. RINGS & BANGLES & BRACELETS (SIZES) */}
@@ -706,27 +696,99 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* ── FULL-WIDTH "YOU MAY ALSO LIKE" SECTION ── */}
-        <div className="mt-20 pt-16 border-t border-[#EAE4D9]">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="font-serif text-2xl md:text-4xl text-[#2C2825] font-medium tracking-tight">
-              YOU MAY ALSO LIKE
-            </h2>
-            <Link
-              href="/shop"
-              className="text-xs font-semibold tracking-[0.2em] uppercase text-[#2C2825] hover:text-[#B38E5D] transition-colors border-b border-[#2C2825] pb-1"
-            >
-              VIEW ALL —
-            </Link>
-          </div>
+        {/* ── SIMILAR FINE DESIGNS SECTION ── */}
+        {similarProducts.length > 0 && (
+          <div className="mt-20 pt-16 border-t border-[#EAE4D9]">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-1">
+                  <Gem size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-3 mb-1">
+                    <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-semibold">
+                      Similar Fine Designs
+                    </h2>
+                    <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Matching
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">Explore comparable artisan creations with matching gemstone and gold purity</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <Link
+                  href={`/catalogue?category=${product.category}`}
+                  className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center"
+                >
+                  Explore Collection <ArrowRight size={16} className="ml-1" />
+                </Link>
+                <div className="hidden md:flex space-x-2">
+                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
 
-          {/* Desktop: Exactly 4 products layout */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((prod) => (
-              <ProductCard key={prod.id} product={prod} />
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarProducts.map((prod) => (
+                <ProductCard key={prod.id} product={prod} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* ── RECENTLY VIEWED PIECES SECTION ── */}
+        {historyProducts.length > 0 && (
+          <div className="mt-16 pt-16 border-t border-[#EAE4D9]">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 mt-1">
+                  <History size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-3 mb-1">
+                    <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-semibold">
+                      Recently Viewed Pieces
+                    </h2>
+                    <span className="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      History
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">Designs you have recently explored in your current shopping journey</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={clearRecentlyViewed}
+                  className="text-sm font-semibold text-gray-500 hover:text-rose-600 transition-colors flex items-center"
+                >
+                  <Trash2 size={16} className="mr-1" /> Clear
+                </button>
+                <div className="hidden md:flex space-x-2">
+                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {historyProducts.map((prod) => (
+                <ProductCard key={prod.id} product={prod} />
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
 

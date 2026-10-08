@@ -52,6 +52,10 @@ aside {
   100% { transform: translateX(-50%); }
 }
 
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

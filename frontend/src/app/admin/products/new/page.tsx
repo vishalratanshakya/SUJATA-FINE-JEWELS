@@ -421,7 +421,7 @@ export default function NewProductPage() {
 
           {/* Dynamic Category Specifications Card */}
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 space-y-6">
-            <div className="border-b border-gray-100 pb-3 flex justify-between items-center">
+            <div className="border-b border-gray-100 pb-3 flex flex-col-reverse md:flex-row justify-between md:items-center items-start gap-3">
               <div>
                 <h2 className="text-base font-semibold text-gray-900">
                   {formData.category === "Other" ? (formData.customCategory || "Custom Category") : formData.category} Category Specifications

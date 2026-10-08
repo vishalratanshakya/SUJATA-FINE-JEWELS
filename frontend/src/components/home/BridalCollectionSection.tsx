@@ -4,15 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useStore } from "@/store/useStore";
-import { ProductCard } from "@/components/product/ProductCard";
+import { Play } from "lucide-react";
 
 export function BridalCollectionSection() {
   const allProducts = useStore((s) => s.products);
   const bridalProducts = allProducts.filter(p => p.isBridalWedding);
 
   if (bridalProducts.length === 0) {
-    return null; // Hide section if no bridal products
+    return null; 
   }
+
+  const p1 = bridalProducts[0];
+  const p2 = bridalProducts[1];
+  const p3 = bridalProducts[2];
+  const p4 = bridalProducts[3];
+  const p5 = bridalProducts[4];
 
   return (
     <section className="py-8 md:py-12 bg-white overflow-hidden">
@@ -32,54 +38,138 @@ export function BridalCollectionSection() {
           </p>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           
-          {/* Static Banner / Cover */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-full lg:w-1/2 flex"
-          >
-            <div className="relative w-full h-full rounded-2xl overflow-hidden group min-h-[350px]">
-              <Image 
-                src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" 
-                alt="Bridal Collection" 
-                fill 
-                className="object-cover group-hover:scale-105 transition-transform duration-700" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8 md:p-12">
-                <h3 className="font-serif text-3xl md:text-4xl text-white mb-3">The Bridal Suite</h3>
-                <p className="text-white/80 text-sm md:text-base line-clamp-3 mb-6">
-                  Discover our exclusive range of timeless bridal jewelry designed to make your special day unforgettable.
-                </p>
-                <Link href={`/catalogue?category=Bridal`} className="inline-block bg-white text-charcoal px-6 py-3 text-xs font-semibold tracking-widest uppercase text-center hover:bg-champagne hover:text-white transition-colors self-start">
-                  Explore Collection
-                </Link>
+          {/* Left: Large Vertical Card */}
+          {p1 && (
+            <Link href={`/product/${p1.slug}`} className="relative group block w-full h-[400px] lg:h-[600px] rounded-xl overflow-hidden cursor-pointer">
+              {p1.videoUrl ? (
+                <video src={p1.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              ) : (
+                <Image src={p1.primaryImage || ""} alt={p1.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              
+              {/* Badges */}
+              <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                <span className="px-3 py-1 bg-white text-charcoal text-[10px] font-bold tracking-widest uppercase rounded-full">
+                  Special Offer
+                </span>
+                {p1.videoUrl && (
+                  <span className="px-2 py-1 bg-black/80 backdrop-blur-md text-amber-400 text-[10px] font-bold tracking-widest uppercase rounded flex items-center space-x-1 border border-amber-400/30">
+                    <Play size={10} className="fill-amber-400" />
+                    <span>Video</span>
+                  </span>
+                )}
               </div>
-            </div>
-          </motion.div>
 
-          {/* Bridal Products - Shop the Look */}
-          <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="w-full lg:w-1/2 flex flex-col justify-center"
-          >
-            <div className="w-full pl-0 lg:pl-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
-              {bridalProducts.slice(0, 6).map((product: any, pIdx: number) => (
-                <div key={`${product.id}-${pIdx}`}>
-                  <ProductCard product={product} />
+              <div className="absolute bottom-6 left-6 right-6">
+                <span className="text-amber-400 text-[10px] font-bold tracking-widest uppercase mb-1 block">
+                  Heritage Bridal
+                </span>
+                <h3 className="font-serif text-3xl text-white mb-2 leading-tight">
+                  {p1.name}
+                </h3>
+              </div>
+            </Link>
+          )}
+
+          {/* Right: 2x2 Grid */}
+          <div className="grid grid-cols-2 grid-rows-2 gap-4 h-full">
+            
+            {p2 && (
+              <Link href={`/product/${p2.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
+                {p2.videoUrl ? (
+                  <video src={p2.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                ) : (
+                  <Image src={p2.primaryImage || ""} alt={p2.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute top-3 left-3">
+                  <span className="px-2 py-1 bg-[#8B7355] text-white text-[9px] font-bold tracking-widest uppercase rounded">
+                    Limited Edition
+                  </span>
                 </div>
-              ))}
-            </div>
-            </div>
-          </motion.div>
 
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="font-serif text-lg text-white mb-1 leading-tight truncate">
+                    {p2.name}
+                  </h3>
+                </div>
+              </Link>
+            )}
+
+            {p3 && (
+              <Link href={`/product/${p3.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
+                {p3.videoUrl ? (
+                  <video src={p3.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                ) : (
+                  <Image src={p3.primaryImage || ""} alt={p3.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute top-3 left-3">
+                  <span className="px-2 py-1 bg-[#8B7355] text-white text-[9px] font-bold tracking-widest uppercase rounded">
+                    Trending Heirloom
+                  </span>
+                </div>
+
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="font-serif text-lg text-white mb-1 leading-tight truncate">
+                    {p3.name}
+                  </h3>
+                </div>
+              </Link>
+            )}
+
+            {p4 && (
+              <Link href={`/product/${p4.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
+                {p4.videoUrl ? (
+                  <video src={p4.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                ) : (
+                  <Image src={p4.primaryImage || ""} alt={p4.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute top-3 left-3">
+                  <span className="px-2 py-1 bg-black/60 text-[#D4AF37] text-[9px] font-bold tracking-widest uppercase rounded">
+                    -50%
+                  </span>
+                </div>
+
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="font-serif text-lg text-white mb-1 leading-tight truncate">
+                    {p4.name}
+                  </h3>
+                </div>
+              </Link>
+            )}
+
+            {p5 && (
+              <Link href={`/product/${p5.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
+                {p5.videoUrl ? (
+                  <video src={p5.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                ) : (
+                  <Image src={p5.primaryImage || ""} alt={p5.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                
+                <div className="absolute top-3 left-3">
+                  <span className="px-2 py-1 bg-[#8B7355] text-white text-[9px] font-bold tracking-widest uppercase rounded">
+                    Solitaire
+                  </span>
+                </div>
+
+                <div className="absolute bottom-4 left-4 right-4">
+                  <h3 className="font-serif text-lg text-white mb-1 leading-tight truncate">
+                    {p5.name}
+                  </h3>
+                </div>
+              </Link>
+            )}
+
+          </div>
         </div>
       </div>
     </section>

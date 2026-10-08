@@ -586,6 +586,7 @@ interface StoreState {
 
   // Recently Viewed State
   recentlyViewed: Product[];
+  addToRecentlyViewed: (product: Product) => void;
   removeFromRecentlyViewed: (productId: string) => void;
   clearRecentlyViewed: () => void;
 }
@@ -1036,6 +1037,14 @@ export const useStore = create<StoreState>()(
       // --- Recently Viewed ---
       recentlyViewed: [],
 
+      addToRecentlyViewed: (product) => {
+        set((state) => {
+          const filtered = state.recentlyViewed.filter((p) => p.id !== product.id);
+          // Keep max 10 recently viewed
+          return { recentlyViewed: [product, ...filtered].slice(0, 10) };
+        });
+      },
+
       removeFromRecentlyViewed: (productId) => {
         set((state) => ({
           recentlyViewed: state.recentlyViewed.filter((p) => p.id !== productId),
@@ -1092,6 +1101,7 @@ export const useStore = create<StoreState>()(
                   product: sanitizeProduct(item.product)
                 })),
                 wishlist: (value?.state?.wishlist || []).map(sanitizeProduct),
+                recentlyViewed: (value?.state?.recentlyViewed || []).map(sanitizeProduct),
                 heroBanners: (value?.state?.heroBanners || []).map(sanitizeHeroBanner),
               },
             };

@@ -249,46 +249,43 @@ export function SignatureProductCarousel() {
           )}
         </div>
 
-        {/* Feature Badges Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-16 mt-12 border-t border-[#E8E2D5]/80 text-center">
-          <div className="flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">
-              💎
-            </div>
-            <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">
-              CERTIFIED DIAMONDS
-            </h4>
-            <p className="text-[11px] text-[#8C8275] mt-0.5">100% Authentic</p>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">
-              ✨
-            </div>
-            <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">
-              EXPERT CRAFTSMANSHIP
-            </h4>
-            <p className="text-[11px] text-[#8C8275] mt-0.5">Handcrafted to perfection</p>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">
-              🛡️
-            </div>
-            <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">
-              LIFETIME WARRANTY
-            </h4>
-            <p className="text-[11px] text-[#8C8275] mt-0.5">For your peace of mind</p>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">
-              📦
-            </div>
-            <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">
-              SECURE DELIVERY
-            </h4>
-            <p className="text-[11px] text-[#8C8275] mt-0.5">Insured & discreet</p>
+        {/* Feature Badges Grid (Marquee Loop) */}
+        <div className="pt-16 mt-12 border-t border-[#E8E2D5]/80 overflow-hidden relative w-full">
+          {/* Gradient masks for smooth edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-r from-[#FAF8F5] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-16 md:w-32 bg-gradient-to-l from-[#FAF8F5] to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex w-max animate-marquee items-center" style={{ animationDuration: '40s' }}>
+            {/* We create 2 identical halves to allow seamless infinite loop with translateX(-50%) */}
+            {[...Array(2)].map((_, halfIdx) => (
+              <div key={halfIdx} className="flex shrink-0">
+                {/* 4 sets of badges inside each half ensures we fill up ultra-wide screens */}
+                {[...Array(4)].map((_, setIdx) => (
+                  <div key={setIdx} className="flex shrink-0 gap-8 md:gap-16 px-4 md:px-8">
+                    <div className="flex flex-col items-center min-w-[200px] shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">💎</div>
+                      <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">CERTIFIED DIAMONDS</h4>
+                      <p className="text-[11px] text-[#8C8275] mt-0.5">100% Authentic</p>
+                    </div>
+                    <div className="flex flex-col items-center min-w-[200px] shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">✨</div>
+                      <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">EXPERT CRAFTSMANSHIP</h4>
+                      <p className="text-[11px] text-[#8C8275] mt-0.5">Handcrafted to perfection</p>
+                    </div>
+                    <div className="flex flex-col items-center min-w-[200px] shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">🛡️</div>
+                      <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">LIFETIME WARRANTY</h4>
+                      <p className="text-[11px] text-[#8C8275] mt-0.5">For your peace of mind</p>
+                    </div>
+                    <div className="flex flex-col items-center min-w-[200px] shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-white border border-[#E0D7C8] flex items-center justify-center mb-3 text-[#A38350] shadow-sm">📦</div>
+                      <h4 className="font-serif text-xs md:text-sm font-medium text-[#2C2825] uppercase tracking-wider">SECURE DELIVERY</h4>
+                      <p className="text-[11px] text-[#8C8275] mt-0.5">Insured & discreet</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
