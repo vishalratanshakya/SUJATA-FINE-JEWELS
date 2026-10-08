@@ -1,9 +1,11 @@
 "use client";
 
-import { useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "800531354256-akj14ieujb2ddl52bqmjd5ftaqicp7d1.apps.googleusercontent.com";
 
 interface GoogleLoginButtonProps {
   buttonText?: string;
@@ -11,7 +13,7 @@ interface GoogleLoginButtonProps {
   onSuccessRedirect?: string;
 }
 
-export function GoogleLoginButton({
+function GoogleLoginButtonInner({
   buttonText = "Continue with Google",
   className = "w-full bg-white border border-[#E2DDD3] hover:border-[#2C2825] text-[#2C2825] text-xs font-medium py-3 rounded-xl transition-all duration-300 flex items-center justify-center space-x-3 shadow-xs cursor-pointer",
   onSuccessRedirect = "/account",
@@ -79,5 +81,13 @@ export function GoogleLoginButton({
       </svg>
       <span>{buttonText}</span>
     </button>
+  );
+}
+
+export function GoogleLoginButton(props: GoogleLoginButtonProps) {
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <GoogleLoginButtonInner {...props} />
+    </GoogleOAuthProvider>
   );
 }

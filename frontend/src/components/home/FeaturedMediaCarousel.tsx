@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import { useStore } from "@/store/useStore";
+import { LazyVideo } from "@/components/ui/LazyVideo";
 
 export function FeaturedMediaCarousel() {
   const items = useStore((s) => s.featuredMediaItems).filter(i => i.active);
@@ -63,8 +64,9 @@ export function FeaturedMediaCarousel() {
             >
               <div className="relative aspect-[4/5] bg-[#EAE4D9] overflow-hidden">
                 {item.videoUrl ? (
-                  <video
+                  <LazyVideo
                     src={item.videoUrl}
+                    poster={item.image}
                     autoPlay
                     loop
                     muted

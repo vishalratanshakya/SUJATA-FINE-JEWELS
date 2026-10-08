@@ -2,17 +2,62 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { useStore } from "@/store/useStore";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+import { useRef } from "react";
 import { Play, ArrowRight } from "lucide-react";
+import { LazyVideo } from "@/components/ui/LazyVideo";
 
 export function BridalCollectionSection() {
   const allProducts = useStore((s) => s.products);
   const bridalProducts = allProducts.filter(p => p.isBridalWedding);
 
+  gsap.registerPlugin(ScrollTrigger);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    if (!sectionRef.current) return;
+
+    // Background Image Parallax
+    gsap.utils.toArray<HTMLElement>('.parallax-bg').forEach((bg) => {
+      gsap.fromTo(bg, 
+        { yPercent: -5 },
+        {
+          yPercent: 5,
+          ease: "none",
+          scrollTrigger: {
+            trigger: bg.parentElement,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true
+          }
+        }
+      );
+    });
+
+    // Text Reveal
+    gsap.fromTo(".parallax-text",
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1, 
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+        }
+      }
+    );
+  }, { scope: sectionRef });
+
   if (bridalProducts.length === 0) {
     return null; 
   }
+
 
   const p1 = bridalProducts[0];
   const p2 = bridalProducts[1];
@@ -21,22 +66,16 @@ export function BridalCollectionSection() {
   const p5 = bridalProducts[4];
 
   return (
-    <section className="py-8 md:py-12 bg-white overflow-hidden">
+    <section ref={sectionRef} className="py-8 md:py-12 bg-white overflow-hidden">
       <div className="max-w-[1920px] mx-auto px-4 md:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 md:mb-16 space-y-4"
-        >
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-charcoal tracking-wide">
+        <div className="text-center mb-12 md:mb-16 space-y-4">
+          <h2 className="parallax-text font-serif text-3xl sm:text-4xl md:text-5xl text-charcoal tracking-wide">
             Bridal & Wedding Collection
           </h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-sm md:text-base mb-6">
+          <p className="parallax-text text-gray-500 max-w-2xl mx-auto text-sm md:text-base mb-6">
             Curated masterpieces for your perfect day. Explore collections that celebrate eternal love.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           
@@ -44,9 +83,9 @@ export function BridalCollectionSection() {
           {p1 && (
             <Link href={`/product/${p1.slug}`} className="relative group block w-full h-[400px] lg:h-[600px] rounded-xl overflow-hidden cursor-pointer">
               {p1.videoUrl ? (
-                <video src={p1.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <LazyVideo src={p1.videoUrl} poster={p1.primaryImage} autoPlay muted loop playsInline className="parallax-bg absolute inset-0 w-full h-[110%] object-cover group-hover:scale-[1.04] transition-transform duration-500" />
               ) : (
-                <Image src={p1.primaryImage || ""} alt={p1.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                <Image src={p1.primaryImage || ""} alt={p1.name} fill className="parallax-bg object-cover group-hover:scale-[1.04] transition-transform duration-500 !h-[110%] !w-full" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               
@@ -80,9 +119,9 @@ export function BridalCollectionSection() {
             {p2 && (
               <Link href={`/product/${p2.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
                 {p2.videoUrl ? (
-                  <video src={p2.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <LazyVideo src={p2.videoUrl} poster={p2.primaryImage} autoPlay muted loop playsInline className="parallax-bg absolute inset-0 w-full h-[110%] object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                 ) : (
-                  <Image src={p2.primaryImage || ""} alt={p2.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={p2.primaryImage || ""} alt={p2.name} fill className="parallax-bg object-cover group-hover:scale-[1.04] transition-transform duration-500 !h-[110%] !w-full" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 
@@ -103,9 +142,9 @@ export function BridalCollectionSection() {
             {p3 && (
               <Link href={`/product/${p3.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
                 {p3.videoUrl ? (
-                  <video src={p3.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <LazyVideo src={p3.videoUrl} poster={p3.primaryImage} autoPlay muted loop playsInline className="parallax-bg absolute inset-0 w-full h-[110%] object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                 ) : (
-                  <Image src={p3.primaryImage || ""} alt={p3.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={p3.primaryImage || ""} alt={p3.name} fill className="parallax-bg object-cover group-hover:scale-[1.04] transition-transform duration-500 !h-[110%] !w-full" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 
@@ -126,9 +165,9 @@ export function BridalCollectionSection() {
             {p4 && (
               <Link href={`/product/${p4.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
                 {p4.videoUrl ? (
-                  <video src={p4.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <LazyVideo src={p4.videoUrl} poster={p4.primaryImage} autoPlay muted loop playsInline className="parallax-bg absolute inset-0 w-full h-[110%] object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                 ) : (
-                  <Image src={p4.primaryImage || ""} alt={p4.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={p4.primaryImage || ""} alt={p4.name} fill className="parallax-bg object-cover group-hover:scale-[1.04] transition-transform duration-500 !h-[110%] !w-full" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 
@@ -149,9 +188,9 @@ export function BridalCollectionSection() {
             {p5 && (
               <Link href={`/product/${p5.slug}`} className="relative group block w-full h-[200px] lg:h-[292px] rounded-xl overflow-hidden cursor-pointer">
                 {p5.videoUrl ? (
-                  <video src={p5.videoUrl} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <LazyVideo src={p5.videoUrl} poster={p5.primaryImage} autoPlay muted loop playsInline className="parallax-bg absolute inset-0 w-full h-[110%] object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                 ) : (
-                  <Image src={p5.primaryImage || ""} alt={p5.name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <Image src={p5.primaryImage || ""} alt={p5.name} fill className="parallax-bg object-cover group-hover:scale-[1.04] transition-transform duration-500 !h-[110%] !w-full" />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 

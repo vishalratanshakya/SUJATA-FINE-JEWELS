@@ -124,7 +124,7 @@ export function ProductCard({ product }: { product: Product }) {
   }).format(product.originalPrice) : null;
 
   return (
-    <div className="group relative flex flex-col bg-[#FDFBF7] rounded-lg overflow-hidden border border-[#EAE4D9] hover:border-[#B38E5D] transition-all duration-300 shadow-sm hover:shadow-md h-full">
+    <div className="group relative flex flex-col bg-[#FDFBF7] rounded-lg overflow-hidden border border-[#EAE4D9] hover:border-[#B38E5D] hover:-translate-y-[3px] transition-all duration-500 shadow-sm hover:shadow-md h-full">
       {/* Product Image Container */}
       <div className="relative aspect-square w-full overflow-hidden bg-[#FAF8F5]">
         
@@ -165,7 +165,7 @@ export function ProductCard({ product }: { product: Product }) {
                   muted
                   loop
                   playsInline
-                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
                 />
               );
             }
@@ -176,7 +176,7 @@ export function ProductCard({ product }: { product: Product }) {
                 alt={product.name}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
               />
             );
           })()}

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { Heart, ArrowRight, Sparkles } from "lucide-react";
+import { LazyVideo } from "@/components/ui/LazyVideo";
 
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -174,8 +175,9 @@ export function CuratedHeritageSection() {
               transition={{ duration: 0.6, delay: 0.1 }}
             >
               {p1.videoUrl ? (
-                <video 
+                <LazyVideo 
                   src={p1.videoUrl} 
+                  poster={p1.primaryImage}
                   autoPlay 
                   muted 
                   loop 
@@ -239,8 +241,9 @@ export function CuratedHeritageSection() {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 {p2.videoUrl ? (
-                  <video 
+                  <LazyVideo 
                     src={p2.videoUrl} 
+                    poster={p2.primaryImage}
                     autoPlay 
                     muted 
                     loop 
@@ -295,8 +298,9 @@ export function CuratedHeritageSection() {
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
                 {p3.videoUrl ? (
-                  <video 
+                  <LazyVideo 
                     src={p3.videoUrl} 
+                    poster={p3.primaryImage}
                     autoPlay 
                     muted 
                     loop 
@@ -343,8 +347,9 @@ export function CuratedHeritageSection() {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 {p4.videoUrl ? (
-                  <video 
+                  <LazyVideo 
                     src={p4.videoUrl} 
+                    poster={p4.primaryImage}
                     autoPlay 
                     muted 
                     loop 
@@ -392,8 +397,9 @@ export function CuratedHeritageSection() {
               transition={{ duration: 0.6, delay: 0.5 }}
             >
               {p5.videoUrl ? (
-                <video 
+                <LazyVideo 
                   src={p5.videoUrl} 
+                  poster={p5.primaryImage}
                   autoPlay 
                   muted 
                   loop 

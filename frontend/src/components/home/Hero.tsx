@@ -3,14 +3,17 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useStore } from "@/store/useStore";
 
-export function Hero() {
+export function Hero({ initialBanners = [] }: { initialBanners?: any[] }) {
   const storeBanners = useStore((state) => state.heroBanners);
   const setHeroBanners = useStore((state) => state.setHeroBanners);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(initialBanners.length === 0);
+
+  // Use initialBanners if store is empty
+  const activeBanners = storeBanners.length > 0 ? storeBanners : initialBanners;
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -21,7 +24,7 @@ export function Hero() {
           return;
         }
         const data = await res.json();
-        if (data.success && data.data) {
+        if (data.success && data.data && data.data.length > 0) {
           setHeroBanners(data.data);
         }
       } catch (err) {
@@ -33,8 +36,8 @@ export function Hero() {
     fetchBanners();
   }, [setHeroBanners]);
 
-  const MAIN_BANNERS = storeBanners.filter((b) => b.active && (b.displayType === 'MAIN_BANNER' || !b.displayType)).slice(0, 3);
-  const HERO_CARDS = storeBanners.filter((b) => b.active && b.displayType === 'HERO_CARD').slice(0, 4);
+  const MAIN_BANNERS = activeBanners.filter((b: any) => b.active && (b.displayType === 'MAIN_BANNER' || !b.displayType)).slice(0, 3);
+  const HERO_CARDS = activeBanners.filter((b: any) => b.active && b.displayType === 'HERO_CARD').slice(0, 4);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -77,8 +80,8 @@ export function Hero() {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[85vh] md:h-[85vh] gap-4">
-        <div className="w-full md:w-[60%] h-[60vh] md:h-full bg-gray-200/50 animate-pulse rounded-3xl" />
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-24 md:pt-32 pb-8 flex flex-col md:flex-row min-h-[75vh] md:h-[85vh] gap-4">
+        <div className="w-full md:w-[60%] h-[45vh] md:h-full bg-gray-200/50 animate-pulse rounded-3xl" />
         <div className="w-full md:w-[40%] h-[50vh] md:h-full grid grid-cols-2 grid-rows-2 gap-4">
           <div className="bg-gray-200/50 animate-pulse rounded-3xl" />
           <div className="bg-gray-200/50 animate-pulse rounded-3xl" />
@@ -99,73 +102,62 @@ export function Hero() {
       <div className={`relative w-full md:w-[60%] h-[45vh] md:h-full bg-charcoal overflow-hidden rounded-3xl shadow-sm`}>
         {MAIN_BANNERS.length > 0 ? (
           <>
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, scale: 1.05 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="absolute inset-0"
+            {MAIN_BANNERS.map((banner: any, idx: number) => (
+              <div
+                key={banner.id}
+                className={`absolute inset-0 transition-all ease-out ${currentIndex === idx ? "opacity-100 scale-[1.04] duration-[4000ms] z-10" : "opacity-0 scale-100 duration-1000 z-0"}`}
               >
-                {MAIN_BANNERS[currentIndex].image && (
+                {banner.image && (
                   <Image
-                    src={MAIN_BANNERS[currentIndex].image}
-                    alt={MAIN_BANNERS[currentIndex].heading}
+                    src={banner.image}
+                    alt={banner.heading}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
-                    priority
+                    priority={idx === 0}
+                    fetchPriority={idx === 0 ? "high" : "auto"}
                   />
                 )}
                 {/* Subtle gradient overlay to ensure text readability */}
                 <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-black/40 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/50 md:to-transparent" />
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            ))}
 
             <div className="relative h-full flex items-end md:items-center md:absolute md:inset-0 z-10 md:bg-transparent">
               <div className="px-4 md:px-12 w-full pb-6 pt-10 md:py-12 md:pt-20">
                 <div className="max-w-xl text-ivory">
-                  <AnimatePresence mode="wait">
-                    <motion.div
+                    <div
                       key={`text-${currentIndex}`}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ duration: 0.6, staggerChildren: 0.2 }}
-                      className="flex flex-col items-start"
+                      className="flex flex-col items-start animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out"
                     >
                       {MAIN_BANNERS[currentIndex].eyebrow && (
-                        <motion.span 
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} 
-                          className="text-[10px] md:text-xs tracking-[0.3em] uppercase mb-4 text-champagne"
+                        <span 
+                          className="text-[10px] md:text-xs tracking-[0.3em] uppercase mb-4 text-champagne animate-in fade-in duration-700"
                         >
                           {MAIN_BANNERS[currentIndex].eyebrow}
-                        </motion.span>
+                        </span>
                       )}
                       
-                      <motion.h1 
-                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                        className="font-serif text-4xl md:text-5xl lg:text-5xl leading-[1.15] mb-4 md:mb-6 font-light"
+                      <h1 
+                        className="font-serif text-4xl md:text-5xl lg:text-5xl leading-[1.15] mb-4 md:mb-6 font-light animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100 fill-mode-both"
                         dangerouslySetInnerHTML={{
                           __html: MAIN_BANNERS[currentIndex].heading.replace(
                             /Your Forever Moments|Heritage|Remembered|Lasts Forever|Most Precious Moments/,
-                            (match) => `<span class="italic text-champagne/90">${match}</span>`
+                            (match: string) => `<span class="italic text-champagne/90">${match}</span>`
                           )
                         }}
                       />
                       
                       {MAIN_BANNERS[currentIndex].description && (
-                        <motion.p 
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                          className="hidden md:block text-sm md:text-base mb-10 max-w-sm font-light text-ivory/80 leading-relaxed line-clamp-3"
+                        <p 
+                          className="hidden md:block text-sm md:text-base mb-10 max-w-sm font-light text-ivory/80 leading-relaxed line-clamp-3 animate-in fade-in duration-700 delay-300 fill-mode-both"
                         >
                           {MAIN_BANNERS[currentIndex].description}
-                        </motion.p>
+                        </p>
                       )}
                       
                       {MAIN_BANNERS[currentIndex].cta && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+                        <div className="animate-in fade-in duration-700 delay-500 fill-mode-both">
                           <Link 
                             href={MAIN_BANNERS[currentIndex].ctaUrl || "#"}
                             className="inline-flex items-center space-x-4 border border-champagne/50 hover:border-champagne hover:bg-champagne/10 px-8 py-3.5 transition-all duration-300 text-xs tracking-widest uppercase text-champagne"
@@ -173,10 +165,9 @@ export function Hero() {
                             <span>{MAIN_BANNERS[currentIndex].cta}</span>
                             <span className="w-8 h-[1px] bg-champagne inline-block" />
                           </Link>
-                        </motion.div>
+                        </div>
                       )}
-                    </motion.div>
-                  </AnimatePresence>
+                    </div>
                 </div>
               </div>
             </div>
@@ -186,11 +177,10 @@ export function Hero() {
               <>
                 <div className="absolute bottom-8 left-4 md:left-12 flex items-center space-x-8 z-20">
                   {/* Progress Bar */}
-                  <div className="hidden md:block w-32 h-[1px] bg-white/20 relative">
-                    <motion.div 
-                      className="absolute top-0 left-0 h-full bg-champagne"
+                  <div className="hidden md:block w-32 h-[1px] bg-white/20 relative overflow-hidden">
+                    <div 
+                      className="absolute top-0 left-0 h-full bg-champagne transition-all duration-[30ms] ease-linear"
                       style={{ width: `${progress}%` }}
-                      transition={{ ease: "linear" }}
                     />
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DesktopNav } from "./DesktopNav";
@@ -11,7 +11,11 @@ import { useStore } from "@/store/useStore";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+  const lastScrollYRef = useRef(lastScrollY);
+  
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -22,7 +26,17 @@ export function Navbar() {
   useEffect(() => {
     setIsMounted(true);
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 30);
+      
+      // Hide on scroll down past category (approx 500px), show on scroll up
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 500) {
+        setIsHidden(true);
+      } else if (currentScrollY < lastScrollYRef.current) {
+        setIsHidden(false);
+      }
+      
+      lastScrollYRef.current = currentScrollY;
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     // Initialize state on mount
@@ -38,7 +52,7 @@ export function Navbar() {
         isScrolled 
           ? "bg-ivory/95 backdrop-blur-md shadow-sm text-charcoal border-b border-charcoal/5" 
           : "bg-transparent text-charcoal"
-      }`}
+      } ${isHidden ? "-translate-y-full" : "translate-y-0"}`}
     >
       <div className="max-w-[1920px] mx-auto px-4 md:px-8 h-[72px] md:h-[82px] flex items-center justify-between">
         

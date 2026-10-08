@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
 import { useStore } from "@/store/useStore";
+import { LazyVideo } from "@/components/ui/LazyVideo";
 import { ProductCard } from "@/components/product/ProductCard";
+import { Reveal } from "@/components/ui/Reveal";
 
 export function BehindTheCraftSection() {
   const allProducts = useStore((s) => s.products);
@@ -64,7 +66,7 @@ export function BehindTheCraftSection() {
 
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8 bg-white/5 rounded-2xl p-4 md:p-6 lg:p-8 border border-white/10">
           {/* Video Area */}
-          <div className="relative w-full lg:w-3/5 aspect-video rounded-xl overflow-hidden group border border-white/10 bg-black flex justify-center items-center">
+          <Reveal direction="left" className="relative w-full lg:w-3/5 aspect-video rounded-xl overflow-hidden group border border-white/10 bg-black flex justify-center items-center">
             {defaultVideoUrl ? (
               defaultVideoUrl.includes("youtube.com") || defaultVideoUrl.includes("vimeo.com") ? (
                 <iframe
@@ -75,7 +77,7 @@ export function BehindTheCraftSection() {
                   allowFullScreen
                 ></iframe>
               ) : (
-                <video
+                <LazyVideo
                   src={defaultVideoUrl}
                   className="w-full h-full object-contain"
                   autoPlay
@@ -93,10 +95,10 @@ export function BehindTheCraftSection() {
                 className="object-cover opacity-80"
               />
             )}
-          </div>
+          </Reveal>
 
           {/* Content Area */}
-          <div className="flex flex-col justify-center w-full lg:w-2/5 space-y-4">
+          <Reveal direction="right" className="flex flex-col justify-center w-full lg:w-2/5 space-y-4">
             <h3 className="font-serif text-2xl md:text-3xl text-white">{title}</h3>
             <p className="text-gray-400 text-sm md:text-base leading-relaxed">
               {description}
@@ -114,7 +116,7 @@ export function BehindTheCraftSection() {
                 </div>
               </div>
             )}
-          </div>
+          </Reveal>
         </div>
 
       </div>
