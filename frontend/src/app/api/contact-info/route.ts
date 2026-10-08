@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/db';
+import { connectToDatabase } from '@/lib/db';
 import { ContactInfo } from '@/models/ContactInfo';
 
 export async function GET() {
   try {
-    await dbConnect();
+    await connectToDatabase();
     let info = await ContactInfo.findOne({});
     if (!info) {
       info = await ContactInfo.create({});
@@ -18,7 +18,7 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    await dbConnect();
+    await connectToDatabase();
     const body = await req.json();
     
     let info = await ContactInfo.findOne({});

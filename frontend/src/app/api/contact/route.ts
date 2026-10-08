@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/db';
+import { connectToDatabase } from '@/lib/db';
 import { ContactSubmission } from '@/models/ContactSubmission';
 
 export async function POST(req: Request) {
   try {
-    await dbConnect();
+    await connectToDatabase();
     
     const body = await req.json();
     const { name, email, phone, message } = body;
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    await dbConnect();
+    await connectToDatabase();
     const messages = await ContactSubmission.find({}).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: messages }, { status: 200 });
   } catch (error: any) {

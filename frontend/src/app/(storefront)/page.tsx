@@ -10,8 +10,6 @@ import { BridalCollectionSection } from "@/components/home/BridalCollectionSecti
 import { TrendingInSocietySection } from "@/components/home/TrendingInSocietySection";
 import { CuratedHeritageSection } from "@/components/home/CuratedHeritageSection";
 import { GiftingStudioSection } from "@/components/home/GiftingStudioSection";
-import { ContactUsSection } from "@/components/home/ContactUsSection";
-import { AboutSection } from "@/components/home/AboutSection";
 import { CustomerReviewsSection } from "@/components/home/CustomerReviewsSection";
 import { ShopByOccasionSection } from "@/components/home/ShopByOccasion";
 
@@ -30,8 +28,6 @@ export default function Home() {
       <SignatureProductCarousel />
       <DealOfTheDay />
       <GiftingStudioSection />
-      <AboutSection />
-      <ContactUsSection />
       <CustomerReviewsSection />
     </div>
   );
