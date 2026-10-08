@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -25,7 +25,9 @@ import {
   History,
   Gem,
   Trash2,
-  ArrowRight
+  ArrowRight,
+  Flame,
+  Star
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -52,6 +54,18 @@ export default function ProductPage() {
   }, [product?.id]); // Only trigger when product ID changes
 
   const isWishlisted = product ? wishlist.some((p) => p.id === product.id) : false;
+
+  const adoreScrollRef = useRef<HTMLDivElement>(null);
+  const similarScrollRef = useRef<HTMLDivElement>(null);
+  const historyScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollContainer = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
+    if (ref.current && ref.current.firstElementChild) {
+      // Get the width of one product card plus the gap (24px for gap-6)
+      const scrollAmount = ref.current.firstElementChild.clientWidth + 24;
+      ref.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   // Selected State
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -213,13 +227,19 @@ export default function ProductPage() {
   };
 
   // Related products and Recently viewed
+  const adoreProducts = products.filter((p) => p.id !== product?.id).slice(0, 8);
   let similarProducts = products.filter((p) => p.category === product?.category && p.id !== product?.id);
   if (similarProducts.length === 0) {
     similarProducts = products.filter((p) => p.id !== product?.id);
   }
-  similarProducts = similarProducts.slice(0, 4);
+  similarProducts = similarProducts.slice(0, 8);
   
-  const historyProducts = recentlyViewed.filter((p) => p.id !== product?.id).slice(0, 4);
+  let historyProducts = recentlyViewed.filter((p) => p.id !== product?.id);
+  if (historyProducts.length === 0) {
+    historyProducts = products.filter((p) => p.id !== product?.id).slice(0, 8); // Fallback to popular products or any products
+  } else {
+    historyProducts = historyProducts.slice(0, 8);
+  }
 
   return (
     <div className="bg-[#FAF8F5] pt-28 pb-24 min-h-screen">
@@ -673,28 +693,56 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* ── PRODUCT STORY SECTION (Editorial Luxury Banner) ── */}
-        <div className="my-24 bg-white rounded-2xl border border-[#EAE4D9] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12 shadow-sm">
-          <div className="w-full lg:w-1/2 space-y-6">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-[#8C8275] uppercase block">
-              THE STORY
-            </span>
-            <h2 className="font-serif text-3xl md:text-5xl text-[#2C2825] leading-tight">
-              Crafted with Grace &amp; Intention
-            </h2>
-            <p className="text-sm text-[#5C554E] leading-relaxed font-light">
-              Every curve of the {product.name} is shaped by master artisans with decades of heritage crafting experience. Designed to reflect light from every angle, this piece embodies timeless sophistication for life’s unforgettable moments.
-            </p>
+
+
+        {/* ── YOU MAY ALSO ADORE SECTION ── */}
+        {adoreProducts.length > 0 && (
+          <div className="mt-20 pt-16 border-t border-[#EAE4D9]">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-500 flex items-center justify-center shrink-0 mt-1">
+                  <Flame size={20} />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-3 mb-1">
+                    <h2 className="font-serif text-2xl md:text-3xl text-charcoal font-semibold">
+                      You May Also Adore
+                    </h2>
+                    <span className="bg-[#6B46C1] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      CURATED
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">Handpicked royal vault recommendations tailored to your taste</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <Link
+                  href="/catalogue"
+                  className="text-sm font-semibold text-[#6B46C1] hover:text-[#553C9A] transition-colors flex items-center"
+                >
+                  Discover All <ArrowRight size={16} className="ml-1" />
+                </Link>
+                <div className="hidden md:flex space-x-2">
+                  <button onClick={() => scrollContainer(adoreScrollRef, 'left')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                    <ChevronLeft size={20} />
+                  </button>
+                  <button onClick={() => scrollContainer(adoreScrollRef, 'right')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div ref={adoreScrollRef} className="flex overflow-x-auto hide-scrollbar gap-6 pb-8 snap-x">
+              {adoreProducts.map((prod) => (
+                <div key={prod.id} className="w-[85vw] sm:w-[45vw] md:w-[30vw] lg:w-[22%] shrink-0 snap-start">
+                  <ProductCard product={prod} />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="w-full lg:w-1/2 relative h-[320px] md:h-[400px] rounded-xl overflow-hidden">
-            <Image
-              src={mediaItems.find(m => m.type === "image")?.url || "/images/products/rings/ring_placeholder.jpg"}
-              alt={product.name}
-              fill
-              className="object-cover"
-            />
-          </div>
-        </div>
+        )}
 
         {/* ── SIMILAR FINE DESIGNS SECTION ── */}
         {similarProducts.length > 0 && (
@@ -725,19 +773,21 @@ export default function ProductPage() {
                   Explore Collection <ArrowRight size={16} className="ml-1" />
                 </Link>
                 <div className="hidden md:flex space-x-2">
-                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                  <button onClick={() => scrollContainer(similarScrollRef, 'left')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronLeft size={20} />
                   </button>
-                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                  <button onClick={() => scrollContainer(similarScrollRef, 'right')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronRight size={20} />
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div ref={similarScrollRef} className="flex overflow-x-auto hide-scrollbar gap-6 pb-8 snap-x">
               {similarProducts.map((prod) => (
-                <ProductCard key={prod.id} product={prod} />
+                <div key={prod.id} className="w-[85vw] sm:w-[45vw] md:w-[30vw] lg:w-[22%] shrink-0 snap-start">
+                  <ProductCard product={prod} />
+                </div>
               ))}
             </div>
           </div>
@@ -772,19 +822,21 @@ export default function ProductPage() {
                   <Trash2 size={16} className="mr-1" /> Clear
                 </button>
                 <div className="hidden md:flex space-x-2">
-                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                  <button onClick={() => scrollContainer(historyScrollRef, 'left')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronLeft size={20} />
                   </button>
-                  <button className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
+                  <button onClick={() => scrollContainer(historyScrollRef, 'right')} className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-charcoal transition-colors">
                     <ChevronRight size={20} />
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div ref={historyScrollRef} className="flex overflow-x-auto hide-scrollbar gap-6 pb-8 snap-x">
               {historyProducts.map((prod) => (
-                <ProductCard key={prod.id} product={prod} />
+                <div key={prod.id} className="w-[85vw] sm:w-[45vw] md:w-[30vw] lg:w-[22%] shrink-0 snap-start">
+                  <ProductCard product={prod} />
+                </div>
               ))}
             </div>
           </div>
