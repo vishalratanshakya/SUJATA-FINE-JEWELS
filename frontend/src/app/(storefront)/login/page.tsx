@@ -41,7 +41,7 @@ export default function LoginPage() {
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Welcome back! Successfully logged in.");
-      router.push("/account");
+      router.push("/");
     }, 1200);
   };
 

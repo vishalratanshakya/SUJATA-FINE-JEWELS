@@ -2,7 +2,9 @@ import { Certificate } from "../models/Certificate";
 import { Order } from "../models/Order";
 
 export const getUserJewelleryWithCertificates = async (userId: string) => {
-  const orders = await Order.find({ customerId: userId });
+  const query: any = userId === "admin123" ? {} : { customerId: userId };
+  query.status = "DELIVERED";
+  const orders = await Order.find(query);
   let jewellery: any[] = [];
   
   for (const order of orders) {

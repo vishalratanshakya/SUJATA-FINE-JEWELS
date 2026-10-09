@@ -32,7 +32,7 @@ export function RightActions() {
       
       {/* Search */}
       <Link 
-        href="/search"
+        href="/shop"
         aria-label="Search" 
         className="hover:text-champagne transition-colors duration-200"
       >

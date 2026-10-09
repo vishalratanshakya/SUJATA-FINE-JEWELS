@@ -16,11 +16,25 @@ export default function ViewCertificatePage() {
   const [certificate, setCertificate] = useState<CertificateData | null>(null);
 
   useEffect(() => {
-    // In a real app, fetch from backend. Here we use the mock data.
-    const cert = INITIAL_CERTIFICATES.find((c) => c.certId === certId);
-    if (cert) {
-      setCertificate(cert);
-    }
+    const fetchCertificate = async () => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${backendUrl}/api/certificates/my-jewellery`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const target = data.data.find((item: any) => item.certificate.certId === certId);
+          if (target) {
+            setCertificate(target.certificate);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch certificate", error);
+      }
+    };
+    fetchCertificate();
   }, [certId]);
 
   if (!certificate) return <div className="p-8 text-center text-[#8C8275]">Loading certificate...</div>;

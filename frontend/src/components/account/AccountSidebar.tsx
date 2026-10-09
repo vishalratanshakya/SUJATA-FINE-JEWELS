@@ -22,10 +22,11 @@ import {
   X
 } from "lucide-react";
 
-export function AccountSidebar({ unreadCount = 2 }: { unreadCount?: number }) {
+export function AccountSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number | undefined>(undefined);
 
   // Zustand cart state
   const cartItems = useStore((s) => s.cart);
@@ -36,6 +37,26 @@ export function AccountSidebar({ unreadCount = 2 }: { unreadCount?: number }) {
   const handleLogout = () => {
     logout();
   };
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${backendUrl}/api/notifications/my-notifications`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const unread = data.data?.filter((n: any) => !n.isRead).length;
+          setUnreadCount(unread > 0 ? unread : undefined);
+        }
+      } catch (e) {
+        // silently ignore error for badge
+      }
+    };
+    fetchUnreadCount();
+  }, []);
 
   const navItems = [
     { id: "overview", label: "Profile Overview", href: "/account", icon: User },

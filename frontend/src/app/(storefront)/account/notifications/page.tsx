@@ -148,12 +148,12 @@ export default function NotificationsPage() {
               <p className="text-sm">No notifications found.</p>
             </div>
           ) : (
-            filtered.map((item) => (
+            filtered.map((item, index) => (
               <Link
-                key={item._id}
+                key={item._id || item.id || `notif-${index}`}
                 href={getNotificationLink(item)}
-                onClick={() => handleNotificationClick(item._id, item.isRead)}
-                className={`p-5 rounded-2xl border transition-all flex items-start justify-between gap-4 block ${
+                onClick={() => handleNotificationClick(item._id || item.id, item.isRead)}
+                className={`p-5 rounded-2xl border transition-all flex items-start justify-between gap-4 ${
                   !item.isRead
                     ? "bg-[#FDFBF7] border-[#B38E5D]/40 shadow-2xs"
                     : "bg-[#FAF8F5] border-[#EAE4D9] hover:border-[#2C2825]"

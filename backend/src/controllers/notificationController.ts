@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { asyncHandler } from "../utils/asyncHandler";
 import { Notification } from "../models/Notification";
-import { sendResponse } from "../utils/sendResponse";
+import { sendResponse } from "../utils/apiResponse";
 
 // Get user notifications
 export const getMyNotifications = asyncHandler(async (req: any, res: Response) => {
