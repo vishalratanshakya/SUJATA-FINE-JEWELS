@@ -91,40 +91,40 @@ export default function ViewCertificatePage() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#B38E5D]/5 rounded-bl-full -z-0"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#B38E5D]/5 rounded-tr-full -z-0"></div>
 
-            <div className="relative z-10 flex flex-col items-center text-center space-y-8">
+            <div className="relative z-10 flex flex-col items-center text-center space-y-8 print:space-y-4">
               
-              <div className="space-y-4 border-b border-[#EAE4D9] pb-8 w-full">
+              <div className="space-y-4 print:space-y-2 border-b border-[#EAE4D9] pb-8 print:pb-4 w-full">
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-full bg-[#2C2825] text-[#B38E5D] flex items-center justify-center shadow-sm">
-                    <Award size={32} />
+                  <div className="w-16 h-16 print:w-12 print:h-12 rounded-full bg-[#2C2825] text-[#B38E5D] flex items-center justify-center shadow-sm">
+                    <Award size={24} className="print:w-6 print:h-6" />
                   </div>
                 </div>
-                <h2 className="font-serif text-3xl sm:text-4xl text-[#2C2825] uppercase tracking-widest">
+                <h2 className="font-serif text-3xl sm:text-4xl print:text-2xl text-[#2C2825] uppercase tracking-widest">
                   Sujata Fine Jewels
                 </h2>
-                <p className="text-sm font-serif text-[#8C8275] italic tracking-wide max-w-lg mx-auto">
+                <p className="text-sm print:text-xs font-serif text-[#8C8275] italic tracking-wide max-w-lg mx-auto">
                   This document certifies that the jewellery described below is an authentic creation of SUJATA Fine Jewels, crafted with genuine materials as specified.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full text-left pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-12 print:gap-8 w-full text-left pt-4 print:pt-2">
                 
-                <div className="space-y-6">
+                <div className="space-y-6 print:space-y-3">
                   <div className="relative aspect-square w-full max-w-xs mx-auto rounded-xl overflow-hidden border-4 border-white shadow-md bg-white">
                     <Image src={certificate.productImage} alt={certificate.productName} fill className="object-cover" />
                   </div>
                   <div className="text-center space-y-1">
-                    <h3 className="font-serif text-2xl text-[#2C2825]">{certificate.productName}</h3>
-                    <p className="text-xs text-[#8C8275] font-mono tracking-widest">{certificate.sku}</p>
+                    <h3 className="font-serif text-2xl print:text-lg text-[#2C2825]">{certificate.productName}</h3>
+                    <p className="text-xs print:text-[10px] text-[#8C8275] font-mono tracking-widest">{certificate.sku}</p>
                   </div>
                 </div>
 
-                <div className="space-y-8">
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#B38E5D] border-b border-[#EAE4D9] pb-2">
+                <div className="space-y-8 print:space-y-4">
+                  <div className="space-y-4 print:space-y-2">
+                    <h4 className="text-xs print:text-[10px] font-bold uppercase tracking-widest text-[#B38E5D] border-b border-[#EAE4D9] pb-2">
                       Product Specifications
                     </h4>
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                    <div className="grid grid-cols-2 gap-y-4 print:gap-y-2 gap-x-8 text-sm print:text-xs">
                       <div className="space-y-1">
                         <span className="text-[10px] uppercase tracking-wider text-[#8C8275]">Metal</span>
                         <p className="font-medium text-[#2C2825]">{certificate.metalType}</p>
@@ -144,18 +144,18 @@ export default function ViewCertificatePage() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#B38E5D] border-b border-[#EAE4D9] pb-2">
+                  <div className="space-y-4 print:space-y-2">
+                    <h4 className="text-xs print:text-[10px] font-bold uppercase tracking-widest text-[#B38E5D] border-b border-[#EAE4D9] pb-2">
                       Gemstone Details
                     </h4>
-                    <p className="text-sm font-medium text-[#2C2825]">{certificate.gemstoneDetails}</p>
+                    <p className="text-sm print:text-xs font-medium text-[#2C2825]">{certificate.gemstoneDetails}</p>
                   </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#B38E5D] border-b border-[#EAE4D9] pb-2">
+                  <div className="space-y-4 print:space-y-2">
+                    <h4 className="text-xs print:text-[10px] font-bold uppercase tracking-widest text-[#B38E5D] border-b border-[#EAE4D9] pb-2">
                       Certification &amp; Ownership
                     </h4>
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm">
+                    <div className="grid grid-cols-2 gap-y-4 print:gap-y-2 gap-x-8 text-sm print:text-xs">
                       <div className="space-y-1">
                         <span className="text-[10px] uppercase tracking-wider text-[#8C8275]">Issued To</span>
                         <p className="font-medium text-[#2C2825]">{certificate.customerName}</p>
