@@ -41,8 +41,30 @@ export default function ViewCertificatePage() {
 
   return (
     <AccountLayoutWrapper>
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#EAE4D9] shadow-xs space-y-6">
-        <div className="flex items-center justify-between border-b border-[#F2EDE4] pb-6">
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #printable-certificate, #printable-certificate * {
+            visibility: visible;
+          }
+          #printable-certificate {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 20px;
+            border: none !important;
+          }
+          @page {
+            margin: 0;
+          }
+        }
+      `}} />
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#EAE4D9] shadow-xs space-y-6 print:border-none print:shadow-none print:p-0">
+        <div className="flex items-center justify-between border-b border-[#F2EDE4] pb-6 print:hidden">
           <div className="flex items-center space-x-4">
             <Link href="/account/my-jewellery" className="w-10 h-10 rounded-full border border-[#EAE4D9] flex items-center justify-center text-[#8C8275] hover:bg-[#FAF8F5] transition-colors">
               <ArrowLeft size={18} />
@@ -63,8 +85,8 @@ export default function ViewCertificatePage() {
           </button>
         </div>
 
-        <div className="max-w-4xl mx-auto py-8">
-          <div className="bg-[#FAF8F5] rounded-2xl border-2 border-[#EAE4D9] p-8 sm:p-12 relative overflow-hidden print:border-4 print:border-[#2C2825] print:bg-white">
+        <div className="max-w-4xl mx-auto py-8 print:py-0">
+          <div id="printable-certificate" className="bg-[#FAF8F5] rounded-2xl border-2 border-[#EAE4D9] p-8 sm:p-12 relative overflow-hidden print:border-none print:bg-white">
             
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#B38E5D]/5 rounded-bl-full -z-0"></div>
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#B38E5D]/5 rounded-tr-full -z-0"></div>
