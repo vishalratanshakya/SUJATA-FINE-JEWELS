@@ -31,6 +31,7 @@ export interface IOrder extends Document {
   paymentMethod?: string;
   couponCode?: string;
   discountAmount?: number;
+  trackingId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,6 +74,7 @@ const OrderSchema = new Schema<IOrder>(
     paymentMethod: { type: String, default: "COD" },
     couponCode: { type: String },
     discountAmount: { type: Number, default: 0 },
+    trackingId: { type: String },
   },
   { timestamps: true }
 );

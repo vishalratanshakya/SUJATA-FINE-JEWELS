@@ -8,7 +8,17 @@ const generateOrderId = () => `ORD-${Math.floor(100000 + Math.random() * 900000)
 export const createOrder = async (userId: string, data: any) => {
   const { items, totalAmount, shippingAddress, paymentMethod, couponCode, discountAmount } = data;
 
-  const user = await User.findById(userId);
+  let user;
+  if (userId === "admin123") {
+    user = {
+      _id: "admin123",
+      name: "Super Admin",
+      email: process.env.ADMIN_EMAIL || "admin@sujatafinejewels.com"
+    };
+  } else {
+    user = await User.findById(userId);
+  }
+  
   if (!user) throw new Error("User not found");
 
   if (!items || items.length === 0) {

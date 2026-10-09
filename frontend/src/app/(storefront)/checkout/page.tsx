@@ -63,8 +63,12 @@ export default function CheckoutPage() {
         if (res.ok) {
           const data = await res.json();
           setAvailableCoupons(data.data || []);
+        } else {
+          console.error("Coupons fetch failed:", res.status, await res.text());
         }
-      } catch { /* silent */ }
+      } catch (err) {
+        console.error("Coupons fetch error:", err);
+      }
     };
     fetchData();
   }, []);
@@ -222,8 +226,8 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-ivory pt-24 pb-20 px-4 md:px-8">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-12">
 
-          {/* LEFT */}
-          <div className="w-full md:w-3/5">
+          {/* LEFT — form (order-1 on mobile & desktop) */}
+          <div className="w-full md:w-3/5 order-1">
             <Link href="/" className="font-serif text-2xl text-charcoal mb-8 block tracking-wider">SUJATA</Link>
             <div className="flex items-center space-x-2 text-[10px] uppercase tracking-widest text-charcoal/50 mb-10">
               <span className={step === "information" ? "text-charcoal font-bold" : ""}>Information & Shipping</span>
@@ -231,7 +235,7 @@ export default function CheckoutPage() {
               <span className={step === "payment" ? "text-charcoal font-bold" : ""}>Payment</span>
             </div>
 
-            <form className="space-y-8" onSubmit={handleContinue}>
+            <form id="checkout-form" className="space-y-8" onSubmit={handleContinue}>
               {step === "information" && (
                 <>
                   <section>
@@ -341,21 +345,19 @@ export default function CheckoutPage() {
                       )}
                     </div>
                   </div>
+                  {/* No button here — Complete Order is in the right column under the Total */}
                 </section>
               )}
 
-              <button type="submit" className="w-full bg-charcoal text-ivory text-xs tracking-widest uppercase py-4 hover:bg-champagne hover:text-white transition-colors">
-                {step === "information" ? "Continue to Payment" : "Complete Order"}
-              </button>
             </form>
           </div>
 
-          {/* RIGHT: Order Summary */}
-          <div className="w-full md:w-2/5 bg-charcoal/5 p-8 border-l border-charcoal/10 self-start sticky top-24">
+          {/* RIGHT: Order Summary — order-2 on mobile & desktop */}
+          <div className="w-full md:w-2/5 bg-charcoal/5 p-8 border-l border-charcoal/10 self-start md:sticky md:top-24 order-2">
             <h2 className="font-serif text-xl text-charcoal mb-6">Order Summary</h2>
 
-            {/* Cart Items with quantity controls */}
-            <div className="max-h-[40vh] overflow-y-auto mb-6 pr-1 space-y-4">
+            {/* Cart Items with quantity + remove controls */}
+            <div className="md:max-h-[40vh] max-h-none md:overflow-y-auto mb-6 pr-1 space-y-4">
               {cart.map((item, index) => (
                 <div key={`${item.product.id}-${index}`} className="flex space-x-3">
                   <div className="w-18 h-18 min-w-[72px] min-h-[72px] bg-white relative rounded-lg overflow-hidden border border-charcoal/10 shadow-sm">
@@ -363,14 +365,24 @@ export default function CheckoutPage() {
                       alt={item.product.name} fill sizes="72px" className="object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-charcoal line-clamp-2 leading-snug mb-1">{item.product.name}</p>
+                    <div className="flex items-start justify-between gap-1 mb-1">
+                      <p className="text-xs font-semibold text-charcoal line-clamp-2 leading-snug flex-1">{item.product.name}</p>
+                      {/* Remove button — clears stale/unwanted cart items */}
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart(item.product.id)}
+                        className="flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-charcoal/10 hover:bg-red-100 hover:text-red-600 text-charcoal/40 transition-colors ml-1"
+                        title="Remove item"
+                      >
+                        <X size={10} />
+                      </button>
+                    </div>
                     {item.product.metal && (
                       <span className="text-[10px] uppercase tracking-wider text-charcoal/50 bg-white px-1.5 py-0.5 rounded border border-charcoal/10 inline-block mb-2">
                         {item.product.metal}
                       </span>
                     )}
                     <div className="flex items-center justify-between">
-                      {/* Quantity controls */}
                       <div className="flex items-center border border-charcoal/20 rounded">
                         <button type="button"
                           onClick={() => item.quantity <= 1 ? removeFromCart(item.product.id) : updateQuantity(item.product.id, item.quantity - 1)}
@@ -453,6 +465,26 @@ export default function CheckoutPage() {
             <div className="border-t border-charcoal/10 pt-4 mt-2 flex justify-between text-lg font-semibold text-charcoal">
               <span>Total</span><span>{formatPrice(finalTotal)}</span>
             </div>
+
+            {/* Action button — always under the Total on ALL screen sizes */}
+            {step === "information" && (
+              <button
+                form="checkout-form"
+                type="submit"
+                className="w-full mt-5 bg-charcoal text-ivory text-xs tracking-widest uppercase py-4 hover:bg-champagne hover:text-white transition-colors"
+              >
+                Continue to Payment
+              </button>
+            )}
+            {step === "payment" && (
+              <button
+                form="checkout-form"
+                type="submit"
+                className="w-full mt-5 bg-charcoal text-ivory text-xs tracking-widest uppercase py-4 hover:bg-champagne hover:text-white transition-colors"
+              >
+                Complete Order
+              </button>
+            )}
           </div>
 
         </div>

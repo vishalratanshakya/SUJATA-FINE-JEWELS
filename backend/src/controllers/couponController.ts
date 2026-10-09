@@ -46,9 +46,17 @@ export const validateCoupon = asyncHandler(async (req: Request, res: Response) =
   });
 });
 
-// GET /api/coupons — Public: list all active coupons
+// GET /api/coupons — Public: list all active, non-expired coupons
 export const getActiveCoupons = asyncHandler(async (req: Request, res: Response) => {
-  const coupons = await Coupon.find({ isActive: true }).sort({ createdAt: -1 });
+  const now = new Date();
+  const coupons = await Coupon.find({
+    isActive: true,
+    $or: [
+      { expiresAt: { $exists: false } },
+      { expiresAt: null },
+      { expiresAt: { $gt: now } },
+    ],
+  }).sort({ createdAt: -1 });
   sendResponse(res, 200, true, "Active coupons retrieved", coupons);
 });
 
