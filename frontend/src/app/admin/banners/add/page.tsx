@@ -29,7 +29,7 @@ export default function AddBannerPage() {
     if (!newBannerForm.image?.trim()) { toast.error("Image is required"); return; }
     
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const nextId = heroBanners.length > 0 ? Math.max(...heroBanners.map((b) => b.id)) + 1 : 1;
       const bannerData = { ...newBannerForm, id: nextId };
 

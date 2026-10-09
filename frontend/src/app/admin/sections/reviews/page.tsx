@@ -84,7 +84,7 @@ export default function AdminReviewsPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/reviews/${editingReview._id}`
         : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/reviews`;
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       
       const res = await fetch(url, {
         method,
@@ -113,7 +113,7 @@ export default function AdminReviewsPage() {
     if (!confirm(`Are you sure you want to delete review by "${name}"?`)) return;
     
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/reviews/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
@@ -132,7 +132,7 @@ export default function AdminReviewsPage() {
 
   const toggleApproval = async (review: any) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/reviews/${review._id}`, {
         method: "PUT",
         headers: { 

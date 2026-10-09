@@ -25,7 +25,7 @@ export default function AdminCouponsPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState(defaultForm);
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") || localStorage.getItem("token") : "";
+  const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") || localStorage.getItem("adminToken") : "";
 
   const fetchCoupons = async () => {
     try {

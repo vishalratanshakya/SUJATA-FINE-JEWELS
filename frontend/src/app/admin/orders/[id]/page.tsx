@@ -55,7 +55,7 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
   const [updating, setUpdating] = useState(false);
 
   const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-  const getToken = () => localStorage.getItem("token") || "";
+  const getToken = () => localStorage.getItem("adminToken") || "";
 
   const fetchOrder = useCallback(async () => {
     setLoading(true);

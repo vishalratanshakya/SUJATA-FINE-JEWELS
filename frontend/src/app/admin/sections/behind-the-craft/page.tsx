@@ -95,7 +95,7 @@ export default function AdminBehindTheCraftPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/craft-stories/${editingStory._id}`
         : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/craft-stories`;
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       
       const res = await fetch(url, {
         method,
@@ -124,7 +124,7 @@ export default function AdminBehindTheCraftPage() {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
     
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/craft-stories/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }

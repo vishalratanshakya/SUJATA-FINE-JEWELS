@@ -76,7 +76,7 @@ export default function AdminBannersPage() {
     if (!editingId) return;
     if (!editForm.heading?.trim()) { toast.error("Heading is required"); return; }
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${editingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -118,7 +118,7 @@ export default function AdminBannersPage() {
       if (data.success) {
         const objectUrl = data.url;
         
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("adminToken");
         await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${uploadingId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -144,7 +144,7 @@ export default function AdminBannersPage() {
     [newBanners[index - 1], newBanners[index]] = [newBanners[index], newBanners[index - 1]];
     
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/reorder`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -162,7 +162,7 @@ export default function AdminBannersPage() {
     [newBanners[index], newBanners[index + 1]] = [newBanners[index + 1], newBanners[index]];
     
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/reorder`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -177,7 +177,7 @@ export default function AdminBannersPage() {
   const toggleActive = async (banner: HeroBanner) => {
     const updatedState = { active: !banner.active };
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${banner.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -192,7 +192,7 @@ export default function AdminBannersPage() {
 
   const saveAnnouncement = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/announcement-bar`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -233,7 +233,7 @@ export default function AdminBannersPage() {
               onClick={async () => {
                 const newState = { active: !announcementBar.active };
                 try {
-                  const token = localStorage.getItem("token");
+                  const token = localStorage.getItem("adminToken");
                   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/announcement-bar`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -555,7 +555,7 @@ export default function AdminBannersPage() {
                       onClick={async () => {
                         if (window.confirm("Are you sure you want to delete this banner?")) {
                           try {
-                            const token = localStorage.getItem("token");
+                            const token = localStorage.getItem("adminToken");
                             await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/hero-banners/${banner.id}`, {
                               method: "DELETE",
                               headers: { Authorization: `Bearer ${token}` }

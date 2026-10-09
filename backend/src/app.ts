@@ -21,6 +21,7 @@ import reviewRoutes from "./routes/reviewRoutes";
 import contactRoutes from "./routes/contactRoutes";
 import newsletterRoutes from "./routes/newsletterRoutes";
 import couponRoutes from "./routes/couponRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 dotenv.config();
 
 const app = express();
@@ -56,6 +57,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/newsletter", newsletterRoutes);
 app.use("/api/coupons", couponRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date() });

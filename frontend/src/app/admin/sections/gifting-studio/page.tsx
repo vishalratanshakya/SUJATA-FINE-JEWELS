@@ -99,7 +99,7 @@ export default function AdminGiftingStudioPage() {
         ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/gifting-collections/${editingCollection._id}`
         : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/gifting-collections`;
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       
       const res = await fetch(url, {
         method,
@@ -128,7 +128,7 @@ export default function AdminGiftingStudioPage() {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
     
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/gifting-collections/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }

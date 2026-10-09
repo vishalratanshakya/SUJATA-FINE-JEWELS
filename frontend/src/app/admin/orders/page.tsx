@@ -27,7 +27,7 @@ export default function AdminOrdersPage() {
     setLoading(true);
     try {
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("adminToken");
       const res = await fetch(`${backendUrl}/api/orders/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });

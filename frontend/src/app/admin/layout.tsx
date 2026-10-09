@@ -20,6 +20,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (isAdminLogin) return;
 
+    // Check if admin is authenticated
+    const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+    if (!adminToken) {
+      router.push("/admin/login");
+      return;
+    }
+
     // Connect to Backend Socket.IO
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
     const socket = io(backendUrl, {
@@ -42,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => {
       socket.disconnect();
     };
-  }, [isAdminLogin]);
+  }, [isAdminLogin, router]);
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {

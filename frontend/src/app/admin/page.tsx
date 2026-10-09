@@ -9,13 +9,50 @@ import {
 
 import Image from "next/image";
 import { useStore } from "@/store/useStore";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function AdminDashboardPage() {
   const products = useStore((s) => s.products);
-  const orders = useStore((s) => s.orders);
-  const customers = useStore((s) => s.customers);
+  
+  const [dashboardData, setDashboardData] = useState({
+    orders: [] as any[],
+    customers: [] as any[],
+    loading: true
+  });
 
-  const totalRevenue = orders.reduce((sum, o) => sum + (o.paymentStatus === 'paid' ? o.totalAmount : 0), 0);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+        const headers = { Authorization: `Bearer ${token}` };
+        
+        const [ordRes, custRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/orders/admin/all`, { headers }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"}/api/users`, { headers })
+        ]);
+        
+        const [ordData, custData] = await Promise.all([
+          ordRes.json(),
+          custRes.json()
+        ]);
+        
+        setDashboardData({
+          orders: ordData.success ? ordData.data : [],
+          customers: custData.success ? custData.data : [],
+          loading: false
+        });
+      } catch (error) {
+        console.error("Failed to load dashboard data", error);
+        setDashboardData(prev => ({ ...prev, loading: false }));
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  const { orders, customers, loading } = dashboardData;
+
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.status !== 'CANCELLED' ? (o.totalAmount || 0) : 0), 0);
 
   // Top Selling Products mock calculation
   const topProducts = products.slice(0, 5).map((p, i) => ({
@@ -27,12 +64,16 @@ export default function AdminDashboardPage() {
   }));
 
   // Order Status distribution counts
-  const pendingCount = orders.filter(o => o.status === 'pending').length || 12;
-  const processingCount = orders.filter(o => o.status === 'processing').length || 18;
-  const shippedCount = orders.filter(o => o.status === 'shipped').length || 24;
-  const deliveredCount = orders.filter(o => o.status === 'delivered').length || 28;
-  const cancelledCount = orders.filter(o => o.status === 'cancelled').length || 4;
-  const totalOrderCount = orders.length || 86;
+  const pendingCount = orders.filter(o => o.status === 'PENDING').length;
+  const processingCount = orders.filter(o => o.status === 'CONFIRMED').length; // Map CONFIRMED to processing
+  const shippedCount = orders.filter(o => o.status === 'SHIPPED').length;
+  const deliveredCount = orders.filter(o => o.status === 'DELIVERED').length;
+  const cancelledCount = orders.filter(o => o.status === 'CANCELLED').length;
+  const totalOrderCount = orders.length;
+
+  if (loading) {
+    return <div className="p-12 text-center text-gray-500">Loading dashboard...</div>;
+  }
 
   return (
     <div className="space-y-6 pb-12 select-none">
@@ -79,7 +120,7 @@ export default function AdminDashboardPage() {
         <div className="bg-[#F8F5FF] p-5 rounded-2xl border border-[#EADBFF] shadow-sm flex items-center justify-between relative overflow-hidden">
           <div className="space-y-1">
             <p className="text-xs font-semibold text-gray-500">Total Orders</p>
-            <p className="text-2xl font-bold font-serif text-gray-900">{orders.length || 86}</p>
+            <p className="text-2xl font-bold font-serif text-gray-900">{orders.length}</p>
             <p className="text-[10px] font-bold text-emerald-600 flex items-center pt-1">
               <ArrowUpRight size={12} className="mr-0.5" /> +18% from last month
             </p>
@@ -98,7 +139,7 @@ export default function AdminDashboardPage() {
         <div className="bg-[#F2FBF6] p-5 rounded-2xl border border-[#D1F3E0] shadow-sm flex items-center justify-between relative overflow-hidden">
           <div className="space-y-1">
             <p className="text-xs font-semibold text-gray-500">Total Customers</p>
-            <p className="text-2xl font-bold font-serif text-gray-900">{customers.length ? customers.length.toLocaleString() : '1,248'}</p>
+            <p className="text-2xl font-bold font-serif text-gray-900">{customers.length.toLocaleString()}</p>
             <p className="text-[10px] font-bold text-emerald-600 flex items-center pt-1">
               <ArrowUpRight size={12} className="mr-0.5" /> +24% from last month
             </p>
@@ -117,7 +158,7 @@ export default function AdminDashboardPage() {
         <div className="bg-[#FFF2F4] p-5 rounded-2xl border border-[#FCD6DC] shadow-sm flex items-center justify-between relative overflow-hidden">
           <div className="space-y-1">
             <p className="text-xs font-semibold text-gray-500">Total Revenue</p>
-            <p className="text-2xl font-bold font-serif text-gray-900">₹{totalRevenue ? totalRevenue.toLocaleString('en-IN') : '3,42,680'}</p>
+            <p className="text-2xl font-bold font-serif text-gray-900">₹{totalRevenue.toLocaleString('en-IN')}</p>
             <p className="text-[10px] font-bold text-emerald-600 flex items-center pt-1">
               <ArrowUpRight size={12} className="mr-0.5" /> +32% from last month
             </p>
@@ -345,23 +386,28 @@ export default function AdminDashboardPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {orders.slice(0, 5).map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50/50">
+                <tr key={order._id} className="hover:bg-gray-50/50">
                   <td className="py-2.5 font-mono font-bold text-amber-800 text-[11px]">
-                    <Link href={`/admin/orders/${order.id}`}>{order.orderNumber}</Link>
+                    <Link href={`/admin/orders/${order._id}`}>{order.orderId}</Link>
                   </td>
                   <td className="py-2.5 font-medium text-gray-900 truncate max-w-[90px]">{order.customerName}</td>
-                  <td className="py-2.5 text-right font-semibold text-gray-900">₹{order.totalAmount.toLocaleString('en-IN')}</td>
+                  <td className="py-2.5 text-right font-semibold text-gray-900">₹{order.totalAmount?.toLocaleString('en-IN') || 0}</td>
                   <td className="py-2.5 text-center">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold capitalize ${
-                      order.status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
-                      order.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                      order.status === 'shipped' ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'
+                      order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' :
+                      order.status === 'CONFIRMED' ? 'bg-blue-100 text-blue-800' :
+                      order.status === 'SHIPPED' ? 'bg-indigo-100 text-indigo-800' : 'bg-amber-100 text-amber-800'
                     }`}>
-                      {order.status}
+                      {order.status.toLowerCase()}
                     </span>
                   </td>
                 </tr>
               ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-gray-400">No orders yet</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -375,22 +421,25 @@ export default function AdminDashboardPage() {
 
           <div className="space-y-3">
             {customers.slice(0, 5).map((cust) => (
-              <div key={cust.id} className="flex items-center justify-between text-xs">
+              <div key={cust._id} className="flex items-center justify-between text-xs">
                 <div className="flex items-center space-x-2.5">
-                  <div className="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-[11px]">
+                  <div className="w-7 h-7 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-[11px] uppercase">
                     {cust.name.charAt(0)}
                   </div>
                   <div>
-                    <Link href={`/admin/customers/${cust.id}`} className="font-bold text-gray-900 hover:text-amber-800 truncate block max-w-[80px]">
+                    <Link href={`/admin/customers/${cust._id}`} className="font-bold text-gray-900 hover:text-amber-800 truncate block max-w-[80px]">
                       {cust.name}
                     </Link>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-gray-500">{cust.totalOrders} Orders</span>
+                  <span className="text-[10px] font-bold text-gray-500">{cust.totalOrders || 0} Orders</span>
                 </div>
               </div>
             ))}
+            {customers.length === 0 && (
+              <div className="py-8 text-center text-gray-400">No customers yet</div>
+            )}
           </div>
         </div>
 

@@ -54,7 +54,7 @@ export default function AdminAboutPage() {
     setSaving(true);
     try {
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const token = localStorage.getItem("token") || "";
+      const token = localStorage.getItem("adminToken") || "";
       const res = await fetch(`${backendUrl}/api/about`, {
         method: "PUT",
         headers: {

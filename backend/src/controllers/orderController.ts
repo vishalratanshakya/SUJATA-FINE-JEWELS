@@ -17,6 +17,18 @@ export const placeOrder = asyncHandler(async (req: any, res: Response) => {
       });
     }
 
+    try {
+      const { Notification } = require("../models/Notification");
+      await Notification.create({
+        userId: order.customerId,
+        title: "Order Placed Successfully",
+        message: `Your order ${order.orderId} has been placed successfully and is currently pending.`,
+        type: "ORDER"
+      });
+    } catch (err) {
+      console.error("Failed to create notification", err);
+    }
+
     sendResponse(res, 201, true, "Order placed successfully", order);
   } catch (error: any) {
     if (error.message === "User not found") {
@@ -80,6 +92,35 @@ export const updateOrderStatusAdmin = asyncHandler(async (req: any, res: Respons
 
   const order = await Order.findByIdAndUpdate(id, updateData, { new: true });
   if (!order) return sendResponse(res, 404, false, "Order not found");
+
+  // Create Notification
+  let notifTitle = "Order Updated";
+  let notifMessage = `Your order ${order.orderId} status has been updated to ${order.status}.`;
+  if (order.status === "DELIVERED") {
+    notifTitle = "Order Delivered";
+    notifMessage = `Your order ${order.orderId} has been delivered successfully.`;
+  } else if (order.status === "SHIPPED") {
+    notifTitle = "Order Shipped";
+    notifMessage = `Your order ${order.orderId} has been shipped. ${trackingId ? 'Tracking ID: ' + trackingId : ''}`;
+  } else if (order.status === "CONFIRMED") {
+    notifTitle = "Order Confirmed";
+    notifMessage = `Your order ${order.orderId} is confirmed and is being processed.`;
+  } else if (order.status === "CANCELLED") {
+    notifTitle = "Order Cancelled";
+    notifMessage = `Your order ${order.orderId} has been cancelled.`;
+  }
+
+  try {
+    const { Notification } = require("../models/Notification");
+    await Notification.create({
+      userId: order.customerId,
+      title: notifTitle,
+      message: notifMessage,
+      type: "ORDER"
+    });
+  } catch (err) {
+    console.error("Failed to create notification", err);
+  }
 
   sendResponse(res, 200, true, "Order status updated", order);
 });

@@ -30,7 +30,7 @@ export default function AccountOrdersPage() {
             });
             const statusColors: Record<string, string> = {
               "PENDING": "bg-gray-50 text-gray-700 border-gray-200",
-              "PROCESSING": "bg-amber-50 text-amber-700 border-amber-200",
+              "CONFIRMED": "bg-amber-50 text-amber-700 border-amber-200",
               "SHIPPED": "bg-blue-50 text-blue-700 border-blue-200",
               "DELIVERED": "bg-emerald-50 text-emerald-700 border-emerald-200",
               "CANCELLED": "bg-red-50 text-red-700 border-red-200"
@@ -87,7 +87,7 @@ export default function AccountOrdersPage() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Status Tabs */}
           <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar w-full sm:w-auto">
-            {["ALL", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"].map((f) => (
+            {["ALL", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}

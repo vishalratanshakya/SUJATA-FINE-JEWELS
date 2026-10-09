@@ -45,8 +45,8 @@ export default function AdminLoginPage() {
       
       setIsLoading(false);
       if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("adminToken", data.token);
+        localStorage.setItem("adminUser", JSON.stringify(data.user));
         document.cookie = "admin_token=true; path=/; max-age=86400; SameSite=Strict";
         toast.success("Welcome back to Admin Portal!");
         router.push("/admin");
